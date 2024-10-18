@@ -1,0 +1,175 @@
+.container {
+  width: 1170px;
+}
+
+.row {
+  margin-left: -15px;
+  margin-right: -15px;
+}
+
+.topbar {
+  padding: 8px 0 3px 0;
+  border-bottom: 1px solid #eee;
+  margin-bottom: -5px;
+}
+
+ul {
+  list-style: none outside;
+}
+
+a {
+  color: #575454;
+  font-weight: bolder;
+  text-decoration: none;
+}
+
+.bi {
+  margin-left: 5px;
+  padding-right: 5px;
+}
+
+.col-lg-6 {
+  width: 50%;
+}
+
+.account {
+  float: right;
+}
+
+.account li a {
+  display: block;
+  padding: 0 5px;
+}
+
+.account li {
+  display: inline-block;
+}
+
+.input-group {
+  width: 100%;
+}
+
+.input-group .form-control {
+  border-radius: 0;
+}
+
+.input-group-append .btn {
+  border-radius: 0;
+}
+
+.middle-header {
+  padding: 15px 0;
+  display: flex;
+  align-items: center;
+}
+
+.search-form {
+  position: relative;
+  width: 100%;
+}
+
+.search-form .form-control {
+  width: 100%;
+  padding-right: 45px;
+  border-radius: 25px;
+  background-color: #fef0ef;
+}
+
+.search-form .search-icon {
+  position: absolute;
+  background-color: #ed145b;
+  border-radius: 25px;
+  height: 33px;
+  line-height: 35px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+}
+
+.search-form .search-icon i {
+  font-size: 1.2rem;
+  color: #fff;
+  font-weight: bold;
+}
+
+.search-form .search-icon:hover {
+  background-color: #000000;
+  transition: color 0.3s ease;
+}
+
+.header-hotline {
+  display: flex;
+  float: right;
+}
+
+.header-hotline i {
+  font-size: 2em;
+  margin-right: 10px;
+}
+
+.hotline {
+  display: flex;
+  flex-direction: column;
+}
+
+.hotline p {
+  margin: 0;
+  font-weight: bold;
+  color: red;
+}
+
+.hotline a:hover {
+  color: #ed145b;
+  transition: color 0.3s ease;
+}
+
+.mini-cart i {
+  font-size: 2em;
+  margin-left: 20px;
+  color: #ed145b;
+}
+
+.bottom-header {
+  background-color: #ed145b;
+  height: 40px;
+  font-size: medium;
+}
+
+.main-nav ul {
+  display: flex;
+  justify-content: space-between;
+  padding: 0;
+  margin: 0;
+}
+
+.main-nav .nav-item:first-child {
+  margin-right: auto;
+  margin-left: -22px;
+}
+
+.main-nav {
+  padding: 7px 0;
+}
+
+.main-nav li.nav-item {
+  margin: 0 35px;
+}
+
+.main-nav i {
+  color: #fff;
+}
+
+.main-nav .right-nav li {
+  margin: 0 30px;
+}
+
+.main-nav .right-nav {
+  display: flex;
+}
+
+.main-nav span {
+  color: #fff;
+}
