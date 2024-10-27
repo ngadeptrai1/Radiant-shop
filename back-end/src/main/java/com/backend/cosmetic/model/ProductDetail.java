@@ -22,4 +22,12 @@ public class ProductDetail  extends BaseModel{
     private int discount;
 
     private int quantity;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "product_id" , referencedColumnName = "id")
+    private Product product;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "color_id" , referencedColumnName = "id")
+    private Color color ;
 }

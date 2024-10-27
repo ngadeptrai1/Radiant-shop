@@ -3,6 +3,8 @@ package com.backend.cosmetic.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Table(name = "products")
 @Entity
 @NoArgsConstructor
@@ -32,5 +34,9 @@ public class Product extends BaseModel {
     @JoinColumn(name = "brand_id",referencedColumnName = "id")
     private Brand brand;
 
+    @OneToMany(mappedBy="product",fetch = FetchType.LAZY)
+    private List<ProductImage> productImages;
 
+    @OneToMany(mappedBy="product",fetch = FetchType.LAZY)
+    private List<ProductDetail> productDetails;
 }
