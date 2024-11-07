@@ -11,11 +11,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.nio.file.attribute.UserPrincipal;
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,9 +33,13 @@ public class BrandController {
     @GetMapping({"","/"})
     public ResponseEntity<?> findAll(@RequestParam("page") Optional<Integer> pageNum,
                                      @RequestParam("size") Optional<Integer> size,
-                                     @RequestParam("sort")Optional<String> sort){
+                                     @RequestParam("sort")Optional<String> sort ,
+                                     @AuthenticationPrincipal UserDetails userDetails){
         Pageable page = PageRequest.of(pageNum.orElse(0),size.orElse(5), Sort.by(sort.orElse("id")).descending());
         try {
+            if (userDetails != null){
+                System.out.println(userDetails.getUsername());
+            }
             return ResponseEntity.status(HttpStatus.OK).body(brandService.findAll(page));
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());

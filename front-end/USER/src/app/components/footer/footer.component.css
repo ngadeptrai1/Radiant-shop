@@ -1,0 +1,122 @@
+.top-footer {
+  background-color: #d51561;
+}
+
+ul {
+  list-style: none outside;
+  margin: 0;
+  padding: 0;
+}
+
+.top-footer a {
+  text-decoration: none;
+  color: #fafbff;
+}
+
+.top-footer h4 {
+  font-family: "Arial", sans-serif;
+  text-transform: uppercase;
+  margin: 25px 0 25px 0;
+  font-size: 15px;
+  color: #fafbff;
+  font-weight: 700;
+}
+
+.top-footer ul li a {
+  font-size: 13px;
+  line-height: 35px;
+}
+
+.top-footer ul li a:hover {
+  color: #000000;
+}
+
+.ct_footer li {
+  display: flex;
+  margin-bottom: 15px;
+  color: #fafbff;
+}
+
+.ct_footer .icon-left {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.ct_footer .content_r {
+  font-size: 13px;
+}
+
+.bottom-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 15px 0;
+  background-color: #ee2d7a;
+  text-align: center;
+}
+
+.bottom-footer p {
+  color: #ffffff;
+  font-size: 13px;
+  margin: 0;
+}
+
+.bottom-footer a {
+  color: #ffffff;
+  text-decoration: none;
+  opacity: 0.8;
+}
+.link-icon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.link-icon img.filter-white {
+  filter: brightness(0) invert(1);
+}
+.link-icon img {
+  height: 25px;
+  -o-object-fit: contain;
+  object-fit: contain;
+}
+.title {
+  font-size: 15px;
+  color: #fafbff;
+  font-weight: 700;
+}
+.footer-click p {
+  font-size: 10px;
+  color: #ffffff;
+  white-space: nowrap;
+}
+.footer form {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  width: 300px;
+  background: #fff;
+  border: 1px solid #fff;
+  height: 34px;
+  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 35px;
+  overflow: hidden;
+}
+.footer form input {
+  height: 100%;
+  border: none !important;
+  outline: none;
+  box-shadow: none;
+  padding: 6px 16px !important;
+  font-size: 12px !important;
+}
+
+.footer form button {
+  background: #000;
+  color: #fff !important;
+  border-color: #000 !important;
+  height: 100%;
+  padding: 6px 15px !important;
+  font-size: 12px !important;
+  white-space: nowrap;
+  border-radius: 0 35px 35px 0 !important;
+}

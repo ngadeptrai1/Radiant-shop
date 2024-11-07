@@ -1,0 +1,137 @@
+<div class="header">
+  <!-- Top bar -->
+  <div class="topbar clearfix">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-6 d-none d-sm-block welcome">
+          Chào mừng bạn đến với Radiant Shop!
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 topbar-login">
+          <ul class="account">
+            <li>
+              <a routerLink="/login" title="login">
+                <i class="bi bi-person-plus"></i>Đăng nhập
+              </a>
+            </li>
+            <li>
+              <a routerLink="/register" title="sign-up">
+                <i class="bi bi-box-arrow-in-right"></i>Đăng ký
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Middle header -->
+  <div class="container">
+    <div class="row">
+      <div class="middle-header clearfix">
+        <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 logo">
+          <a routerLink="/" title="logo">
+            <img src="assets/logo/logo.png" alt="Radiant Shop" />
+          </a>
+        </div>
+
+        <div class="col-lg-5 col-md-5 d-none d-md-block search-box">
+          <div class="header_search">
+            <form class="d-flex search-form" role="search">
+              <input
+                class="form-control me-2"
+                type="search"
+                placeholder="Tìm kiếm..."
+                aria-label="Search"
+              />
+              <button class="btn search-icon" type="submit">
+                <i class="bi bi-search"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="mini-cart">
+          <a routerLink="/cart" class="menu-btn">
+            <i class="bi bi-cart"></i>
+            <span class="cart">Giỏ hàng</span>
+            <span class="cart-items-total">0</span>
+          </a>
+        </div>
+
+        <div class="col-lg-3 col-md-3" style="width: 286px">
+          <div class="header-hotline f-right clearfix">
+            <i class="bi bi-telephone"></i>
+            <div class="hotline">
+              <p>Đặt hàng nhanh!</p>
+              <a href="#" title="Số hotline">0123456789</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <div class="bottom-header">
+    <div class="container">
+      <div class="main-nav">
+        <ul>
+          <!-- Danh mục sản phẩm -->
+          <li class="nav-item dropdown">
+            <a href="#" class="dropdown-toggle">
+              <i class="bi bi-list"></i>
+              TẤT CẢ DANH MỤC
+            </a>
+            <ul class="dropdown-menu menu-item">
+              <li>
+                <a href="#" class="menu-btn"> Trang Điểm </a>
+              </li>
+              <li>
+                <a href="#" class="menu-btn"> Son Môi </a>
+              </li>
+              <li>
+                <a href="#" class="menu-btn"> Chăm sóc da </a>
+              </li>
+              <li>
+                <a href="#" class="menu-btn"> Nước hoa </a>
+              </li>
+              <li>
+                <a href="#" class="menu-btn"> Sản phẩm khác </a>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Các mục khác -->
+          <li class="nav-item">
+            <a href="#">KHUYẾN MẠI</a>
+          </li>
+          <li class="nav-item">
+            <a href="#">THƯƠNG HIỆU</a>
+          </li>
+          <li class="nav-item">
+            <a href="#">GIỚI THIỆU</a>
+          </li>
+          <li class="nav-item">
+            <a href="#">XU HƯỚNG LÀM ĐẸP</a>
+          </li>
+
+          <li class="nav-item dropdown order">
+            <a href="#" class="dropdown-toggle"> TRA CỨU ĐƠN HÀNG </a>
+            <div class="dropdown-menu order-lookup" style="height: 115px">
+              <form>
+                <input
+                  type="text"
+                  placeholder="Nhập email hoặc mã đơn hàng"
+                  class="form-control"
+                />
+                <button class="btn btn-danger mt-2 fw-bold" type="submit">
+                  Kiểm tra đơn hàng
+                </button>
+              </form>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

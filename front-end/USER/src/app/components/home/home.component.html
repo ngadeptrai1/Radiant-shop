@@ -1,0 +1,182 @@
+<app-header />
+<div class="content">
+  <div class="slider">
+    <div
+      id="carouselExampleInterval"
+      class="carousel slide"
+      data-bs-ride="carousel"
+    >
+      <div class="carousel-indicators">
+        <button
+          type="button"
+          data-bs-target="#carouselExampleInterval"
+          data-bs-slide-to="0"
+          class="active"
+          aria-current="true"
+          aria-label="Slide 1"
+        ></button>
+        <button
+          type="button"
+          data-bs-target="#carouselExampleInterval"
+          data-bs-slide-to="1"
+          aria-label="Slide 2"
+        ></button>
+        <button
+          type="button"
+          data-bs-target="#carouselExampleInterval"
+          data-bs-slide-to="2"
+          aria-label="Slide 3"
+        ></button>
+      </div>
+      <div class="carousel-inner">
+        <div class="carousel-item active" data-bs-interval="3000">
+          <img src="assets/slides/slide1.jpg" class="d-block w-100" alt="..." />
+        </div>
+        <div class="carousel-item" data-bs-interval="3000">
+          <img src="assets/slides/slide2.jpg" class="d-block w-100" alt="..." />
+        </div>
+        <div class="carousel-item" data-bs-interval="3000">
+          <img src="assets/slides/slide3.jpg" class="d-block w-100" alt="..." />
+        </div>
+      </div>
+      <button
+        class="carousel-control-prev"
+        type="button"
+        data-bs-target="#carouselExampleInterval"
+        data-bs-slide="prev"
+      >
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button
+        class="carousel-control-next"
+        type="button"
+        data-bs-target="#carouselExampleInterval"
+        data-bs-slide="next"
+      >
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="banner">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+          <a href="#">
+            <img src="assets/banner/banner_mini1.jpg" alt="Sale" />
+          </a>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+          <a href="#">
+            <img src="assets/banner/banner_mini2.jpg" alt="Sale" />
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="section1">
+    <section class="product-noibat">
+      <div class="container">
+        <div class="title">
+          <h2><a href="#"></a>Sản phẩm nổi bật</h2>
+        </div>
+        <div class="products">
+          <div class="row">
+            <div class="col-lg-3 col-md-3 col-sm-3 mb-4">
+              <div class="product">
+                <div class="product-main">
+                  <a (click)="onProductClick(1)">
+                    <img
+                      src="assets/products/product1.jpg"
+                      alt="Kem dưỡng ẩm"
+                    />
+                  </a>
+                </div>
+                <div class="product-infor">
+                  <div class="product-name">
+                    <h3>
+                      <a href="#">Kem dưỡng da 1</a>
+                    </h3>
+                  </div>
+                  <div class="product-price">
+                    <span class="price">500.000đ</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-3 mb-4">
+              <div class="product">
+                <div class="product-main">
+                  <a (click)="onProductClick(1)">
+                    <img
+                      src="assets/products/product2.jpg"
+                      alt="Kem dưỡng ẩm"
+                    />
+                  </a>
+                </div>
+                <div class="product-infor">
+                  <div class="product-name">
+                    <h3>
+                      <a href="#">Kem dưỡng da 1</a>
+                    </h3>
+                  </div>
+                  <div class="product-price">
+                    <span class="price">500.000đ</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-3 mb-4">
+              <div class="product">
+                <div class="product-main">
+                  <a (click)="onProductClick(1)">
+                    <img
+                      src="assets/products/product3.jpg"
+                      alt="Kem dưỡng ẩm"
+                    />
+                  </a>
+                </div>
+                <div class="product-infor">
+                  <div class="product-name">
+                    <h3>
+                      <a href="#">Kem dưỡng da 1</a>
+                    </h3>
+                  </div>
+                  <div class="product-price">
+                    <span class="price">500.000đ</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-3 mb-4">
+              <div class="product">
+                <div class="product-main">
+                  <a (click)="onProductClick(1)">
+                    <img
+                      src="assets/products/product4.jpg"
+                      alt="Kem dưỡng ẩm"
+                    />
+                  </a>
+                </div>
+                <div class="product-infor">
+                  <div class="product-name">
+                    <h3>
+                      <a href="#">Kem dưỡng da 1</a>
+                    </h3>
+                  </div>
+                  <div class="product-price">
+                    <span class="price">500.000đ</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+</div>
+<app-footer />

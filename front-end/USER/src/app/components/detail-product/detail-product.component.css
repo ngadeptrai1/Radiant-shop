@@ -1,0 +1,198 @@
+.container {
+  padding: 0;
+}
+.layout-padding {
+  padding: 15px 10px;
+}
+/* Tổng thể bố cục */
+.layout-page-product-detail {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between; /* Đảm bảo không có xung đột với flexbox */
+  gap: 20px;
+}
+
+.layout-left {
+  width: calc(80% - 10px);
+}
+
+.layout-right {
+  width: calc(20% - 10px);
+}
+
+/* Hộp chứa sản phẩm */
+.layout-box {
+  width: 100%;
+  border: 1px solid #e0e0e0;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.thumbnail {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 0 0 300px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0; /* Đường viền xám nhạt */
+  background-color: #fff;
+}
+
+.thumbnail img {
+  display: block;
+  margin: 0 auto;
+}
+
+.detail-information {
+  flex-grow: 1; /* Để chi tiết sản phẩm chiếm phần còn lại */
+}
+
+.detail-brand {
+  font-size: 18px;
+  color: #d3232a;
+  text-transform: uppercase;
+}
+
+.detail-title {
+  font-size: 24px;
+  color: #333;
+}
+
+.detail-sku {
+  font-size: 14px;
+  color: #666;
+}
+
+.public-price {
+  font-size: 22px;
+  color: #d3232a;
+  font-weight: bold;
+}
+
+.detail-relate a {
+  display: inline-block;
+  width: 60px;
+  height: 60px;
+  margin-right: 10px;
+  border: 1px solid #e0e0e0;
+  padding: 5px;
+  text-align: center;
+}
+
+.detail-relate img {
+  width: 100%;
+  height: auto;
+}
+
+.detail-quantity label {
+  font-weight: bold;
+}
+
+.detail-quantity input {
+  width: 70px;
+  padding: 5px;
+  margin-left: 10px;
+}
+
+.detail-button button {
+  padding: 10px 20px;
+  font-size: 16px;
+}
+
+.detail-button .btn-dark {
+  background-color: #333;
+  border: none;
+  color: #fff;
+}
+
+.detail-button .btn-danger {
+  background-color: #d3232a;
+  border: none;
+  color: #fff;
+}
+
+/* Bố cục thông tin sản phẩm */
+.product-attribute {
+  border: 1px solid #e5e4e4;
+  border-radius: 5px;
+  font-size: 15px;
+}
+
+.product-attribute .attribute-item {
+  display: grid;
+  grid-template-columns: 30% 70%;
+  border-bottom: 1px solid #e5e4e4;
+}
+
+.product-attribute .attribute-title {
+  padding: 10px 12px;
+  font-weight: 700;
+  background: #f0f0f0;
+  padding-left: 40px;
+}
+
+.product-attribute .attribute-value {
+  padding: 10px 12px;
+  padding-left: 100px;
+}
+
+/* Danh sách mã khuyến mãi */
+.list-coupon {
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.item-coupon {
+  width: 320px;
+  border: 1px solid #e0e0e0;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 5px;
+}
+
+.sub-title-coupon {
+  font-size: 18px;
+  color: #d3232a;
+  font-weight: bold;
+}
+
+.voucher-detail {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.progress {
+  height: 8px;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  background-color: #d3232a;
+}
+
+.list-coupon
+  .slide-main-coupon
+  .slide-template-slide-coupon
+  .item-coupon
+  .box-coupon
+  .btn-call-modal {
+  color: #c73030;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.item-coupon .box-coupon button {
+  color: #fff;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
+}
