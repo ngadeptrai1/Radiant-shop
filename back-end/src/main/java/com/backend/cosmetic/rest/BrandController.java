@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -42,8 +43,8 @@ public class BrandController {
         return ResponseEntity.status(HttpStatus.FOUND).body(brandService.findById(id));
     }
 
-    @PostMapping({"","/"})
-    public ResponseEntity<?> create(@Valid @RequestBody BrandDTO brand ,
+    @PostMapping(value = {"","/"}, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> create(@Valid @ModelAttribute BrandDTO brand ,
                                     BindingResult result){
 
         if(result.hasErrors()){

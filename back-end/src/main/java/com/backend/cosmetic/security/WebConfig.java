@@ -57,16 +57,15 @@ public class WebConfig {
                 .csrf(AbstractHttpConfigurer::disable)
 
                 .authorizeRequests(authorized -> authorized
-                        .requestMatchers("api/auth/**").permitAll()
-                        .anyRequest().authenticated())
+                        .anyRequest().permitAll())
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(customOAuth2SuccessHandler())
                 )
-                .oauth2ResourceServer((oauth2)->
-                    oauth2.jwt((jwt)->jwt.jwtAuthenticationConverter(jwtToUserConverter))
+                .oauth2ResourceServer((oauth2) ->
+                        oauth2.jwt((jwt) -> jwt.jwtAuthenticationConverter(jwtToUserConverter))
                 )
-                .sessionManagement((session)->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling((exceptions)->exceptions
+                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling((exceptions) -> exceptions
                         .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
                         .accessDeniedHandler(new BearerTokenAccessDeniedHandler()));
         return http.build();
