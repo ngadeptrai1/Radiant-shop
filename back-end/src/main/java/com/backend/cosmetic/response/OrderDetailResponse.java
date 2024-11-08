@@ -12,7 +12,7 @@ import lombok.*;
 public class OrderDetailResponse {
     private int id;
     private int quantity;
-    private Double price;
+    private Long price;
     private ProductDetailResponse productDetail;
 
     public static OrderDetailResponse fromOrderDetail(OrderDetail orderDetail) {

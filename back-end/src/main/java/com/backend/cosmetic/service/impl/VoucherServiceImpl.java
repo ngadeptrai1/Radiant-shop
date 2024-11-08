@@ -4,6 +4,7 @@ import com.backend.cosmetic.dto.VoucherDTO;
 import com.backend.cosmetic.exception.DataInvalidException;
 import com.backend.cosmetic.exception.DataNotFoundException;
 import com.backend.cosmetic.model.Voucher;
+import com.backend.cosmetic.model.VoucherType;
 import com.backend.cosmetic.repository.VoucherRepository;
 import com.backend.cosmetic.response.VoucherResponse;
 import com.backend.cosmetic.service.VoucherService;
@@ -107,5 +108,38 @@ public class VoucherServiceImpl implements VoucherService {
             throw new DataInvalidException("Voucher min order amount has been reached");
         }
         return VoucherResponse.fromVoucher(voucher);
+    }
+
+    @Override
+    public long approveVoucher(String code ,long totalAmount) {
+        Voucher voucher = voucherRepository.findVoucherByCode(code).orElseThrow(()->
+                new DataNotFoundException("Not found voucher")
+        );
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isBefore(voucher.getStartDate()) || now.isAfter(voucher.getEndDate())) {
+            throw new DataInvalidException("Voucher is not valid at this time");
+        }
+
+        Long usageCount = voucherRepository.countVoucherUsage(code);
+
+        if (voucher.getUsageLimit() != null && usageCount >= voucher.getUsageLimit()) {
+            throw new DataInvalidException("Voucher usage limit has been reached");
+        }
+
+        if (voucher.getMinOrderAmount() > totalAmount ) {
+            throw new DataInvalidException("Voucher min order amount has been reached");
+        }
+        long totalDiscount = 0;
+
+        if(voucher.getType().equalsIgnoreCase(VoucherType.PERCENT)){
+            totalDiscount = (totalAmount*voucher.getValue())/100;
+            if(totalDiscount > voucher.getMaxDiscountAmount()){
+                totalDiscount = voucher.getMaxDiscountAmount();
+            }
+        }
+        if(voucher.getType().equalsIgnoreCase(VoucherType.VALUE)){
+            totalDiscount = voucher.getValue();
+        }
+        return totalDiscount;
     }
 }

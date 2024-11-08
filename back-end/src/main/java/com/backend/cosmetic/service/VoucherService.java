@@ -18,4 +18,5 @@ public interface VoucherService {
     List<VoucherResponse> findAll(Pageable pageable);
     VoucherResponse findByCode(String code);
     VoucherResponse applyCode(String code , long totalAmount);
+    long approveVoucher(String code,long totalAmount);
 }

@@ -65,6 +65,8 @@ public class Order extends BaseModel {
     @Column(name = "payment_status ",nullable = true)
     private String paymentStatus;
 
+
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderDetail> orderDetails ;
 }
