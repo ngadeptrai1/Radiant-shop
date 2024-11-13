@@ -1,0 +1,29 @@
+.mat-elevation-z8 {
+    margin: 20px;
+  }
+  
+  .filters-container {
+    padding: 16px;
+  }
+  
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  mat-form-field {
+    width: 100%;
+  }
+  
+  .mat-chip {
+    min-height: 24px;
+    padding: 4px 8px;
+  }
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+  }

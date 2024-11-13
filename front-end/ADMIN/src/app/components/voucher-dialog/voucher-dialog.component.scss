@@ -1,0 +1,21 @@
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  
+  .full-width {
+    grid-column: 1 / -1;
+  }
+  
+  .toggle-container {
+    grid-column: 1 / -1;
+    padding: 8px 0;
+  }
+  
+  @media (max-width: 600px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  

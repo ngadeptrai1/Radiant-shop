@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { LogoutModalComponent } from '../logout-modal/logout-modal.component';
-import { FooterComponent } from '../footer/footer.component';
 import { HeaderComponent } from '../header/header.component';
 import { SlideBarComponent } from '../slide-bar/slide-bar.component';
 import { CommonModule } from '@angular/common';
@@ -10,7 +9,6 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [
     LogoutModalComponent,
-    FooterComponent,
     HeaderComponent,
     SlideBarComponent,
     CommonModule,

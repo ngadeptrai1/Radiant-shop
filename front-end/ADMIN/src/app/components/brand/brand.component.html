@@ -1,0 +1,86 @@
+
+<div class="container-fluid">
+    <h1 class="h3 mb-2 text-gray-800">Quản Lý Thương Hiệu</h1>
+    <button mat-raised-button color="primary" (click)="openDialog()">
+      Thêm mới
+    </button>
+    <div class="mat-elevation-z8">
+        <div class="filters-container">
+          <mat-form-field>
+            <mat-label>Tìm theo tên</mat-label>
+            <input matInput (keyup)="applyFilter($event)" placeholder="Nhập tên bất kì để tìm kiếm..." #input>
+          </mat-form-field>
+        </div>
+        @if(isLoading){
+            <div class="loading-container">
+          <mat-spinner diameter="40"></mat-spinner>
+        </div>
+        }
+       
+      
+        <mat-table [dataSource]="dataSource" matSort>
+          <!-- ID Column -->
+          <ng-container matColumnDef="id">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> ID </mat-header-cell>
+            <mat-cell *matCellDef="let row"> {{row.id}} </mat-cell>
+          </ng-container>
+      
+          <!-- Thumbnail Column -->
+          <ng-container matColumnDef="thumbnail">
+            <mat-header-cell *matHeaderCellDef> Logo </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              <img [src]="row.thumbnail" 
+                   (error)="onImageError($event)"
+                   class="brand-thumbnail" 
+                   [alt]="row.name + ' logo'"
+                   loading="lazy">
+            </mat-cell>
+          </ng-container>
+      
+          <!-- Name Column -->
+          <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> Tên thương hiệu </mat-header-cell>
+            <mat-cell *matCellDef="let row"> {{row.name}} </mat-cell>
+          </ng-container>
+      
+          <!-- Active Column -->
+          <ng-container matColumnDef="active">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> Trạng thái </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+              <mat-chip-listbox>
+                <mat-chip [color]="row.active ? 'primary' : 'warn'" selected>
+                  {{row.active ? 'Đang hoạt động' : 'Ngừng hoạt động'}}
+                </mat-chip>
+              </mat-chip-listbox>
+            </mat-cell>
+          </ng-container>
+      
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef> Thao tác </mat-header-cell>
+            <mat-cell *matCellDef="let brand">
+              <button mat-icon-button color="primary" (click)="openDialog(brand)" matTooltip="Sửa">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="deleteBrand(brand)" matTooltip="Xóa">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </mat-cell>
+          </ng-container>
+      
+          <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+      
+          <!-- Row shown when no matches are found -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" colspan="5">
+             Không tìm thấy giá trị "{{input.value}}"
+            </td>
+          </tr>
+        </mat-table>
+      
+        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" 
+                       aria-label="Select page of brands">
+        </mat-paginator>
+      </div>
+</div>

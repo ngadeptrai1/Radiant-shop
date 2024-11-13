@@ -20,7 +20,7 @@
   <li class="nav-item active">
     <a class="nav-link" routerLink="/admin">
       <i class="fas fa-fw fa-tachometer-alt"></i>
-      <span>Dashboard</span></a
+      <span>Trang chủ</span></a
     >
   </li>
 
@@ -29,33 +29,106 @@
 
   <!-- Heading -->
   <div class="sidebar-heading">Interface</div>
+<!-- User -->
+<li class="nav-item">
+  <a class="nav-link collapsed"
+    href="#"
+    data-toggle="collapse"
+    data-target="#collapseUser"
+    aria-expanded="true"
+    aria-controls="collapseUser"
+  >
+    <i class="fa fa-user"></i>
+    <span>Người dùng</span>
+  </a>
+  <div
+    id="collapseUser"
+    class="collapse"
+    aria-labelledby="headingUser"
+    data-parent="#accordionSidebar"
+  >
+    <div class="bg-white py-2 collapse-inner rounded">
+      <a class="collapse-item" href="#">Quản lí người dùng</a>
+      <a class="collapse-item" href="#">Thêm mới người dùng</a>
+    </div>
+  </div>
+</li>
 
-  <!-- Nav Item - Pages Collapse Menu -->
+  <!-- product -->
   <li class="nav-item">
-    <a
-      class="nav-link collapsed"
+    <a class="nav-link collapsed"
       href="#"
       data-toggle="collapse"
-      data-target="#collapseTwo"
+      data-target="#collapseProduct"
       aria-expanded="true"
-      aria-controls="collapseTwo"
+      aria-controls="collapseProduct"
     >
-      <i class="fas fa-fw fa-cog"></i>
-      <span>Components</span>
+      <i class="fa fa-archive"></i>
+      <span>Sản phẩm</span>
     </a>
     <div
-      id="collapseTwo"
+      id="collapseProduct"
       class="collapse"
-      aria-labelledby="headingTwo"
+      aria-labelledby="headingProduct"
       data-parent="#accordionSidebar"
     >
-      <div class="bg-white py-2 collapse-inner rounded">
-        <h6 class="collapse-header">Custom Components:</h6>
-        <a class="collapse-item" href="#">Buttons</a>
-        <a class="collapse-item" href="#">Cards</a>
+      <div class="bg-gradient-light py-2 collapse-inner rounded">
+
+        <a class="collapse-item text-capitalize text-dark" [routerLink]="['products']"><i class="fa fa-boxes"></i> Quản lí sản phẩm </a>
+        <a class="collapse-item text-capitalize text-dark "  [routerLink]="['category']"><i class="fa fa-bars"></i> Quản lí danh mục </a>
+        <a class="collapse-item text-capitalize text-dark "  [routerLink]="['brands']"><i class="fa fa-tags"></i> Quản lí thương hiệu </a>
       </div>
     </div>
   </li>
+
+<!-- voucher -->
+<li class="nav-item">
+  <a class="nav-link collapsed"
+    href="#"
+    data-toggle="collapse"
+    data-target="#collapseVoucher"
+    aria-expanded="true"
+    aria-controls="collapseVoucher"
+  >
+    <i class="fa fa-ticket-alt"></i>
+    <span>Mã giảm giá</span>
+  </a>
+  <div
+    id="collapseVoucher"
+    class="collapse"
+    aria-labelledby="headingVoucher"
+    data-parent="#accordionSidebar"
+  >
+    <div class="bg-white py-2 collapse-inner rounded">
+      <a class="collapse-item text-capitalize text-dark "  [routerLink]="['vouchers']">Quản lí mã giảm giá</a>
+    </div>
+  </div>
+</li>
+
+
+<!-- order -->
+<li class="nav-item">
+  <a class="nav-link collapsed"
+    href="#"
+    data-toggle="collapse"
+    data-target="#collapseOrder"
+    aria-expanded="true"
+    aria-controls="collapseOrder"
+  >
+    <i class="fa fa-money-bill"></i>
+    <span>Đơn hàng</span>
+  </a>
+  <div
+    id="collapseOrder"
+    class="collapse"
+    aria-labelledby="headingOrder"
+    data-parent="#accordionSidebar"
+  >
+    <div class="bg-gradient-light py-2 collapse-inner rounded">
+      <a class="collapse-item text-capitalize text-dark" href="#">Quản lí đơn hàng</a>
+    </div>
+  </div>
+</li>
 
   <!-- Nav Item - Utilities Collapse Menu -->
   <li class="nav-item">
