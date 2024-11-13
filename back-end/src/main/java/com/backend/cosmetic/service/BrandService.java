@@ -16,7 +16,7 @@ public interface BrandService {
     BrandResponse findById(int id);
     BrandResponse save (BrandDTO brand) throws IOException;
     BrandResponse update(Integer id, BrandDTO brand);
-    void delete(Integer id);
-    List<BrandResponse> findAll(Pageable pageable);
+    BrandResponse delete(Integer id);
+    List<BrandResponse> findAll( );
     BrandResponse findByName(String name);
 }

@@ -50,21 +50,29 @@ public class BrandServiceImpl implements BrandService {
         });
         brand.setName(brandUpdate.getName());
         brand.setActive(brandUpdate.isActive());
+
+        if(brandUpdate.getThumbnail() != null){
+            try {
+                brand.setThumbnail(fileHandleService.uploadThumbnail(brandUpdate.getThumbnail()));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
         return BrandResponse.fromBrand( brandRepository.save(brand));
     }
 
     @Override
-    public void delete(Integer id) {
+    public BrandResponse delete(Integer id) {
        Brand brand = brandRepository.findById(id).orElseThrow(() ->{
            return new DataNotFoundException("Not found brand with id " + id);
        });
        brand.setActive(false);
-       brandRepository.save(brand);
+     return BrandResponse.fromBrand(brandRepository.save(brand));
     }
 
     @Override
-    public List<BrandResponse> findAll(Pageable pageable) {
-        List<Brand> categories = brandRepository.findAll(pageable).getContent();
+    public List<BrandResponse> findAll() {
+        List<Brand> categories = brandRepository.findAll();
         return categories.stream()
                 .map(BrandResponse::fromBrand)
                 .collect(Collectors.toList());}

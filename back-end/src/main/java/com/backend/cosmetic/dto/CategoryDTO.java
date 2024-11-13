@@ -1,6 +1,7 @@
 package com.backend.cosmetic.dto;
 
 import com.backend.cosmetic.model.Category;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -22,8 +23,8 @@ public class CategoryDTO {
     @NotNull(message = "Category name cannot be null")
     @Size(min = 6 , max = 200, message = "Category name must between 6 - 200 characters")
     private String name;
-
-    private int parentId;
+    @JsonProperty("parent_id")
+    private Integer parentId;
 
     private boolean activate = true;
 }

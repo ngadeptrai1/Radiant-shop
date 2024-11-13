@@ -37,12 +37,12 @@ public class VoucherServiceImpl implements VoucherService {
                 .value(voucherDTO.getValue())
                 .maxDiscountAmount(voucherDTO.getMaxDiscountAmount())
                 .minOrderAmount(voucherDTO.getMinOrderAmount())
-                .startDate(voucherDTO.getStartDate())
-                .endDate(voucherDTO.getEndDate())
+                .startDate(voucherDTO.getStartDate().plusDays(1))
+                .endDate(voucherDTO.getEndDate().plusDays(1))
                 .usageLimit(voucherDTO.getUsageLimit())
                 .description(voucherDTO.getDescription())
                 .build();
-
+                newVoucher.setActive(voucherDTO.isActive());
         Voucher savedVoucher = voucherRepository.save(newVoucher);
         return VoucherResponse.fromVoucher(savedVoucher);
     }
@@ -57,26 +57,26 @@ public class VoucherServiceImpl implements VoucherService {
         voucher.setValue(voucherDTO.getValue());
         voucher.setMaxDiscountAmount(voucherDTO.getMaxDiscountAmount());
         voucher.setMinOrderAmount(voucherDTO.getMinOrderAmount());
-        voucher.setStartDate(voucherDTO.getStartDate());
-        voucher.setEndDate(voucherDTO.getEndDate());
+        voucher.setStartDate(voucherDTO.getStartDate().plusDays(1));
+        voucher.setEndDate(voucherDTO.getEndDate().plusDays(1));
         voucher.setUsageLimit(voucherDTO.getUsageLimit());
         voucher.setDescription(voucherDTO.getDescription());
-
+        voucher.setActive(voucherDTO.isActive());
         Voucher updatedVoucher = voucherRepository.save(voucher);
         return VoucherResponse.fromVoucher(updatedVoucher);
     }
 
     @Override
-    public void delete(Long id) {
+    public VoucherResponse delete(Long id) {
         Voucher voucher = voucherRepository.findById(id).orElseThrow(
                 () ->  new DataNotFoundException("Not found product with id  " + id))  ;
         voucher.setActive(false);
-        voucherRepository.save(voucher);
+      return VoucherResponse.fromVoucher( voucherRepository.save(voucher));
     }
 
     @Override
-    public List<VoucherResponse> findAll(Pageable pageable) {
-        return voucherRepository.findAll(pageable)
+    public List<VoucherResponse> findAll() {
+        return voucherRepository.findAll()
                 .stream()
                 .map(VoucherResponse::fromVoucher)
                 .collect(Collectors.toList());

@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,7 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponse findById(int id) {
         return CategoryResponse.fromCategory( categoryRepository.findById(id).orElseThrow(() ->{
             return new DataNotFoundException("Not found category with id " + id);
-        }));
+        }),new HashSet<>());
     }
 
     @Override
@@ -33,15 +34,18 @@ public class CategoryServiceImpl implements CategoryService {
         if (categoryRepository.findByName(category.getName()).isPresent()){
           throw new DataPresentException("Category with name "+ category.getName()+ " already exist ");
         }
-        Category parentCate = categoryRepository.findById(category.getParentId()).orElseThrow(() ->{
-            return new DataNotFoundException("Not found category parent with id " + category.getParentId());
-        });
-      Category newCate =  Category.builder()
-                .name(category.getName())
-                .parentCategory(parentCate)
-                .build();
-      newCate.setActive(category.isActivate());
-        return CategoryResponse.fromCategory( categoryRepository.save(newCate));
+        Category categoryEntity = new Category();
+        if(category.getParentId()!= null){
+            Category parentCate = categoryRepository.findById(category.getParentId()).orElseThrow(() ->{
+                return new DataNotFoundException("Not found category parent with id " + category.getParentId());
+            });
+            categoryEntity.setParentCategory(parentCate);
+            categoryEntity.setName(category.getName());
+        }else{
+            categoryEntity.setName(category.getName());
+        }
+      categoryEntity.setActive(category.isActivate());
+        return CategoryResponse.fromCategory( categoryRepository.save(categoryEntity),new HashSet<>());
     }
 
     @Override
@@ -49,20 +53,25 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findById(id).orElseThrow(() ->{
             return new DataNotFoundException("Not found category with id " + id);
         });
-        Category parentCate = categoryRepository.findById(categoryUpdate.getParentId()).orElseThrow(() ->{
-            return new DataNotFoundException("Not found category parent with id " + categoryUpdate.getParentId());
-        });
-        category.setName(category.getName());
-        category.setActive(category.isActive());
-        category.setParentCategory(parentCate);
-        return CategoryResponse.fromCategory( categoryRepository.save(category));
+        if(categoryUpdate.getParentId()!=null){
+            Category parentCate = categoryRepository.findById(categoryUpdate.getParentId()).orElseThrow(() ->{
+                return new DataNotFoundException("Not found category parent with id " + categoryUpdate.getParentId());
+            });
+            category.setParentCategory(parentCate);
+        }else{
+            category.setParentCategory(null);
+        }
+        category.setName(categoryUpdate.getName());
+        category.setActive(categoryUpdate.isActivate());
+
+        return CategoryResponse.fromCategory( categoryRepository.save(category),new HashSet<>());
     }
 
     @Override
-    public List<CategoryResponse> findAll(Pageable pageable) {
-        List<Category> categories = categoryRepository.findAll(pageable).getContent();
+    public List<CategoryResponse> findAll() {
+        List<Category> categories = categoryRepository.findAll();
         return categories.stream()
-                .map(CategoryResponse::fromCategory)
+                .map(category -> {return CategoryResponse.fromCategory(category,new HashSet<>());})
                 .collect(Collectors.toList());
     }
 
@@ -70,16 +79,17 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponse findByName(String name) {
         return CategoryResponse.fromCategory( categoryRepository.findByName(name).orElseThrow(() ->{
             return new DataNotFoundException("Not found category with name =  " + name);
-        }));
+        }),new HashSet<>());
     }
 
     @Override
-    public void delete(int id) {
+    public CategoryResponse delete(int id) {
         try {
            Category category =  categoryRepository.findById(id).orElseThrow(() ->{
                 return new DataNotFoundException("Not found category with id " + id);
             });
-           categoryRepository.save(category);
+           category.setActive(false);
+          return CategoryResponse.fromCategory( categoryRepository.save(category),new HashSet<>());
         }catch (Exception ex){
             throw new DataNotFoundException(ex.getMessage());
         }

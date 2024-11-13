@@ -14,8 +14,8 @@ public interface VoucherService {
     VoucherResponse findById(long id);
     VoucherResponse save (VoucherDTO voucher) throws IOException;
     VoucherResponse update(Long id, VoucherDTO voucher);
-    void delete(Long id);
-    List<VoucherResponse> findAll(Pageable pageable);
+    VoucherResponse delete(Long id);
+    List<VoucherResponse> findAll( );
     VoucherResponse findByCode(String code);
     VoucherResponse applyCode(String code , long totalAmount);
     long approveVoucher(String code,long totalAmount);

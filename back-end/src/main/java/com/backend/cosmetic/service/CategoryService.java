@@ -14,7 +14,7 @@ public interface CategoryService {
     CategoryResponse findById(int id);
     CategoryResponse save (CategoryDTO category);
     CategoryResponse update( Integer id , CategoryDTO category);
-    List<CategoryResponse> findAll(Pageable pageable);
+    List<CategoryResponse> findAll();
     CategoryResponse findByName(String name);
-    void delete(int id);
+    CategoryResponse delete(int id);
 }

@@ -23,6 +23,8 @@ public class VoucherResponse {
     private LocalDateTime endDate;
     private Integer usageLimit;
     private String description;
+    private Integer usedAmount;
+    private boolean active ;
 
     // Getters and Setters
 
@@ -39,6 +41,8 @@ public class VoucherResponse {
                 .endDate(voucher.getEndDate())
                 .usageLimit(voucher.getUsageLimit())
                 .description(voucher.getDescription())
+                .usedAmount( voucher.getApplyOrder()!=null ? voucher.getApplyOrder().size():0)
+                .active(voucher.isActive())
                 .build();
     }
 }

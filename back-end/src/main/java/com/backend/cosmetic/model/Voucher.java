@@ -5,6 +5,7 @@ import lombok.*;
 
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Table(name = "vouchers")
 @Entity
@@ -46,5 +47,6 @@ public class Voucher extends BaseModel{
     @Column(length = 500,columnDefinition = "TEXT")
     private String description;
 
-
+    @OneToMany(mappedBy = "voucher")
+    private List<Order> applyOrder ;
 }

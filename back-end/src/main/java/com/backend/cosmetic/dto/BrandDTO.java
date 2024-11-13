@@ -15,12 +15,12 @@ import org.springframework.web.multipart.MultipartFile;
 @ToString
 @Builder
 public class BrandDTO {
+    Integer id;
     @NotEmpty(message = "Brand name cannot be empty")
     @NotNull(message = "Brand name cannot be null")
     @Size(min = 6 , max = 200, message = "Brand name must between 6 - 200 characters")
     private String name;
 
-    @Nullable
     private MultipartFile thumbnail;
 
     private boolean active= true;

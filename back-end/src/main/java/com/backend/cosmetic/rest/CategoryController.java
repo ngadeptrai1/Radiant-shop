@@ -25,12 +25,9 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping({"","/"})
-    public ResponseEntity<?> getAll(@RequestParam("page") Optional<Integer> pageNum,
-                                    @RequestParam("size") Optional<Integer> size,
-                                    @RequestParam("sort")Optional<String> sort){
-        Pageable page = PageRequest.of(pageNum.orElse(0),size.orElse(5), Sort.by(sort.orElse("id")).descending());
+    public ResponseEntity<?> getAll(){
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(categoryService.findAll(page));
+            return ResponseEntity.status(HttpStatus.OK).body(categoryService.findAll());
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -39,6 +36,7 @@ public class CategoryController {
     @PostMapping({"","/"})
     public ResponseEntity<?> insert( @Valid @RequestBody CategoryDTO category ,
                                     BindingResult result){
+        System.out.println("cate" + category);
         if(result.hasErrors()){
             List<String> errs = result.getFieldErrors().stream().map(FieldError:: getDefaultMessage).toList();
             throw new DataInvalidException( errs.isEmpty() ? "" : errs.get(0));
@@ -49,6 +47,7 @@ public class CategoryController {
     public ResponseEntity<?> update( @PathVariable int id,
                                     @Valid @RequestBody CategoryDTO updateCate ,
                                     BindingResult result){
+
         if(result.hasErrors()){
             List<String> errs = result.getFieldErrors().stream().map(FieldError:: getDefaultMessage).toList();
             throw new DataInvalidException( errs.isEmpty() ? "" : errs.get(0));
@@ -58,6 +57,10 @@ public class CategoryController {
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable int id){
         return ResponseEntity.status(HttpStatus.FOUND).body(categoryService.findById(id));
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete( @PathVariable int id){
+        return ResponseEntity.status(HttpStatus.OK).body(categoryService.delete(id));
     }
 
 }
