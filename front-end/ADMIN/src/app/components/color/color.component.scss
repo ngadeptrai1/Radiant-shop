@@ -1,0 +1,55 @@
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+  }
+  
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .color-table {
+    width: 100%;
+  }
+  
+  .color-preview {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+  }
+  
+  // color-dialog.component.scss
+  .form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .full-width {
+    width: 100%;
+  }
+  
+  .color-picker-container {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  
+    .color-preview {
+      width: 40px;
+      height: 40px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+  }
+  
+  input[type="color"] {
+    height: 40px;
+    padding: 0;
+    border: none;
+    cursor: pointer;
+  }

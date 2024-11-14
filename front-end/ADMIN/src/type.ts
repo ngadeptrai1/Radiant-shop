@@ -64,3 +64,9 @@ export interface BrandReq {
     active?: boolean;
     usedAmount:number;
   }
+  export interface Color {
+    id?: number;
+    hexCode: string;
+    name: string;
+    active: boolean;
+  }

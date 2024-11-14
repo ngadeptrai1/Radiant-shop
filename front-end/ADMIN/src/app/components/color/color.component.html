@@ -1,0 +1,70 @@
+
+<div class="container-fluid">
+    <h1 class="h3 mb-2 text-gray-800">Quản Lý Màu Sắc</h1>
+<div class="mat-elevation-z8">
+    <div class="table-header">
+      <button mat-raised-button color="primary" (click)="openDialog()">
+        Thêm mới
+      </button>
+    </div>
+  @if (isLoading) {<div class="loading-container" >
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>}
+    
+  
+    <mat-table [dataSource]="dataSource" class="color-table">
+      <ng-container matColumnDef="id">
+        <mat-header-cell *matHeaderCellDef> ID </mat-header-cell>
+        <mat-cell *matCellDef="let color"> {{color.id}} </mat-cell>
+      </ng-container>
+  
+      <ng-container matColumnDef="colorPreview">
+        <mat-header-cell *matHeaderCellDef> Mẫu màu </mat-header-cell>
+        <mat-cell *matCellDef="let color">
+          <div class="color-preview" [style.background-color]="color.hexCode"></div>
+        </mat-cell>
+      </ng-container>
+  
+      <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef> Tên màu </mat-header-cell>
+        <mat-cell *matCellDef="let color"> {{color.name}} </mat-cell>
+      </ng-container>
+  
+      <ng-container matColumnDef="hexCode">
+        <mat-header-cell *matHeaderCellDef> Mã màu </mat-header-cell>
+        <mat-cell *matCellDef="let color"> {{color.hexCode}} </mat-cell>
+      </ng-container>
+  
+      <ng-container matColumnDef="active">
+        <mat-header-cell *matHeaderCellDef> Trạng thái </mat-header-cell>
+        <mat-cell *matCellDef="let color">
+          <mat-icon [color]="color.active ? 'primary' : 'warn'">
+            {{color.active ? 'check_circle' : 'cancel'}}
+          </mat-icon>
+        </mat-cell>
+      </ng-container>
+  
+      <ng-container matColumnDef="actions">
+        <mat-header-cell *matHeaderCellDef> Thao tác </mat-header-cell>
+        <mat-cell *matCellDef="let color">
+          <button mat-icon-button color="primary" (click)="openDialog(color)" matTooltip="Sửa">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteColor(color)" matTooltip="Xóa">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-cell>
+      </ng-container>
+  
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+  
+    <mat-paginator 
+      [pageSize]="10"
+      [pageSizeOptions]="[5, 10, 25, 100]"
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>
+

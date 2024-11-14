@@ -9,6 +9,7 @@ import { CategoryComponent } from './components/category/category.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { BrandComponent } from './components/brand/brand.component';
 import { VoucherComponent } from './components/voucher/voucher.component';
+import { ColorComponent } from './components/color/color.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -20,6 +21,8 @@ export const routes: Routes = [
   { path:'category',component:CategoryComponent},
   { path:'brands',component:BrandComponent},
   { path:'vouchers',component:VoucherComponent},
+  { path:'colors',component:ColorComponent},
+
   { path: '**',component: NotFoundComponent }
 
  
