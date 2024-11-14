@@ -22,7 +22,7 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/color")
+@RequestMapping("api/v1/colors")
 public class ColorController {
     private ColorService colorService;
 
@@ -32,12 +32,10 @@ public class ColorController {
     }
 
     @GetMapping({"", "/"})
-    public ResponseEntity<?> findAll(@RequestParam("page") Optional<Integer> pageNum,
-                                     @RequestParam("size") Optional<Integer> size,
-                                     @RequestParam("sort") Optional<String> sort) {
-        Pageable page = PageRequest.of(pageNum.orElse(0), size.orElse(5), Sort.by(sort.orElse("id")).descending());
+    public ResponseEntity<?> findAll() {
+
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(colorService.findAll(page));
+            return ResponseEntity.status(HttpStatus.OK).body(colorService.findAll());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -68,8 +66,8 @@ public class ColorController {
         return ResponseEntity.status(HttpStatus.OK).body(colorService.update(id ,colorDTO));
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable Integer id){
-        return ResponseEntity.ok().body("ok");
+    public ResponseEntity<?> delete(@PathVariable Integer id){
+        return ResponseEntity.ok().body(colorService.delete(id));
     }
 
 

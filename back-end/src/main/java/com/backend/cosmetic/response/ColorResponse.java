@@ -11,11 +11,14 @@ import lombok.Setter;
 public class ColorResponse {
     private Integer id;
     private String hexCode;
-
+    private String name;
+    private boolean active;
 
     public static ColorResponse fromColor(Color color) {
         return ColorResponse.builder()
                 .id(color.getId())
+                .name(color.getName())
+                .active(color.isActive())
                 .hexCode(color.getHexCode())
                 .build();
     }

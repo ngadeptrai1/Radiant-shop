@@ -18,4 +18,5 @@ public class Color extends BaseModel {
     @Column(name = "hex_code", nullable = false)
     private String hexCode;
 
+    private String name;
 }

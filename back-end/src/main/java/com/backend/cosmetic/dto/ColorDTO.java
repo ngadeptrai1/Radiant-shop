@@ -16,7 +16,9 @@ import lombok.*;
 public class ColorDTO {
     @NotEmpty(message = "hexCode  cannot be empty")
     @NotNull(message = "hexCode cannot be null")
-    @Size(min = 6 , max = 200, message = "hexCode name must between 6 - 200 characters")
+    @Size(min = 4 , max = 200, message = "hexCode name must between 6 - 200 characters")
     private String hexCode;
+    @NotEmpty(message = "name cannot be empty")
+    private String name;
     private boolean active= true;
 }

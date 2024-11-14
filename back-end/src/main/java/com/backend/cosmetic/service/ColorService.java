@@ -13,7 +13,7 @@ public interface ColorService {
     ColorResponse findById(int id);
     ColorResponse save (ColorDTO colorDTO) throws IOException;
     ColorResponse update(Integer id, ColorDTO colorDTO);
-    void delete(Integer id);
-    List<ColorResponse> findAll(Pageable pageable);
+    ColorResponse delete(Integer id);
+   List< ColorResponse> findAll();
 
 }

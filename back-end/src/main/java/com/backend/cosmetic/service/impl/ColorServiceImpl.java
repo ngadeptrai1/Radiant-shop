@@ -31,7 +31,8 @@ public class ColorServiceImpl implements ColorService {
 
         Color newColor = new Color();
         newColor.setHexCode(colorDTO.getHexCode());
-
+        newColor.setActive(colorDTO.isActive());
+        newColor.setName(colorDTO.getName());
         return ColorResponse.fromColor( colorRepository.save(newColor));
     }
 
@@ -41,22 +42,23 @@ public class ColorServiceImpl implements ColorService {
             return new DataNotFoundException("Brand with id "+id + " Not found ");
         });
         color.setHexCode(colorDTO.getHexCode());
-
+        color.setActive(colorDTO.isActive());
+        color.setName(colorDTO.getName());
         return ColorResponse.fromColor(colorRepository.save(color));
     }
 
     @Override
-    public void delete(Integer id) {
+    public ColorResponse delete(Integer id) {
         Color color = colorRepository.findById(id).orElseThrow(() ->{
             return new DataNotFoundException("Not found brand with id " + id);
         });
-
-        colorRepository.delete(color);
+color.setActive(false);
+return ColorResponse.fromColor(colorRepository.save(color));
     }
 
     @Override
-    public List<ColorResponse> findAll(Pageable pageable) {
-        List<Color> color = colorRepository.findAll(pageable).getContent();
+    public List<ColorResponse> findAll() {
+        List<Color> color = colorRepository.findAll();
         return color.stream()
                 .map(ColorResponse::fromColor)
                 .collect(Collectors.toList());
