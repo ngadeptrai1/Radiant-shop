@@ -34,7 +34,7 @@ import { ConfirmDialogComponent } from '../../../constant/confirm-dialog.compone
   templateUrl: './category.component.html',
   styleUrl: './category.component.scss'
 })
-export class CategoryComponent implements OnInit {
+export class CategoryComponent implements OnInit,AfterViewInit {
   categories: Category[] = [];
   newCategory !: Category ;
   editMode: boolean = false;
@@ -67,8 +67,9 @@ export class CategoryComponent implements OnInit {
     this.categoryService.getAllCategories() .subscribe({
       next: (categories) => {
         this.dataSource = new MatTableDataSource(this.flattenCategories(categories));
-        this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
+        this.dataSource.paginator = this.paginator;
+        
         this.isLoading = false;
       },
       error: (error) => {

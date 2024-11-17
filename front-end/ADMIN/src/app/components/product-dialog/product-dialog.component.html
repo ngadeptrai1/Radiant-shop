@@ -1,0 +1,171 @@
+<h3 mat-dialog-title>{{ dialogTitle }}</h3>
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+  <mat-dialog-content>
+    <div class="form-container">
+      <!-- Tên sản phẩm -->
+      <div class="form-group mb-3">
+        <label class="form-label">Tên sản phẩm</label>
+        <input type="text" class="form-control" formControlName="name" required>
+        @if (form.get('name')?.hasError('required')) {
+          <div class="text-danger">
+            Tên sản phẩm là bắt buộc
+          </div>
+        }
+      </div>
+
+      <!-- Trạng thái kích hoạt -->
+      <div class="form-check mb-3">
+        <label class="form-label">Trạng thái </label><br>
+        <mat-slide-toggle formControlName="activate" class="full-width">
+          Kích hoạt
+      </mat-slide-toggle>
+      </div>
+
+      <!-- Danh mục và Thương hiệu -->
+      <div class="row mb-3">
+
+        <div class="col-md-6">
+          <div class="form-group">
+            <label class="form-label">Danh mục</label><br>
+            <select class="form-control" formControlName="categoryId" required>
+              <option value="">Chọn danh mục</option>
+              @for (category of categories; track category.id) {
+                <option [value]="category.id">{{ category.name }}</option>
+              }
+            </select>
+            @if (form.get('categoryId')?.hasError('required')) {
+              <div class="text-danger">
+                Danh mục là bắt buộc
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-group">
+            <label class="form-label">Thương hiệu</label><br>
+            <select class="form-control" formControlName="brandId" required>
+              <option value="">Chọn thương hiệu</option>
+              @for (brand of brands; track brand.id) {
+                <option [value]="brand.id">{{ brand.name }}</option>
+              }
+            </select>
+            @if (form.get('brandId')?.hasError('required')) {
+              <div class="text-danger">
+                Thương hiệu là bắt buộc
+              </div>
+            }
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Product Details section -->
+      <div formArrayName="productDetails">
+        <h3>Chi tiết sản phẩm</h3>
+        @for (detail of productDetails.controls; track i; let i = $index) {
+          <div [formGroupName]="i" class="row mb-3">
+            <div class="col-lg-4 col-md-4 col-sm-12">
+              <div class="form-group">
+                <label class="form-label">Giá bán</label>
+                <input type="number" class="form-control" formControlName="salePrice" required>
+                <div class="text-danger" *ngIf="detail.get('salePrice')?.hasError('required')">
+                  Giá bán là bắt buộc
+                </div>
+                <div class="text-danger" *ngIf="detail.get('salePrice')?.hasError('min')">
+                  Giá bán phải lớn hơn 0
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-4 col-md-4 col-sm-12">
+              <div class="form-group">
+                <label class="form-label">Số lượng</label>
+                <input type="number" class="form-control" formControlName="quantity" required>
+                <div class="text-danger" *ngIf="detail.get('quantity')?.hasError('required')">
+                  Số lượng là bắt buộc
+                </div>
+                <div class="text-danger" *ngIf="detail.get('quantity')?.hasError('min')">
+                  Số lượng phải lớn hơn 0
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-4 col-md-4 col-sm-12">
+              <div class="form-group">
+                <label class="form-label">Giảm giá (%)</label>
+                <input type="number" class="form-control" formControlName="discount" required>
+                <div class="text-danger" *ngIf="detail.get('discount')?.hasError('required')">
+                  Giảm giá là bắt buộc
+                </div>
+                <div class="text-danger" *ngIf="detail.get('discount')?.hasError('min')">
+                  Giảm giá không thể nhỏ hơn 0
+                </div>
+                <div class="text-danger" *ngIf="detail.get('discount')?.hasError('max')">
+                  Giảm giá không được vượt quá 100%
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-5 col-md-5 col-sm-12 mt-3">
+              <div class="form-group">
+                <label class="form-label">Màu sắc</label>
+                <select class="form-control" formControlName="colorId" required>
+                  <option value="">Chọn màu sắc</option>
+                  @for (color of colors; track color.id) {
+                    @if (color.active) {
+                      
+                    <option [value]="color.id">{{ color.name }}</option>
+                    }
+                  }
+                </select>
+                <div class="text-danger" *ngIf="detail.get('colorId')?.hasError('required')">
+                  Màu sắc là bắt buộc
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-5 col-md-5 col-sm-12 mt-3">
+            
+              <label class="form-label">Trạng thái </label><br>
+              <mat-slide-toggle formControlName="active" class="full-width">
+                Kích hoạt
+            </mat-slide-toggle>
+            </div>
+
+            <div class="col-lg-2 col-md-2">
+              <p class="mt-3" style="background-color: aliceblue;"> .</p>
+              <a class="btn btn-danger" (click)="removeProductDetail(i)">
+                <i class="fa fa-trash"></i>
+              </a>
+            </div>
+
+          </div>
+        }
+
+        <button class="btn btn-primary" type="button" (click)="addProductDetail()">
+          Thêm chi tiết sản phẩm
+        </button>
+      </div>
+    </div>
+
+    <!-- Mô tả sản phẩm -->
+    <div class="form-group mb-3">
+      <label class="form-label">Mô tả</label>
+      <textarea class="form-control" formControlName="description" rows="3" required></textarea>
+      @if (form.get('description')?.hasError('required')) {
+        <div class="text-danger">
+          Mô tả là bắt buộc
+        </div>
+      }
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button class="btn btn-secondary me-2" type="button" (click)="onCancel()">Hủy</button>
+    <button class="btn btn-primary" type="submit" [disabled]="form.invalid">
+      {{ data.product ? 'Cập nhật' : 'Thêm mới' }}
+    </button>
+  </mat-dialog-actions>
+</form>

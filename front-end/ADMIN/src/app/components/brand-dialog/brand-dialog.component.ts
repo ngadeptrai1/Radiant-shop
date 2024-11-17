@@ -4,16 +4,21 @@ import { MatButton } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
-import { MatOption, MatSelect } from '@angular/material/select';
-import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { Brand, BrandReq } from '../../../type';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-brand-dialog',
   standalone: true,
-  imports: [MatDialogContent,MatFormField,MatLabel
-    ,MatError,MatSelect,MatOption,MatSlideToggle,MatDialogActions,
-    ReactiveFormsModule,MatInput,MatButton],
+  imports: [
+    MatDialogContent,
+    MatDialogActions,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatButton,
+    ReactiveFormsModule,MatError,MatSlideToggleModule 
+  ],
   templateUrl: './brand-dialog.component.html',
   styleUrl: './brand-dialog.component.scss'
 })

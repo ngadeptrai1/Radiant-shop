@@ -10,6 +10,7 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
 import { BrandComponent } from './components/brand/brand.component';
 import { VoucherComponent } from './components/voucher/voucher.component';
 import { ColorComponent } from './components/color/color.component';
+import { AddProductComponent } from './components/add-product/add-product.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -22,7 +23,7 @@ export const routes: Routes = [
   { path:'brands',component:BrandComponent},
   { path:'vouchers',component:VoucherComponent},
   { path:'colors',component:ColorComponent},
-
+{ path:'add-product',component:AddProductComponent},
   { path: '**',component: NotFoundComponent }
 
  

@@ -70,3 +70,60 @@ export interface BrandReq {
     name: string;
     active: boolean;
   }
+  export interface Product {
+    id: number;
+    name: string;
+    description: string;
+    activate: boolean;
+    thumbnail: string;
+    productImages: ProductImage[];
+    categoryId: number;
+    brandId: number;
+    productDetails: ProductDetail[];
+  }
+  
+  export interface ProductDetail {
+    id: number;
+    salePrice: number;
+    discount: number;
+    quantity: number;
+    colorId: number;
+  }
+  
+  export interface ProductImage {
+    id: number;
+    url: string;
+  }
+  
+  export interface ProductRequest {
+    id:number;
+    name: string;
+    description: string;
+    activate: boolean;
+    thumbnail: File;
+    productImages: File[];
+    categoryId: number;
+    brandId: number;
+    productDetails: ProductDetail[];
+  }
+  
+  export interface ProductResponse {
+    id: number;
+    name: string;
+    description: string;
+    activate: boolean;
+    thumbnail: string;
+    productImages: ProductImage[];
+    category: Category;
+    brand: Brand;
+    productDetails: ProductDetailResponse[];
+  }
+  export interface ProductDetailResponse {
+    id: number;
+    salePrice: number;
+    discount: number;
+    quantity: number;
+    color: Color;
+    active: boolean;
+  }
+    
