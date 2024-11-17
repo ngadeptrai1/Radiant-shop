@@ -1,11 +1,12 @@
 package com.backend.cosmetic.rest;
 
 
-import com.backend.cosmetic.dto.ProductDTO;
-import com.backend.cosmetic.exception.DataInvalidException;
-import com.backend.cosmetic.service.ProductService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.logging.Logger;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -16,13 +17,15 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.logging.Logger;
+import com.backend.cosmetic.dto.ProductDTO;
+import com.backend.cosmetic.exception.DataInvalidException;
+import com.backend.cosmetic.service.ProductService;
 
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 @RequestMapping("api/v1/products")
 @RequiredArgsConstructor
@@ -63,6 +66,16 @@ private static final Logger LOGGER = Logger.getLogger(ProductController.class.ge
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    @GetMapping("get-all")
+    public ResponseEntity<?> getAll() {
+
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(productService.getAllProducts());
+        } catch (Exception e) {
+            LOGGER.severe("Error: " + e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable Long id){
@@ -76,13 +89,14 @@ private static final Logger LOGGER = Logger.getLogger(ProductController.class.ge
         try {
             if(result.hasErrors()){
                 List<String> errs = result.getFieldErrors().stream().map(FieldError:: getDefaultMessage).toList();
-                throw new DataInvalidException(errs.isEmpty() ? "" : errs.get(0));
             }
+            System.out.println(product);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(productService.saveProduct(product));
         }
-        catch (IOException ex){
-            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Some thing went wrong , please try again ");
+        catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Something went wrong, please try again: " + ex.getMessage());
         }
     }
 
@@ -95,7 +109,14 @@ private static final Logger LOGGER = Logger.getLogger(ProductController.class.ge
             List<String> errs = result.getFieldErrors().stream().map(FieldError:: getDefaultMessage).toList();
             throw new DataInvalidException( errs.isEmpty() ? "" : errs.get(0));
         }
+        System.out.println(product);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(productService.updateProduct(product,id));
     }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id){
+        return ResponseEntity.status(HttpStatus.OK).body(productService.deleteProduct(id));
+    }
+
 }

@@ -4,6 +4,7 @@ import com.backend.cosmetic.model.Product;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,13 +19,9 @@ public class ProductResponse {
     private String description;
     private boolean activate ;
     private String thumbnail;
-    @JsonProperty("product_images")
     private List<ProductImageResponse> productImages;
-    @JsonProperty("category_id")
-    private int categoryId;
-    @JsonProperty("brand_id")
-    private int brandId;
-    @JsonProperty(value = "product_details")
+    private CategoryResponse category;
+    private BrandResponse brand;
     private List< ProductDetailResponse> productDetails;
 
     public static ProductResponse fromProduct(Product product){
@@ -34,8 +31,8 @@ public class ProductResponse {
                 .description(product.getDescription())
                 .activate(product.isActive())
                 .thumbnail(product.getThumbnail())
-                .brandId(product.getBrand().getId())
-                .categoryId(product.getCategory().getId())
+                .brand(BrandResponse.fromBrand( product.getBrand()))
+                .category(CategoryResponse.fromCategory(product.getCategory(),new HashSet<>()))
                 .productImages(product.getProductImages().stream().map(productImage -> {
                     return ProductImageResponse.builder()
                             .id(productImage.getId())

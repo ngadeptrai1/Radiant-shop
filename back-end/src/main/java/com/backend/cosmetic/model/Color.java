@@ -13,7 +13,7 @@ import lombok.*;
 public class Color extends BaseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Column(name = "hex_code", nullable = false)
     private String hexCode;

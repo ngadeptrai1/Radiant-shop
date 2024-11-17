@@ -15,22 +15,26 @@ import lombok.*;
 @Setter
 @Builder
 public class ProductDetailResponse {
+    private Long id;
 
-    @JsonProperty(value = "sale_price")
     private Long salePrice;
 
     private int discount;
 
     private int quantity;
 
-    private int colorId;
+    private ColorResponse color;
+
+    private boolean active;
 
     public static ProductDetailResponse fromProductDetail(ProductDetail product) {
         return ProductDetailResponse.builder()
+                .id(product.getId())
                 .salePrice(product.getSalePrice())
                 .discount(product.getDiscount())
                 .quantity(product.getQuantity())
-                .colorId(product.getColor().getId())
+                .color(ColorResponse.fromColor(product.getColor()))
+                .active(product.isActive())
                 .build();
     }
 
