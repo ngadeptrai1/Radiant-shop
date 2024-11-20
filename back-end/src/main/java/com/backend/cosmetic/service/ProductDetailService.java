@@ -14,5 +14,7 @@ public interface ProductDetailService {
     List<ProductDetailResponse> update(List<ProductDetailDTO> productDetailDTO, Product product);
     ProductDetailResponse delete(Long id);
     ProductDetailResponse findById(Long id);
+    ProductDetailResponse updateQuantityByOne(Long id, String type);
+    ProductDetailResponse updateQuantityByAmount(Long id, int amount);
 
 }

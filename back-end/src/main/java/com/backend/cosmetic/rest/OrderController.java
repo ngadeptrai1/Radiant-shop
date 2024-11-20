@@ -3,6 +3,7 @@ package com.backend.cosmetic.rest;
 import com.backend.cosmetic.dto.OrderCounterDTO;
 import com.backend.cosmetic.dto.OrderDTO;
 import com.backend.cosmetic.exception.DataInvalidException;
+import com.backend.cosmetic.response.OrderResponse;
 import com.backend.cosmetic.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -61,7 +62,8 @@ public class OrderController {
         }
         try {
 //
-            return ResponseEntity.status(HttpStatus.CREATED).body( orderService.createOrderInCounter(orderDTO));
+            System.out.println(orderDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createOrderInCounter(orderDTO));
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }

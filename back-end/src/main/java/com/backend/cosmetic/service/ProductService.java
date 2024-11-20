@@ -1,14 +1,15 @@
 package com.backend.cosmetic.service;
 
-import com.backend.cosmetic.dto.ProductDTO;
-import com.backend.cosmetic.response.ProductResponse;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import com.backend.cosmetic.dto.ProductDTO;
+import com.backend.cosmetic.response.ProductResponse;
 
 @Service
 public interface ProductService {
@@ -19,4 +20,5 @@ public interface ProductService {
     ProductResponse findById(Long id);
     List<ProductResponse> getAllProducts();
     ProductResponse deleteProduct(Long id);
+    List<ProductResponse> searchProductsByName(String name);
 }

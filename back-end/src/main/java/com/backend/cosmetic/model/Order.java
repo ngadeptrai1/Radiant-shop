@@ -56,7 +56,7 @@ public class Order extends BaseModel {
     private long finalAmount;
 
     @JoinColumn(name = "voucher_code",referencedColumnName = "code",nullable = true)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY,optional = true)
     private Voucher voucher;
 
     @Column(name = "payment_method",nullable = true)
@@ -65,6 +65,9 @@ public class Order extends BaseModel {
     @Column(name = "payment_status ",nullable = true)
     private String paymentStatus;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @Column(name = "type",nullable = true)
+    private String type;
+
+    @OneToMany(mappedBy = "order")
     private List<OrderDetail> orderDetails ;
 }

@@ -15,10 +15,21 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.cosmetic.dto.ProductDTO;
 import com.backend.cosmetic.exception.DataInvalidException;
+import com.backend.cosmetic.response.ProductResponse;
+import com.backend.cosmetic.service.ProductDetailService;
 import com.backend.cosmetic.service.ProductService;
 
 import jakarta.validation.Valid;
@@ -32,6 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ProductController {
 
 private final ProductService productService;
+private final ProductDetailService productDetailService;
 private static final Logger LOGGER = Logger.getLogger(ProductController.class.getName());
 
     @GetMapping("")
@@ -118,5 +130,39 @@ private static final Logger LOGGER = Logger.getLogger(ProductController.class.ge
     public ResponseEntity<?> delete(@PathVariable Long id){
         return ResponseEntity.status(HttpStatus.OK).body(productService.deleteProduct(id));
     }
+
+    @PutMapping("/product-detail/{id}/quantity/{type}")
+    public ResponseEntity<?> updateQuantityByOne(
+            @PathVariable Long id,
+            @PathVariable String type) {
+        try {
+            return ResponseEntity.ok(productDetailService.updateQuantityByOne(id, type));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/product-detail/{id}/quantity/amount/{amount}")
+    public ResponseEntity<?> updateQuantityByAmount(
+            @PathVariable Long id,
+            @PathVariable int amount) {
+        try {
+            return ResponseEntity.ok(productDetailService.updateQuantityByAmount(id, amount));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<?> searchProducts(@RequestParam String name) {
+        try {
+            List<ProductResponse> products = productService.searchProductsByName(name);
+            return ResponseEntity.ok(products);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    
 
 }

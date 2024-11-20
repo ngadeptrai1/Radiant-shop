@@ -14,9 +14,10 @@ import lombok.*;
 @ToString
 @Builder
 public class OrderDetailDTO {
+    private Long id;
 
     @NotNull(message = "Product id not null ")
-    @JsonProperty(value = "product_detail_id")
+
     @Min(value = 1 ,message = "Product id invalid")
     private Long productDetailId;
 

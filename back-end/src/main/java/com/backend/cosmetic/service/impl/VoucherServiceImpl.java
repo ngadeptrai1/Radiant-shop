@@ -92,19 +92,15 @@ public class VoucherServiceImpl implements VoucherService {
     public VoucherResponse applyCode(String code , long totalAmount) {
         Voucher voucher = voucherRepository.findVoucherByCode(code).orElseThrow(
                         () ->  new DataNotFoundException("Not found voucher with code  " + code))  ;
-
         LocalDateTime now = LocalDateTime.now();
         if (now.isBefore(voucher.getStartDate()) || now.isAfter(voucher.getEndDate())) {
             throw new DataInvalidException("Voucher is not valid at this time");
         }
-
         Long usageCount = voucherRepository.countVoucherUsage(code);
-
         if (voucher.getUsageLimit() != null && usageCount >= voucher.getUsageLimit()) {
             throw new DataInvalidException("Voucher usage limit has been reached");
         }
-
-        if (voucher.getMinOrderAmount() >totalAmount ) {
+        if (voucher.getMinOrderAmount() > totalAmount ) {
             throw new DataInvalidException("Voucher min order amount has been reached");
         }
         return VoucherResponse.fromVoucher(voucher);
@@ -142,4 +138,22 @@ public class VoucherServiceImpl implements VoucherService {
         }
         return totalDiscount;
     }
+
+    @Override
+    public List<VoucherResponse> findValidVouchersByAmount(long amount) {
+        LocalDateTime now = LocalDateTime.now();
+        return voucherRepository.findAll().stream()
+                .filter(voucher -> 
+                    voucher.isActive() &&
+                    now.isAfter(voucher.getStartDate()) &&
+                    now.isBefore(voucher.getEndDate()) &&
+                    amount >= voucher.getMinOrderAmount() &&
+                    (voucher.getUsageLimit() == null || 
+                     voucherRepository.countVoucherUsage(voucher.getCode()) < voucher.getUsageLimit())
+                )
+                .map(VoucherResponse::fromVoucher)
+                .collect(Collectors.toList());
+    }
+
+
 }

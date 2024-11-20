@@ -47,6 +47,6 @@ public class Voucher extends BaseModel{
     @Column(length = 500,columnDefinition = "TEXT")
     private String description;
 
-    @OneToMany(mappedBy = "voucher")
-    private List<Order> applyOrder ;
+    @OneToMany(mappedBy = "voucher", fetch = FetchType.EAGER)
+    private List<Order> applyOrder;
 }

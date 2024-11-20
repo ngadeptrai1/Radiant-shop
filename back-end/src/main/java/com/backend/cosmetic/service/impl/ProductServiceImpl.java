@@ -199,4 +199,24 @@ public class ProductServiceImpl implements ProductService {
         return ProductResponse.fromProduct(product);
     }
 
+    private void checkDuplicateName(String name) {
+        if (productRepository.existsByName(name)) {
+            throw new DataNotFoundException("Product name '" + name + "' already exists");
+        }
+    }
+
+    private void checkDuplicateNameForUpdate(String name, Long id) {
+        if (productRepository.existsByNameAndIdNot(name, id)) {
+            throw new DataNotFoundException("Product name '" + name + "' already exists");
+        }
+    }
+
+    @Override
+    public List<ProductResponse> searchProductsByName(String name) {
+        List<Product> products = productRepository.findByNameContainingIgnoreCase(name);
+        return products.stream()
+                .map(ProductResponse::fromProduct)
+                .collect(Collectors.toList());
+    }
+
 }

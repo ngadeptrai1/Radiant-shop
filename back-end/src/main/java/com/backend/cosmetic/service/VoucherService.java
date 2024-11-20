@@ -1,13 +1,13 @@
 package com.backend.cosmetic.service;
 
 
-import com.backend.cosmetic.dto.VoucherDTO;
-import com.backend.cosmetic.response.VoucherResponse;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.backend.cosmetic.dto.VoucherDTO;
+import com.backend.cosmetic.response.VoucherResponse;
 
 @Service
 public interface VoucherService {
@@ -19,4 +19,5 @@ public interface VoucherService {
     VoucherResponse findByCode(String code);
     VoucherResponse applyCode(String code , long totalAmount);
     long approveVoucher(String code,long totalAmount);
+    List<VoucherResponse> findValidVouchersByAmount(long amount);
 }

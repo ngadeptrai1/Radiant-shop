@@ -51,4 +51,9 @@ public class VoucherController {
     public ResponseEntity<?> applyCode(@RequestParam("code") String code , @RequestParam("totalAmount") long totalAmount) {
         return ResponseEntity.ok(voucherService.applyCode(code, totalAmount));
     }
+
+    @GetMapping("/valid")
+    public ResponseEntity<?> getValidVouchers(@RequestParam("amount") long amount) {
+        return ResponseEntity.ok(voucherService.findValidVouchersByAmount(amount));
+    }
 }

@@ -98,4 +98,37 @@ public class ProductDetailServiceImpl implements ProductDetailService {
         });
         return ProductDetailResponse.fromProductDetail(productDetail);
     }
+
+    @Override
+    public ProductDetailResponse updateQuantityByOne(Long id, String type) {
+        ProductDetail productDetail = productDetailRepository.findById(id).orElseThrow(() -> 
+            new DataNotFoundException("Product detail with id " + id + " not found"));
+        
+        if ("plus".equalsIgnoreCase(type)) {
+            productDetail.setQuantity(productDetail.getQuantity() + 1);
+        } else if ("minus".equalsIgnoreCase(type)) {
+            if (productDetail.getQuantity() <= 0) {
+                throw new DataNotFoundException("Cannot decrease quantity below 0");
+            }
+            productDetail.setQuantity(productDetail.getQuantity() - 1);
+        } else {
+            throw new DataNotFoundException("Invalid type. Must be 'plus' or 'minus'");
+        }
+        
+        return ProductDetailResponse.fromProductDetail(productDetailRepository.save(productDetail));
+    }
+
+    @Override
+    public ProductDetailResponse updateQuantityByAmount(Long id, int amount) {
+        ProductDetail productDetail = productDetailRepository.findById(id).orElseThrow(() ->
+            new DataNotFoundException("Product detail with id " + id + " not found"));
+        
+        int newQuantity = productDetail.getQuantity() + amount;
+        if (newQuantity < 0) {
+            throw new DataNotFoundException("Cannot set quantity below 0");
+        }
+        
+        productDetail.setQuantity(newQuantity);
+        return ProductDetailResponse.fromProductDetail(productDetailRepository.save(productDetail));
+    }
 }

@@ -19,9 +19,8 @@ public class CategoryResponse {
     private Integer id;
     private String name;
     private CategoryResponse parentCategory;
+    private boolean activate;
     private List<CategoryResponse> subCategories;
-    private boolean activate ;
-
     public static CategoryResponse fromCategory(Category category, Set<Integer> visitedIds) {
         if (category == null || visitedIds.contains(category.getId())) {
             return null;

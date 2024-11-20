@@ -2,6 +2,8 @@ package com.backend.cosmetic.service.impl;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -13,6 +15,7 @@ import com.backend.cosmetic.exception.DataNotFoundException;
 import com.backend.cosmetic.model.Order;
 import com.backend.cosmetic.model.OrderDetail;
 import com.backend.cosmetic.model.OrderStatus;
+import com.backend.cosmetic.model.ProductDetail;
 import com.backend.cosmetic.model.User;
 import com.backend.cosmetic.repository.OrderDetailRepository;
 import com.backend.cosmetic.repository.OrderRepository;
@@ -21,6 +24,7 @@ import com.backend.cosmetic.repository.UserRepository;
 import com.backend.cosmetic.response.OrderResponse;
 import com.backend.cosmetic.service.OrderService;
 import com.backend.cosmetic.service.VoucherService;
+import com.cloudinary.utils.StringUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -100,42 +104,59 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(rollbackFor = {DataNotFoundException.class, Exception.class,NullPointerException.class})
     public OrderResponse createOrderInCounter(OrderCounterDTO orderDTO) {
+        // Build order with null checks using Optional
         Order order = Order.builder()
-                .email(orderDTO.getEmail())
-                .fullName(orderDTO.getFullName())
-                .note(orderDTO.getNote())
+                .email(Optional.ofNullable(orderDTO.getEmail()).orElse(""))
+                .fullName(Optional.ofNullable(orderDTO.getFullName()).orElse(""))
+                .note(Optional.ofNullable(orderDTO.getNote()).orElse(""))
                 .status(OrderStatus.SUCCESS)
-                .paymentStatus("success")
-                .shippingCost(0)
+                .paymentMethod(orderDTO.getPaymentMethod())
+                .paymentStatus(Optional.ofNullable(orderDTO.getPaymentStatus()).orElse(""))
+                .phoneNumber(Optional.ofNullable(orderDTO.getPhoneNumber()).orElse(""))
+                .shippingCost(Optional.ofNullable(orderDTO.getShippingCost()).orElse(0L))
+                .type(Optional.ofNullable(orderDTO.getType()).orElse(""))
+                .address("")
                 .build();
 
         order = orderRepository.save(order);
-        List<OrderDetail> orderDetails = new LinkedList<>();
-        Order finalOrder = order;
-        orderDTO.getOrderDetails().forEach(orderDetail -> {
-            OrderDetail orderDetailDto = OrderDetail.builder()
-                    .order(finalOrder)
-                    .quantity(orderDetail.getQuantity())
-                    .productDetail(productDetailRepo.findById(orderDetail.getProductDetailId()).orElseThrow(()->
-                            new DataNotFoundException("Not found product detail")
-                    ))
-                    .price(productDetailRepo.findById(orderDetail.getProductDetailId()).orElseThrow(()->
-                            new DataNotFoundException("Not found product detail ")
-                    ).getSalePrice())
-                    .build();
-            orderDetails.add(orderDetailDto);});
+        
+        // Save order first and make it final
+        final Order savedOrder = orderRepository.save(order);
+        
+        // Process order details in batch
+        List<OrderDetail> orderDetails = orderDTO.getOrderDetails().stream()
+                .map(detail -> {
+                    ProductDetail productDetail = productDetailRepo.findById(detail.getProductDetailId())
+                            .orElseThrow(() -> new DataNotFoundException("Not found product detail"));
+                    
+                    return OrderDetail.builder()
+                            .order(savedOrder)
+                            .quantity(detail.getQuantity()) 
+                            .productDetail(productDetail)
+                            .price(productDetail.getSalePrice())
+                            .build();
+                })
+                .collect(Collectors.toList());
+
         order.setOrderDetails(orderDetailRepository.saveAll(orderDetails));
-        long totalAmount = order.getOrderDetails().stream().mapToLong(OrderDetail::getQuantity).sum();
+
+        // Calculate totals
+        long totalAmount = order.getOrderDetails().stream()
+                .mapToLong(OrderDetail::getPrice)
+                .sum();
+                
         order.setTotalOrderAmount(totalAmount);
-        order.setTotalItems(order.getOrderDetails().size());
-        if (orderDTO.getVoucherCode()!= null && !orderDTO.getVoucherCode().isEmpty() ) {
+        order.setTotalItems(orderDetails.size());
+
+        // Apply voucher if exists
+        if (StringUtils.isNotBlank(orderDTO.getVoucherCode())) {
             order.setVoucherAmount(voucherService.approveVoucher(orderDTO.getVoucherCode(), totalAmount));
         }
-        order.setFinalAmount((totalAmount-order.getVoucherAmount())+ order.getShippingCost());
-        order = orderRepository.save(order);
-        // send mail
 
-        return OrderResponse.fromOrder(order);
+        // Calculate final amount
+        order.setFinalAmount((totalAmount - order.getVoucherAmount()) + order.getShippingCost());
+        
+        return OrderResponse.fromOrder(orderRepository.save(order));
     }
 
     @Override

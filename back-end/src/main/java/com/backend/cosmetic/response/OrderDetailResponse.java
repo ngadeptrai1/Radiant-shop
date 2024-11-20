@@ -10,7 +10,7 @@ import lombok.*;
 @Setter
 @Builder
 public class OrderDetailResponse {
-    private int id;
+    private long id;
     private int quantity;
     private Long price;
     private ProductDetailResponse productDetail;
