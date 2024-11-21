@@ -13,4 +13,14 @@ public class OrderStatus {
     public static final String CANCELLED = "cancelled";
 
     public static final String SUCCESS = "success";
+
+    public static final String PAYMENT_PENDING = "payment_pending";
+
+    public static final String PAYMENT_SUCCESS = "payment_success";
+
+    public static final String PAYMENT_FAILED = "payment_failed";
+
+    public static final String TYPE_ONLINE = "online";
+
+    public static final String TYPE_COUNTER = "counter";
 }

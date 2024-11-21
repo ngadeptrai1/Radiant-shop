@@ -18,7 +18,7 @@ public class UserResponseDto {
     private String username;
     private String email;
     private String fullName;
-    private String phoneNum;
+    private String phoneNumber;
     private String provider;
     private boolean blocked;
     private boolean enabled;

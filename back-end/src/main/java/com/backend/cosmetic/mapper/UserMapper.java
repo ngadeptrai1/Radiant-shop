@@ -16,7 +16,7 @@ public class UserMapper {
             .username(user.getUsername())
             .email(user.getEmail())
             .fullName(user.getFullName())
-            .phoneNum(user.getPhoneNum())
+            .phoneNumber(user.getPhoneNum())
             .provider(user.getProvider())
             .blocked(user.isBlocked())
             .enabled(user.isEnabled())

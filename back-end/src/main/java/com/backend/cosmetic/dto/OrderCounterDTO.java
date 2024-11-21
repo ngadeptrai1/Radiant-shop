@@ -39,12 +39,15 @@ public class OrderCounterDTO {
 
     private String paymentStatus;
 
+    private Long userId;
 
     private Long shippingCost;
 
     @Nullable
 
     private String voucherCode;
+
+
 
     @Size(min = 1, max = 50, message = "List size must be between 1 and 50 elements")
     @Valid

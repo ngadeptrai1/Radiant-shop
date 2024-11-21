@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.cosmetic.dto.ProductDTO;
 import com.backend.cosmetic.exception.DataInvalidException;
+import com.backend.cosmetic.repository.ProductRepository;
 import com.backend.cosmetic.response.ProductResponse;
 import com.backend.cosmetic.service.ProductDetailService;
 import com.backend.cosmetic.service.ProductService;
@@ -43,9 +45,11 @@ import lombok.extern.slf4j.Slf4j;
 public class ProductController {
 
 private final ProductService productService;
+private final ProductRepository productRepository;
 private final ProductDetailService productDetailService;
 private static final Logger LOGGER = Logger.getLogger(ProductController.class.getName());
 
+    @Cacheable(value = "products", key = "#pageNum + #size + #sort + #direction")
     @GetMapping("")
     public ResponseEntity<?> getAllProducts(@RequestParam("page") Optional<Integer> pageNum,
                                             @RequestParam("size") Optional<Integer> size,
@@ -72,7 +76,8 @@ private static final Logger LOGGER = Logger.getLogger(ProductController.class.ge
         Pageable page = PageRequest.of(pageNum.orElse(0), size.orElse(5),
                 Sort.by(sortDirection, sort.orElse("id")));
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(productService.findAll(filterCriteria,page));
+            // return ResponseEntity.status(HttpStatus.OK).body(productRepository.findAll(page));
+           return ResponseEntity.status(HttpStatus.OK).body(productService.findAll(filterCriteria,page));
         } catch (Exception e) {
             LOGGER.severe("Error: " + e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -89,6 +94,7 @@ private static final Logger LOGGER = Logger.getLogger(ProductController.class.ge
         }
     }
 
+    @Cacheable(value = "product", key = "#id")
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable Long id){
         return ResponseEntity.status(HttpStatus.OK)

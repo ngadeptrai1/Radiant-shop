@@ -36,11 +36,13 @@ public class UserManager implements UserDetailsManager {
         userRepository.save(newUser);
     }
 
-    public void createStaffUser(User user) {
+    public User createStaffUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        // Set STAFF role for users created by admin
-        user.getRoles().add(roleService.getStaffRole());
-        userRepository.save(user);
+        // Chỉ thêm role STAFF nếu user chưa có role nào
+        if (user.getRoles().isEmpty()) {
+            user.getRoles().add(roleService.getStaffRole());
+        }
+        return userRepository.save(user);
     }
 
     public void createOauth2User(User user) {

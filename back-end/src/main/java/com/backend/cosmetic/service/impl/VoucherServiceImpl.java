@@ -154,6 +154,10 @@ public class VoucherServiceImpl implements VoucherService {
                 .map(VoucherResponse::fromVoucher)
                 .collect(Collectors.toList());
     }
-
+    public Voucher getByCode(String code){
+        return voucherRepository.findVoucherByCode(code).orElseThrow(
+                () -> new DataNotFoundException("Not found voucher with code  " + code)
+        );
+    }
 
 }

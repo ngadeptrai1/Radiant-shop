@@ -20,8 +20,8 @@ public class ProductResponse {
     private boolean activate ;
     private String thumbnail;
     private List<ProductImageResponse> productImages;
-    private CategoryResponse category;
-    private BrandResponse brand;
+    private String category;
+    private String brand;
     private List< ProductDetailResponse> productDetails;
 
     public static ProductResponse fromProduct(Product product){
@@ -31,8 +31,8 @@ public class ProductResponse {
                 .description(product.getDescription())
                 .activate(product.isActive())
                 .thumbnail(product.getThumbnail())
-                .brand(BrandResponse.fromBrand( product.getBrand()))
-                .category(CategoryResponse.fromCategory(product.getCategory(),new HashSet<>()))
+                .brand(product.getBrand().getName())
+                .category(product.getCategory().getName())
                 .productImages(product.getProductImages().stream().map(productImage -> {
                     return ProductImageResponse.builder()
                             .id(productImage.getId())

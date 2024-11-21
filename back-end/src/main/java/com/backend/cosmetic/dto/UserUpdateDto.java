@@ -19,7 +19,7 @@ public class UserUpdateDto {
     private String email;
     
     @Size(min = 10, max = 15, message = "Phone number must be between 10 and 15 characters")
-    private String phoneNum;
+    private String phoneNumber;
     
     private String address;
 } 

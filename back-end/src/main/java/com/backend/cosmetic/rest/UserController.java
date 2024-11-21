@@ -1,6 +1,7 @@
 package com.backend.cosmetic.rest;
 
-import org.springframework.data.domain.Pageable;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.backend.cosmetic.dto.StaffCreateDto;
+import com.backend.cosmetic.dto.UserResponseDto;
 import com.backend.cosmetic.dto.UserUpdateDto;
 import com.backend.cosmetic.dto.WalkInCustomerDto;
 import com.backend.cosmetic.service.UserService;
@@ -56,6 +59,7 @@ public class UserController {
     public ResponseEntity<?> createWalkInCustomer(@RequestBody @Valid WalkInCustomerDto walkInCustomerDto) {
         return ResponseEntity.ok(userService.createWalkInCustomer(walkInCustomerDto));
     }
+    
 
     @GetMapping("/search")
     public ResponseEntity<?> searchCustomers(
@@ -68,9 +72,51 @@ public class UserController {
     @GetMapping("/role/{roleName}")
     public ResponseEntity<?> getUsersByRole(@PathVariable String roleName) {
         try {
-            return ResponseEntity.ok(userService.getUsersByRole(roleName));
+            List<UserResponseDto> users = userService.getUsersByRole(roleName);
+            return ResponseEntity.ok(users);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @GetMapping("/roles")
+    public ResponseEntity<?> getUsersByRoles(@RequestParam List<String> roleNames) {
+        try {
+            List<UserResponseDto> users = userService.getUsersByRoles(roleNames);
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/staff")
+    public ResponseEntity<?> createStaff(@RequestBody @Valid StaffCreateDto staffDto) {
+        return ResponseEntity.ok(userService.createStaff(staffDto));
+    }
+
+    @PutMapping("/staff/{id}")
+    public ResponseEntity<?> updateStaff(@PathVariable Long id, @RequestBody @Valid StaffCreateDto staffDto) {
+        return ResponseEntity.ok(userService.updateStaff(id, staffDto));
+    }
+
+    @DeleteMapping("/staff/{id}")
+    public ResponseEntity<?> deleteStaff(@PathVariable Long id) {
+        userService.deleteStaff(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/staff/search")
+    public ResponseEntity<?> searchStaff(
+        @RequestParam(required = false) String username,
+        @RequestParam(required = false) String email,
+        @RequestParam(required = false) String phone
+    ) {
+        try {
+            List<UserResponseDto> staff = userService.searchStaff(username, email, phone);
+            return ResponseEntity.ok(staff);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    
 }

@@ -14,12 +14,16 @@ public class RoleService {
     private final RoleRepository roleRepository;
 
     public Role getCustomerRole() {
-        return roleRepository.findByName(RoleType.CUSTOMER)
+        return roleRepository.findByNameLike(RoleType.CUSTOMER)
             .orElseThrow(() -> new RuntimeException("Customer role not found"));
     }
 
     public Role getStaffRole() {
-        return roleRepository.findByName(RoleType.STAFF)
+        return roleRepository.findByNameLike(RoleType.STAFF)
             .orElseThrow(() -> new RuntimeException("Staff role not found"));
+    }
+    public Role getAdminRole() {
+        return roleRepository.findByNameLike(RoleType.ADMIN)
+                .orElseThrow(() -> new RuntimeException("Staff role not found"));
     }
 } 

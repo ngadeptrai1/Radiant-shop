@@ -14,4 +14,5 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
     @Query("SELECT COUNT(o) FROM Order o WHERE o.voucher.code = :code")
     Long countVoucherUsage(String code);
     boolean existsByCode(String code);
+
 }

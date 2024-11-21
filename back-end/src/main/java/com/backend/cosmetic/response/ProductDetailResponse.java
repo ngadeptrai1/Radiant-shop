@@ -23,7 +23,7 @@ public class ProductDetailResponse {
 
     private int quantity;
 
-    private ColorResponse color;
+    private String color;
 
     private boolean active;
 
@@ -33,7 +33,9 @@ public class ProductDetailResponse {
                 .salePrice(product.getSalePrice())
                 .discount(product.getDiscount())
                 .quantity(product.getQuantity())
-                .color(ColorResponse.fromColor(product.getColor()))
+                .color((product.getColor().getName()))
+
+
                 .active(product.isActive())
                 .build();
     }

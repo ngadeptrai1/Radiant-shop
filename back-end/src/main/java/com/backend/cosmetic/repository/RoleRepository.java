@@ -8,5 +8,5 @@ import com.backend.cosmetic.model.Role;
 import com.backend.cosmetic.model.RoleType;
 
 public interface RoleRepository extends JpaRepository<Role, Integer> {
-    Optional<Role> findByName(RoleType name);
+    Optional<Role> findByNameLike(RoleType name);
 } 

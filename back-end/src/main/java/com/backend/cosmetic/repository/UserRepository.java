@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.backend.cosmetic.model.RoleType;
 import com.backend.cosmetic.model.User;
 
 @Repository
@@ -29,9 +30,22 @@ public interface UserRepository extends JpaRepository<User, Long> {
         Pageable pageable
     );
     @Query("SELECT u FROM User u JOIN u.roles r WHERE r.name = :roleName")
-    List<User> findByRoleName(@Param("roleName") String roleName);
+    List<User> findByRole(@Param("roleName") RoleType roleName);
 
     List<User> findByPhoneNumContaining(String phone);
 
     List<User> findByFullNameContainingIgnoreCase(String name);
+
+    @Query("SELECT DISTINCT u FROM User u JOIN u.roles r WHERE r.name IN :roleNames")
+    List<User> findByRoles(@Param("roleNames") List<RoleType> roleNames);
+
+    @Query("SELECT u FROM User u JOIN u.roles r WHERE r.name = 'STAFF' AND " +
+           "(:username IS NULL OR u.username LIKE %:username%) AND " +
+           "(:email IS NULL OR u.email LIKE %:email%) AND " +
+           "(:phone IS NULL OR u.phoneNum LIKE %:phone%)")
+    List<User> searchStaff(
+        @Param("username") String username,
+        @Param("email") String email, 
+        @Param("phone") String phone
+    );
 }
