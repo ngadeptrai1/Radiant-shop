@@ -39,6 +39,9 @@
           Giá trị giảm là bắt buộc
         </mat-error>
         }
+        <mat-error *ngIf="form.get('value')?.errors?.['exceedsMinOrder']">
+          Giá trị giảm không được lớn hơn điều kiện giảm
+        </mat-error>
        @if ( form.get('value')?.hasError('min')) {
          <mat-error >
           Giá trị giảm phải lớn hơn 0
@@ -155,7 +158,7 @@
 
   <mat-dialog-actions align="end">
     <button mat-button type="button" (click)="onCancel()">Hủy</button>
-    <button mat-raised-button color="primary" type="submit" [disabled]="!form.valid">
+    <button mat-raised-button color="primary" type="submit" [disabled]="form.valid">
       {{data.voucher ? 'Cập nhật' : 'Thêm mới'}}
     </button>
   </mat-dialog-actions>

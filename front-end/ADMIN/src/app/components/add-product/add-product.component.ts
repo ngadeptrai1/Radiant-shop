@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Brand,  Category, Color, ProductDetail } from '../../../type';
+import { Brand,  Category, Color, ProductDetail, ProductResponse } from '../../../type';
 import { CategoryService } from '../../services/category-service.service';
 import { BrandService } from '../../services/brand-service.service';
 import { ColorService } from '../../services/color.service';
@@ -34,6 +34,7 @@ export class AddProductComponent {
   file:File | undefined;
   files:File[] | undefined;
   isLoading = false;
+  existingProductName: boolean = false;
   
   constructor(  private fb: FormBuilder,
     private categoryService: CategoryService, 
@@ -64,16 +65,38 @@ export class AddProductComponent {
 
   addProductDetail() {
     const productDetailForm = this.fb.group({
-      salePrice: ['', [Validators.required, Validators.min(10000)]],
-      discount: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
-      quantity: [0, [Validators.required, Validators.min(1)]],
-      colorId: ['', [Validators.required]]
+      salePrice: ['', [
+        Validators.required, 
+        Validators.min(10000),
+        Validators.pattern(/^[0-9]+$/)
+      ]],
+      discount: [0, [
+        Validators.required, 
+        Validators.min(0), 
+        Validators.max(100),
+        Validators.pattern(/^[0-9]+$/)
+      ]],
+      quantity: [1, [
+        Validators.required, 
+        Validators.min(1),
+        Validators.pattern(/^[0-9]+$/)
+      ]],
+      colorId: [null, [Validators.required]]
+    });
+
+    // Subscribe to color changes
+    productDetailForm.get('colorId')?.valueChanges.subscribe(colorId => {
+        if (!colorId) return;
+        setTimeout(() => {
+            this.updateDuplicateColorErrors();
+        });
     });
     
     if (this.productDetailsArray.length >= 10) {
-      alert('Không thể thêm quá 10 chi tiết sản phẩm');
-      return; 
+        this.showSnackBar('Không thể thêm quá 10 chi tiết sản phẩm');
+        return;
     }
+    
     this.productDetailsArray.push(productDetailForm);
   }
 
@@ -116,69 +139,59 @@ export class AddProductComponent {
 
   
   }
-  onSubmit() {
+  async onSubmit() {
+    // Kiểm tra tên sản phẩm trùng lặp
+    const productName = this.formBuilder.get('name')?.value;
+    try {
+        const existingProducts = await this.productService.searchByName(productName).toPromise();
+        if (existingProducts && existingProducts.length > 0) {
+            this.formBuilder.get('name')?.setErrors({ 'duplicate': true });
+            this.showSnackBar('Tên sản phẩm đã tồn tại!');
+            return;
+        }
+    } catch (error) {
+        this.showSnackBar('Có lỗi xảy ra khi kiểm tra tên sản phẩm!');
+        return;
+    }
+
     // Validate product details array
     const productDetails = this.formBuilder.get('productDetails') as FormArray;
     if (productDetails.length === 0) {
-      this.snackBar.open('Phải có ít nhất một chi tiết sản phẩm!', 'Đóng', {
-        duration: 3000,
-        horizontalPosition: 'right', 
-        verticalPosition: 'top',
-      });
-      return;
+        this.showSnackBar('Phải có ít nhất một chi tiết sản phẩm!');
+        return;
     }
 
     // Check for duplicate colors
     const colors = productDetails.controls.map(control => control.get('colorId')?.value);
     const uniqueColors = new Set(colors);
     if (colors.length !== uniqueColors.size) {
-      this.snackBar.open('Không thể có hai chi tiết sản phẩm cùng màu!', 'Đóng', {
-        duration: 3000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top',
-      });
-    return;
+        this.showSnackBar('Không thể có hai chi tiết sản phẩm cùng màu!');
+        return;
     }
 
     // Validate each product detail
     for (let i = 0; i < productDetails.length; i++) {
-      const detail = productDetails.at(i);
-      if (detail.invalid) {
-        this.snackBar.open('Vui lòng điền đầy đủ thông tin chi tiết sản phẩm!', 'Đóng', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top',
-        });
-        return;
-      }
+        const detail = productDetails.at(i);
+        if (detail.invalid) {
+            this.showSnackBar('Vui lòng điền đầy đủ thông tin chi tiết sản phẩm!');
+            return;
+        }
     }
 
     // Validate thumbnail
     if (!this.file) {
-      this.snackBar.open('Vui lòng chọn ảnh đại diện!', 'Đóng', {
-        duration: 3000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top',
-      });
-      return;
+        this.showSnackBar('Vui lòng chọn ảnh đại diện!');
+        return;
     }
 
     // Validate product images
     if (!this.files || this.files.length < 2) {
-      this.snackBar.open('Vui lòng chọn ít nhất 2 ảnh sản phẩm!', 'Đóng', {
-        duration: 3000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top', 
-      });
-      return;
+        this.showSnackBar('Vui lòng chọn ít nhất 2 ảnh sản phẩm!');
+        return;
     }
     if (!this.files || this.files.length > 5) {
-      this.snackBar.open('Ảnh sản phẩm không vượt quá 4 ảnh!', 'Đóng', {
-        duration: 3000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top', 
-      });
-      return;
+        this.showSnackBar('Ảnh sản phẩm không vượt quá 4 ảnh!');
+        return;
     }
 
     const formValue = this.formBuilder.value;
@@ -186,16 +199,16 @@ export class AddProductComponent {
     Object.keys(formValue).forEach(key => {
         formData.append(key, formValue[key]);
     });
+    
     // Set file values
-    formData.set('thumbnail',this.file);
+    formData.set('thumbnail', this.file);
     for(let i = 0; i < this.files?.length; i++) {
-      formData.set(`productImages[${i}]`, this.files[i]);
+        formData.set(`productImages[${i}]`, this.files[i]);
     }
     formData.delete('productImages');
-    console.log(this.formBuilder.value);
+    
     this.isLoading = true;
-    console.log(this.formBuilder.value.productDetails);
-    // this.createProduct(formData,this.formBuilder.value.productDetails);
+    this.createProduct(formData, this.formBuilder.value.productDetails);
   }
 
   showSnackBar(message: string) {
@@ -206,20 +219,75 @@ export class AddProductComponent {
     });
   }
     createProduct(product: FormData, productDetails: ProductDetail[]) {
-    this.productService.createProduct(product,productDetails).subscribe({
-      next: (newProduct) => {
+    this.productService.createProduct(product, productDetails).subscribe({
+      next: (newProduct: ProductResponse) => {
         console.log(newProduct);
         this.showSnackBar('Thêm sản phẩm thành công');
         this.isLoading = false;
-        // Reset form after successful creation
-       setTimeout(() => {
-        window.location.reload();
-       }, 1500);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
       },
       error: (error) => {
         this.showSnackBar('Lỗi khi thêm sản phẩm');
         this.isLoading = false;
       }
     });
+  }
+
+  private checkDuplicateColor(colorId: string, currentIndex: number): boolean {
+    if (!colorId || colorId === '') return false;
+    
+    // Kiểm tra xem có màu trùng lặp không
+    return this.productDetailsArray.controls.some((control, index) => 
+        index !== currentIndex && control.get('colorId')?.value === colorId
+    );
+  }
+
+  private updateDuplicateColorErrors() {
+    // Tạo map để đếm số lần xuất hiện của mỗi màu
+    const colorCounts = new Map<string, number>();
+    
+    // Đếm số lần xuất hiện của mỗi màu
+    this.productDetailsArray.controls.forEach(control => {
+        const colorId = control.get('colorId')?.value;
+        if (colorId) {
+            colorCounts.set(colorId, (colorCounts.get(colorId) || 0) + 1);
+        }
+    });
+
+    // Cập nhật lỗi cho tất cả các control
+    this.productDetailsArray.controls.forEach(control => {
+        const colorId = control.get('colorId')?.value;
+        if (colorId && colorCounts.get(colorId)! > 1) {
+            control.get('colorId')?.setErrors({ 'duplicateColor': true });
+        } else {
+            const currentErrors = control.get('colorId')?.errors;
+            if (currentErrors) {
+                delete currentErrors['duplicateColor'];
+                if (Object.keys(currentErrors).length === 0) {
+                    control.get('colorId')?.setErrors(null);
+                } else {
+                    control.get('colorId')?.setErrors(currentErrors);
+                }
+            }
+        }
+    });
+  }
+
+  numberOnly(event: KeyboardEvent): boolean {
+    const charCode = (event.which) ? event.which : event.keyCode;
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+      return false;
+    }
+    return true;
+  }
+
+  // Thêm phương thức để format giá
+  formatPrice(price: number): string {
+    return new Intl.NumberFormat('vi-VN', { 
+      style: 'currency', 
+      currency: 'VND' 
+    }).format(price);
   }
 }

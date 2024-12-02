@@ -1,0 +1,157 @@
+<div class="account-container">
+  <div class="sidebar">
+    <div class="user-info">
+      <h3>{{user?.fullName}}</h3>
+      <p>{{user?.email}}</p>
+    </div>
+    
+    <nav class="nav-menu">
+      <button [class.active]="activeTab === 'profile'" (click)="switchTab('profile')">
+        Thông tin cá nhân
+      </button>
+      <button [class.active]="activeTab === 'address'" (click)="switchTab('address') " (click)="loadAddresses()">
+        Địa chỉ
+      </button>
+      <button [class.active]="activeTab === 'password'" (click)="switchTab('password')">
+        Đổi mật khẩu
+      </button>
+    </nav>
+  </div>
+
+  <div class="content">
+    <!-- Profile Tab -->
+    <div *ngIf="activeTab === 'profile'" class="tab-content">
+      <h2>Thông tin cá nhân</h2>
+      <form [formGroup]="profileForm" (ngSubmit)="onProfileSubmit()">
+        <div class="form-group">
+          <label>Họ và tên</label>
+          <input type="text" formControlName="fullName">
+        </div>
+        
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" formControlName="email">
+        </div>
+        
+        <div class="form-group">
+          <label>Tên đăng nhập</label>
+          <input type="text" formControlName="username">
+        </div>
+
+        <button type="submit" [disabled]="!profileForm.valid">Cập nhật</button>
+      </form>
+    </div>
+
+    <!-- Address Tab -->
+    <div *ngIf="activeTab === 'address'" class="tab-content">
+      <div class="address-header">
+        <h2>Địa chỉ của tôi</h2>
+        <button class="add-address-btn" (click)="toggleAddressForm()" *ngIf="!showAddressForm">
+          <i class="fas fa-plus"></i> Thêm địa chỉ mới
+        </button>
+      </div>
+
+      <div class="address-list" *ngIf="!showAddressForm">
+        <div class="address-card" *ngFor="let address of addresses">
+          <div class="address-info">
+            <h3>{{address.fullname}}</h3>
+            <p>{{address.phoneNumber}}</p>
+            <p>{{address.email}}</p>
+            <p>{{address.address}}</p>
+            <p>{{address.wardName}}, {{address.districtName}}, {{address.provinceName}}</p>
+          </div>
+          <div class="address-actions">
+           
+            <button class="delete-btn" (click)="deleteAddress(address.id)">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <form [formGroup]="addressForm" (ngSubmit)="onAddressSubmit()" *ngIf="showAddressForm" class="address-form">
+        <div class="form-group">
+          <label>Họ và tên</label>
+          <input type="text" formControlName="fullName">
+        </div>
+        
+        <div class="form-group">
+          <label>Số điện thoại</label>
+          <input type="text" formControlName="phoneNumber">
+        </div>
+        
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" formControlName="email">
+          <div class="error-message" *ngIf="addressForm.get('email')?.invalid && addressForm.get('email')?.touched">
+            <small *ngIf="addressForm.get('email')?.errors?.['required']">Email là bắt buộc</small>
+            <small *ngIf="addressForm.get('email')?.errors?.['email']">Email không hợp lệ</small>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>Tỉnh/Thành phố</label>
+          <select formControlName="provinceId" (change)="onProvinceChange($event)">
+            <option value="">Chọn Tỉnh/Thành phố</option>
+            <option *ngFor="let province of provinces" [value]="province.ProvinceID">
+              {{province.ProvinceName}}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Quận/Huyện</label>
+          <select formControlName="districtId" (change)="onDistrictChange($event)" [disabled]="!addressForm.get('provinceId')?.value">
+            <option value="">Chọn Quận/Huyện</option>
+            <option *ngFor="let district of districts" [value]="district.DistrictID">
+              {{district.DistrictName}}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Phường/Xã</label>
+          <select formControlName="wardCode" (change)="onWardChange($event)" [disabled]="!addressForm.get('districtId')?.value">
+            <option value="">Chọn Phường/Xã</option>
+            <option *ngFor="let ward of wards" [value]="ward.WardCode">
+              {{ward.WardName}}
+            </option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Địa chỉ chi tiết</label>
+          <input type="text" formControlName="address" placeholder="Số nhà, tên đường...">
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="cancel-btn" (click)="toggleAddressForm()">Hủy</button>
+          <button type="submit" [disabled]="!addressForm.valid">Lưu địa chỉ</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Password Tab -->
+    <div *ngIf="activeTab === 'password'" class="tab-content">
+      <h2>Đổi mật khẩu</h2>
+      <form [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()">
+        <div class="form-group">
+          <label>Mật khẩu hiện tại</label>
+          <input type="password" formControlName="currentPassword">
+        </div>
+        
+        <div class="form-group">
+          <label>Mật khẩu mới</label>
+          <input type="password" formControlName="newPassword">
+        </div>
+        
+        <div class="form-group">
+          <label>Xác nhận mật khẩu mới</label>
+          <input type="password" formControlName="confirmPassword">
+        </div>
+
+        <button type="submit" [disabled]="!passwordForm.valid">Đổi mật khẩu</button>
+      </form>
+    </div>
+  </div>
+</div>

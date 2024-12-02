@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.backend.cosmetic.repository.RoleRepository;
 import com.backend.cosmetic.service.RoleService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -137,10 +138,8 @@ public class UserServiceImpl implements UserService {
                     .map(name -> RoleType.valueOf(name.toUpperCase()))
                     .collect(Collectors.toList());
             
-            List<User> users = userRepository.findByRoles(roleTypes);
-            return users.stream()
-                    .map(userMapper::toResponseDto)
-                    .collect(Collectors.toList());
+
+            return userMapper.toResponseDtoList( userRepository.findByRoles(roleTypes));
                     
         } catch (IllegalArgumentException e) {
             throw new DataNotFoundException("Invalid role name in list: " + roleNames);

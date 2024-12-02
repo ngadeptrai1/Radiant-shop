@@ -1,0 +1,102 @@
+<div class="content">
+  <div class="container">
+    <div class="checkout-wrapper">
+      <div class="page-title">
+        <h2>Giỏ hàng của bạn</h2>
+        <p *ngIf="cartItems.length > 0">{{cartItems.length}} sản phẩm</p>
+      </div>
+
+      <ng-container *ngIf="cartItems.length > 0; else emptyCart">
+        <div class="cart-container">
+          <div class="cart-items">
+            <div class="cart-header">
+              <div class="header-product">Sản phẩm</div>
+              <div class="header-price">Đơn giá</div>
+              <div class="header-quantity">Số lượng</div>
+              <div class="header-total">Thành tiền</div>
+              <div class="header-action"></div>
+            </div>
+
+            <div class="cart-item" *ngFor="let item of cartItems">
+              <div class="item-product">
+                <div class="item-image">
+                  <img [src]="item.thumbnail" [alt]="item.name">
+                </div>
+                <div class="item-info">
+                  <div class="item-name">{{item.name}}</div>
+                  <div class="item-color">Màu: {{item.color}}</div>
+                </div>
+              </div>
+
+              <div class="item-price">
+                <div class="current-price">{{formatPrice(getDiscountedPrice(item.productDetail))}}</div>
+                <div class="original-price" *ngIf="item.productDetail.discount > 0">
+                  {{formatPrice(item.productDetail.salePrice)}}
+                  <span class="discount-badge">-{{item.productDetail.discount}}%</span>
+                </div>
+              </div>
+
+              <div class="item-quantity">
+                <div class="quantity-controls">
+                  <button (click)="decreaseQuantity(item)" [disabled]="item.quantity <= 1">
+                    <i class="bi bi-dash"></i>
+                  </button>
+                  <input type="number" 
+                         [value]="item.quantity" 
+                         (change)="updateQuantity(item.productDetail.id, $event)"
+                         min="1"
+                         [max]="item.productDetail.quantity">
+                  <button (click)="increaseQuantity(item)" 
+                          [disabled]="item.quantity >= item.productDetail.quantity">
+                    <i class="bi bi-plus"></i>
+                  </button>
+                </div>
+                <div class="stock-info" *ngIf="item.productDetail.quantity < 10">
+                  Còn {{item.productDetail.quantity}} sản phẩm
+                </div>
+              </div>
+
+              <div class="item-total">
+                {{formatPrice(getDiscountedPrice(item.productDetail) * item.quantity)}}
+              </div>
+
+              <div class="item-action">
+                <button class="btn-remove" (click)="removeFromCart(item.productDetail.id)">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="cart-summary">
+            <div class="summary-row">
+              <span>Tạm tính:</span>
+              <span>{{formatPrice(getSubTotal())}}</span>
+            </div>
+            <div class="summary-row discount" *ngIf="getTotalDiscount() > 0">
+              <span>Giảm giá:</span>
+              <span>-{{formatPrice(getTotalDiscount())}}</span>
+            </div>
+            <div class="summary-row total">
+              <span>Tổng cộng:</span>
+              <span>{{formatPrice(getTotalAmount())}}</span>
+            </div>
+            <button class="btn-checkout" routerLink="/payment">
+              Tiến hành thanh toán
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #emptyCart>
+        <div class="empty-cart">
+          <i class="bi bi-cart-x"></i>
+          <p>Giỏ hàng của bạn đang trống</p>
+          <button class="btn-continue-shopping" routerLink="/">
+            Tiếp tục mua sắm
+          </button>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

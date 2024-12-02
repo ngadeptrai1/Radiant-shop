@@ -13,7 +13,7 @@ export class CategoryService {
   constructor(private apiService: ApiService) { }
 
   getAllCategories(): Observable<Category[]> {
-    return this.apiService.get<Category[]>(this.endpoint);
+    return this.apiService.get<Category[]>(this.endpoint+'/get-all');
   }
 
   getCategoryById(id: number): Observable<Category> {

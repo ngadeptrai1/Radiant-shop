@@ -7,9 +7,113 @@
 /* Tổng thể bố cục */
 .layout-page-product-detail {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between; /* Đảm bảo không có xung đột với flexbox */
   gap: 20px;
+}
+
+.layout-main {
+  flex: 1;
+  max-width: calc(100% - 320px); /* Adjust based on aside width */
+}
+
+.layout-aside {
+  width: 300px;
+  position: sticky;
+  top: 20px;
+  height: fit-content;
+  box-sizing: border-box; /* Ensure padding and border are included in the width */
+}
+
+/* Vouchers Section */
+.vouchers-section {
+  width: 100%;
+  box-sizing: border-box; /* Ensure padding and border are included in the width */
+}
+
+.list-coupon {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.slide-main-coupon {
+  width: 100%;
+  box-sizing: border-box; /* Ensure padding and border are included in the width */
+}
+
+.slide-template-slide-coupon {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.item-coupon {
+  width: 100%;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 15px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box; /* Ensure padding and border are included in the width */
+}
+
+.item-coupon:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Loading States */
+.vouchers-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.skeleton-voucher {
+  width: 100%;
+  height: 120px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 8px;
+  box-sizing: border-box; /* Ensure padding and border are included in the width */
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .layout-page-product-detail {
+    flex-direction: column;
+  }
+
+  .layout-main {
+    max-width: 100%;
+  }
+
+  .layout-aside {
+    width: 100%;
+    position: static;
+  }
+
+  .slide-template-slide-coupon {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .item-coupon {
+    width: calc(50% - 8px);
+  }
+
+  .skeleton-voucher {
+    width: calc(50% - 8px);
+  }
+}
+
+@media (max-width: 576px) {
+  .item-coupon,
+  .skeleton-voucher {
+    width: 100%;
+  }
 }
 
 .layout-left {
@@ -24,7 +128,7 @@
 .layout-box {
   width: 100%;
   border: 1px solid #e0e0e0;
-  padding: 20px;
+  padding: 10px;
   border-radius: 5px;
 }
 
@@ -195,4 +299,327 @@
   font-style: normal;
   font-weight: 400;
   line-height: 20px;
+}
+
+/* Thêm styles cho phần review */
+.review-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.rating i {
+  color: #ffc107;
+  font-size: 14px;
+}
+
+.review-text {
+  color: #666;
+  line-height: 1.6;
+}
+
+.rating-input i {
+  font-size: 24px;
+  color: #ffc107;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+.review-form textarea {
+  resize: none;
+}
+
+.review-item {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 20px;
+}
+
+.review-item:last-child {
+  border-bottom: none;
+}
+
+/* Thêm styles mới */
+.main-image {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  object-fit: cover;
+}
+
+.color-options {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.color-option {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.color-option.selected {
+  border-color: #ed145b;
+  transform: scale(1.1);
+}
+
+.original-price {
+  text-decoration: line-through;
+  color: #999;
+  margin-left: 10px;
+  font-size: 0.9em;
+}
+
+.detail-relate {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.detail-relate a {
+  cursor: pointer;
+  opacity: 0.7;
+  transition: all 0.2s;
+}
+
+.detail-relate a.active {
+  opacity: 1;
+  border: 2px solid #ed145b;
+}
+
+.rating-input {
+  font-size: 24px;
+  color: #ffc107;
+  cursor: pointer;
+}
+
+.rating-input i {
+  margin-right: 5px;
+  transition: all 0.2s;
+}
+
+.rating-input i:hover {
+  transform: scale(1.1);
+}
+
+/* Cập nhật và thêm styles mới */
+.main-image-container {
+  width: 400px;
+  height: 400px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.main-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.thumbnail-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.color-option {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.color-option.selected {
+  border-color: #ed145b;
+  transform: scale(1.1);
+}
+
+.color-option.inactive {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.selected-color-name {
+  display: block;
+  margin-top: 8px;
+  color: #666;
+  font-size: 0.9em;
+}
+
+.price-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.current-price {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #ed145b;
+}
+
+.original-price {
+  text-decoration: line-through;
+  color: #999;
+  font-size: 1em;
+}
+
+.discount-badge {
+  background-color: #ed145b;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8em;
+}
+
+.quantity-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stock-info {
+  color: #666;
+  font-size: 0.9em;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .product-detail {
+    flex-direction: column;
+  }
+
+  .main-image-container {
+    width: 100%;
+    height: 300px;
+  }
+
+  .thumbnail {
+    margin-right: 0;
+    margin-bottom: 20px;
+  }
+}
+
+.review-form {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.rating-input {
+  font-size: 24px;
+  color: #ffc107;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.rating-input i {
+  margin-right: 5px;
+  transition: all 0.2s;
+}
+
+.rating-input i:hover {
+  transform: scale(1.1);
+}
+
+.review-item {
+  border-bottom: 1px solid #eee;
+}
+
+.review-item:last-child {
+  border-bottom: none;
+}
+
+.review-content .rating {
+  color: #ffc107;
+  font-size: 14px;
+}
+
+.review-text {
+  color: #666;
+  line-height: 1.6;
+}
+
+.text-danger {
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.color-options .sm-button {
+  padding: 8px 16px;
+  margin: 0 8px 8px 0;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  color: #333;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.color-options .sm-button.selected {
+  border-color: #ed145b;
+  color: #ed145b;
+}
+
+.color-options .sm-button.inactive {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.color-options .sm-button.out-of-stock {
+  background: #f5f5f5;
+  border-color: #ddd;
+  color: #999;
+}
+
+.out-of-stock-label {
+  font-size: 0.75rem;
+  color: #ff4444;
+  display: block;
+  margin-top: 2px;
+}
+
+/* Loading skeleton styles */
+.detail-information-skeleton {
+  padding: 20px;
+}
+
+.skeleton-line {
+  height: 20px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+
+.skeleton-line.title {
+  height: 32px;
+  width: 80%;
+}
+
+.skeleton-line.price {
+  height: 24px;
+  width: 40%;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }

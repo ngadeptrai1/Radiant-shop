@@ -1,16 +1,13 @@
 package com.backend.cosmetic.rest;
 
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,10 +26,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.cosmetic.dto.ProductDTO;
 import com.backend.cosmetic.exception.DataInvalidException;
-import com.backend.cosmetic.repository.ProductRepository;
+import com.backend.cosmetic.repository.ProductDetailRepository;
 import com.backend.cosmetic.response.ProductResponse;
 import com.backend.cosmetic.service.ProductDetailService;
 import com.backend.cosmetic.service.ProductService;
+import com.google.common.util.concurrent.RateLimiter;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -45,44 +43,55 @@ import lombok.extern.slf4j.Slf4j;
 public class ProductController {
 
 private final ProductService productService;
-private final ProductRepository productRepository;
 private final ProductDetailService productDetailService;
+private final ProductDetailRepository productDetailRepository;
 private static final Logger LOGGER = Logger.getLogger(ProductController.class.getName());
+private final RateLimiter rateLimiter = RateLimiter.create(2.0);
 
-    @Cacheable(value = "products", key = "#pageNum + #size + #sort + #direction")
     @GetMapping("")
     public ResponseEntity<?> getAllProducts(@RequestParam("page") Optional<Integer> pageNum,
                                             @RequestParam("size") Optional<Integer> size,
                                             @RequestParam("sort") Optional<String> sort,
                                             @RequestParam("direction") Optional<String> direction,
-                                            @RequestParam("category") Optional<String> category,
-                                            @RequestParam("brand") Optional<String> brand,
+                                            @RequestParam("categories") Optional<List<Integer>> categoryIds,
+                                            @RequestParam("brands") Optional<List<Long>> brandIds,
                                             @RequestParam("name") Optional<String> name,
                                             @RequestParam("minPrice") Optional<Double> minPrice,
                                             @RequestParam("maxPrice") Optional<Double> maxPrice) {
-        Map<String, Object> filterCriteria = new HashMap<>();
-        category.ifPresent(value -> filterCriteria.put("category", value));
-        brand.ifPresent(value -> filterCriteria.put("brand", value));
-        name.ifPresent(value -> filterCriteria.put("name", value));
-        minPrice.ifPresent(value -> filterCriteria.put("minPrice", value));
-        maxPrice.ifPresent(value -> filterCriteria.put("maxPrice", value));
         // Default direction to DESC if invalid value is provided
-        Sort.Direction sortDirection;
+     
+        Pageable page = PageRequest.of(pageNum.orElse(0), size.orElse(5));
+                
         try {
-            sortDirection = Sort.Direction.fromString(direction.orElse("DESC"));
-        } catch (IllegalArgumentException e) {
-            sortDirection = Sort.Direction.DESC;
-        }
-        Pageable page = PageRequest.of(pageNum.orElse(0), size.orElse(5),
-                Sort.by(sortDirection, sort.orElse("id")));
-        try {
-            // return ResponseEntity.status(HttpStatus.OK).body(productRepository.findAll(page));
-           return ResponseEntity.status(HttpStatus.OK).body(productService.findAll(filterCriteria,page));
+            return ResponseEntity.status(HttpStatus.OK).body(
+                productService.findAll(
+                    categoryIds.orElse(null),
+                    brandIds.orElse(null),
+                    name.orElse(null),
+                    minPrice.orElse(null),
+                    maxPrice.orElse(null),
+                    true,
+                    sort.orElse("id"),
+                    direction.orElse("DESC"),
+                    page
+                )
+            );
         } catch (Exception e) {
             LOGGER.severe("Error: " + e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+
+    @GetMapping("category/{id}")
+    public ResponseEntity<?> findByCateId(@PathVariable Integer id,
+                                          @RequestParam("page") Optional<Integer> pageNum,
+                                            @RequestParam("size") Optional<Integer> size){
+        Pageable page = PageRequest.of(pageNum.orElse(0),size.orElse(5));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body( productService.findProductsByCategoryAndSubcategories(id,page));
+    }
+
     @GetMapping("get-all")
     public ResponseEntity<?> getAll() {
 
@@ -137,28 +146,32 @@ private static final Logger LOGGER = Logger.getLogger(ProductController.class.ge
         return ResponseEntity.status(HttpStatus.OK).body(productService.deleteProduct(id));
     }
 
-    @PutMapping("/product-detail/{id}/quantity/{type}")
-    public ResponseEntity<?> updateQuantityByOne(
-            @PathVariable Long id,
-            @PathVariable String type) {
-        try {
-            return ResponseEntity.ok(productDetailService.updateQuantityByOne(id, type));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+    @PutMapping("/product-detail/plus/{id}")
+    public ResponseEntity<Integer> plusQuantity(@PathVariable Long id){
+        if (!rateLimiter.tryAcquire()) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(0);
         }
+       
+        return ResponseEntity.status(HttpStatus.OK).body( productDetailService.plusQuantity(id));
     }
-
-    @PutMapping("/product-detail/{id}/quantity/amount/{amount}")
-    public ResponseEntity<?> updateQuantityByAmount(
-            @PathVariable Long id,
-            @PathVariable int amount) {
-        try {
-            return ResponseEntity.ok(productDetailService.updateQuantityByAmount(id, amount));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+    @PutMapping("/product-detail/minus/{id}")
+    public ResponseEntity<Integer> minusQuantity(@PathVariable Long id){
+        if (!rateLimiter.tryAcquire()) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(0);
         }
+       ;
+        return ResponseEntity.status(HttpStatus.OK).body( productDetailService.minusQuantity(id) );
     }
+    @PutMapping("/product-detail/refill/{id}")
+    public ResponseEntity<?> refillQuantity(@PathVariable Long id, @RequestParam("quantity") int quantity){
 
+        productDetailService.refillQuantity(id, quantity);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+    @PutMapping("/product-detail/minus-in-pos/{id}")
+    public ResponseEntity<?> minusInPos(@PathVariable Long id, @RequestParam("quantity") int quantity){
+        return ResponseEntity.status(HttpStatus.OK).body(productDetailService.minusInPos(id, quantity));
+    }
     @GetMapping("/search")
     public ResponseEntity<?> searchProducts(@RequestParam String name) {
         try {
@@ -169,6 +182,10 @@ private static final Logger LOGGER = Logger.getLogger(ProductController.class.ge
         }
     }
 
-    
+    @GetMapping("/product-details/get-all")
+    public ResponseEntity<?> getProductDetails() {
+        return ResponseEntity.status(HttpStatus.OK).body(productDetailRepository.findAllProductDetails());
+    }
+
 
 }

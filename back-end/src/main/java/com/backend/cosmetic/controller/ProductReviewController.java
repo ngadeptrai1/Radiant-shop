@@ -15,25 +15,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.cosmetic.dto.ProductReviewDTO;
+import com.backend.cosmetic.response.ProductReviewResponse;
 import com.backend.cosmetic.service.ProductReviewService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/reviews")
+@RequestMapping("/api/v1/reviews")
 @RequiredArgsConstructor
 public class ProductReviewController {
 
     private final ProductReviewService reviewService;
 
     @PostMapping
-    public ResponseEntity<ProductReviewDTO> createReview(@Valid @RequestBody ProductReviewDTO reviewDTO) {
+        public ResponseEntity<ProductReviewResponse> createReview(@Valid @RequestBody ProductReviewDTO reviewDTO) {
         return new ResponseEntity<>(reviewService.createReview(reviewDTO), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductReviewDTO> updateReview(
+    public ResponseEntity<ProductReviewResponse> updateReview(
             @PathVariable Long id,
             @Valid @RequestBody ProductReviewDTO reviewDTO) {
         return ResponseEntity.ok(reviewService.updateReview(id, reviewDTO));
@@ -46,34 +47,38 @@ public class ProductReviewController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductReviewDTO> getReviewById(@PathVariable Long id) {
+    public ResponseEntity<ProductReviewResponse> getReviewById(@PathVariable Long id) {
         return ResponseEntity.ok(reviewService.getReviewById(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductReviewDTO>> getAllReviews() {
+    public ResponseEntity<List<ProductReviewResponse>> getAllReviews() {
         return ResponseEntity.ok(reviewService.getAllReviews());
     }
 
     @GetMapping("/product/{productId}")
-    public ResponseEntity<List<ProductReviewDTO>> getReviewsByProductId(@PathVariable Long productId) {
+    public ResponseEntity<List<ProductReviewResponse>> getReviewsByProductId(@PathVariable Long productId) {
         return ResponseEntity.ok(reviewService.getReviewsByProductId(productId));
     }
 
     @GetMapping("/active")
-    public ResponseEntity<List<ProductReviewDTO>> getActiveReviews() {
+    public ResponseEntity<List<ProductReviewResponse>> getActiveReviews() {
         return ResponseEntity.ok(reviewService.getActiveReviews());
     }
 
-    @PatchMapping("/{id}/approve")
+    @PutMapping("/{id}/approve")
     public ResponseEntity<Void> approveReview(@PathVariable Long id) {
         reviewService.approveReview(id);
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/{id}/reject")
+    @PutMapping("/{id}/reject")
     public ResponseEntity<Void> rejectReview(@PathVariable Long id) {
         reviewService.rejectReview(id);
         return ResponseEntity.ok().build();
+    }
+    @GetMapping("/avg-rating/{productId}")
+    public ResponseEntity<Double> getAverageRating(@PathVariable Long productId) {
+        return ResponseEntity.ok(reviewService.getAverageRating(productId));
     }
 } 

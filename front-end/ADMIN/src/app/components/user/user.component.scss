@@ -1,0 +1,88 @@
+.user-container {
+  padding: 20px;
+
+  .tab-content {
+    padding: 20px 0;
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+
+      mat-form-field {
+        width: 40%;
+      }
+    }
+
+    .table-container {
+      position: relative;
+      min-height: 200px;
+      overflow: auto;
+    }
+
+    .user-table {
+      width: 100%;
+      
+      th.mat-header-cell {
+        font-weight: bold;
+        color: rgba(0, 0, 0, 0.87);
+        padding: 0 16px;
+        
+        &.mat-sort-header-sorted {
+          color: black;
+        }
+      }
+
+      td.mat-cell {
+        padding: 0 16px;
+      }
+    }
+  }
+
+  .loading-spinner {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+  }
+
+  .mat-mdc-row:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  // Thêm styles cho responsive table
+  @media (max-width: 768px) {
+    .mat-table {
+      overflow-x: auto;
+      display: block;
+    }
+  }
+
+  .loading-container, .empty-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+  }
+
+  .empty-container {
+    color: #666;
+    font-style: italic;
+  }
+
+  .table-container {
+    margin-top: 20px;
+    overflow: auto;
+  }
+
+  .mat-mdc-table {
+    width: 100%;
+    max-height: calc(100vh - 300px);
+    overflow: auto;
+  }
+
+  .mat-column-actions {
+    width: 100px;
+    text-align: center;
+  }
+}

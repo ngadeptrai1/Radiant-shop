@@ -62,20 +62,20 @@ public class CustomOAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHa
         TokenDto tokenDto = tokenGenerator.createToken(auth);
         // Save JWT in a secure HttpOnly cookie
         Cookie refreshToken = new Cookie("REFRESH_TOKEN", tokenDto.getRefreshToken());
-        refreshToken.setHttpOnly(true);
-        refreshToken.setSecure(true);
+        refreshToken.setHttpOnly(false);
+        refreshToken.setSecure(false);
         refreshToken.setPath("/");
         response.addCookie(refreshToken);
 
         Cookie accessToken = new Cookie("ACCESS_TOKEN", tokenDto.getAccessToken());
-        accessToken.setHttpOnly(true);
-        accessToken.setSecure(true);
+        accessToken.setHttpOnly(false);
+        accessToken.setSecure(false);
         accessToken.setPath("/");
         response.addCookie(accessToken);
 
         Cookie userId = new Cookie("USER_ID", tokenDto.getUserId().toString());
-        userId.setHttpOnly(true);
-        userId.setSecure(true);
+        userId.setHttpOnly(false);
+        userId.setSecure(false);
         userId.setPath("/");
         response.addCookie(userId);
         // Redirect to frontend

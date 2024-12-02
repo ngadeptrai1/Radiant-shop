@@ -1,70 +1,108 @@
-<app-header />
+@if(isLoading) {  
 <ngx-spinner
   bdColor="rgba(51,51,51,0.8)"
   size="medium"
   color="#fff"
   type="ball-scale-multiple"
 >
-  <p style="font-size: 20px; color: white">Loading...</p>
+  <p style="font-size: 20px; color: white">Đang tải...</p>
 </ngx-spinner>
-<div class="col-lg-8 offset-lg-2 mt-5">
-  <p class="mb-0">Log-In With Social</p>
-  <hr class="my-1" />
-  <div class="row mt-4 mb-5">
-    <div class="d-grid col-md-6 my-2">
-      <!-- href="https://authen-hkxg.onrender.com/oauth2/authorization/google" -->
-      <div class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
-        <div class="d-flex flex-wrap justify-content-center">
-          <p class="mb-0">Google</p>
-        </div>
-      </div>
-    </div>
-    <div class="d-grid col-md-6 my-2">
-      <!-- href="https://authen-hkxg.onrender.com/oauth2/authorization/facebook" -->
-      <div class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
-        <div class="d-flex flex-wrap justify-content-center">
-          <p class="mb-0">Facebook</p>
+}
+  
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow-lg mt-5">
+        <div class="card-body p-5">
+          <h2 class="text-center mb-4">Đăng nhập</h2>
+          
+          <!-- Error Alert -->
+          @if(showError) {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              {{ errorMessage }}
+              <button type="button" class="btn-close" (click)="showError = false"></button>
+            </div>
+          }
+
+          <!-- Social Login Buttons -->
+          <div class="social-login mb-4">
+            <a class="btn btn-outline-primary w-100 mb-2" href="http://localhost:8080/oauth2/authorization/google" >
+              <i class="fab fa-google me-2"></i>Đăng nhập với Google
+            </a>
+            <a class="btn btn-outline-primary w-100" href="http://localhost:8080/oauth2/authorization/facebook">
+              <i class="fab fa-facebook me-2"></i>Đăng nhập với Facebook
+            </a>
+          </div>
+
+          <div class="divider text-center my-4">
+            <span class="line"></span>
+            <span class="mx-3">Hoặc</span>
+            <span class="line"></span>
+          </div>
+
+          <!-- Login Form -->
+          <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+            <div class="form-floating mb-3">
+              <input type="text" 
+                     class="form-control" 
+                     formControlName="username" 
+                     placeholder="Tên đăng nhập"
+                     [ngClass]="{'is-invalid': loginForm.get('username')?.touched && loginForm.get('username')?.invalid}">
+              <label>Tên đăng nhập</label>
+              @if(loginForm.get('username')?.touched && loginForm.get('username')?.errors) {
+                <div class="invalid-feedback">
+                  @if(loginForm.get('username')?.errors?.['required']) {
+                    Vui lòng nhập tên đăng nhập
+                  }
+                  @if(loginForm.get('username')?.errors?.['minlength']) {
+                    Tên đăng nhập phải có ít nhất 3 ký tự
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="form-floating mb-3">
+              <input type="password" 
+                     class="form-control" 
+                     formControlName="password" 
+                     placeholder="Mật khẩu"
+                     [ngClass]="{'is-invalid': loginForm.get('password')?.touched && loginForm.get('password')?.invalid}">
+              <label>Mật khẩu</label>
+              @if(loginForm.get('password')?.touched && loginForm.get('password')?.errors) {
+                <div class="invalid-feedback">
+                  @if(loginForm.get('password')?.errors?.['required']) {
+                    Vui lòng nhập mật khẩu
+                  }
+                  @if(loginForm.get('password')?.errors?.['minlength']) {
+                    Mật khẩu phải có ít nhất 6 ký tự
+                  }
+                </div>
+              }
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" formControlName="rememberMe">
+                <label class="form-check-label">Ghi nhớ đăng nhập</label>
+              </div>
+              <a href="#" class="text-decoration-none">Quên mật khẩu?</a>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100" [disabled]="loginForm.invalid || isLoading">
+              @if(isLoading) {
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                Đang xử lý...
+              } @else {
+                Đăng nhập
+              }
+            </button>
+          </form>
+
+          <p class="text-center mt-4">
+            Chưa có tài khoản? <a routerLink="/register" class="text-decoration-none">Đăng ký ngay</a>
+          </p>
         </div>
       </div>
     </div>
   </div>
-
-  <p class="mb-0">Or Log-In With An Existing Account</p>
-  <hr class="my-1" />
-
-  <form id="form1" class="form-group flex-wrap">
-    <div class="form-input col-lg-12 my-4">
-      <input
-        type="text"
-        id="exampleInputEmail1"
-        formControlName="account_name"
-        placeholder="Enter account name"
-        class="form-control mb-3 p-4"
-      />
-
-      <input
-        type="password"
-        id="inputPassword1"
-        formControlName="password"
-        placeholder="Enter password"
-        class="form-control mb-3 p-4"
-        aria-describedby="passwordHelpBlock"
-      />
-
-      <label class="py-3 d-flex flex-wrap justify-content-between">
-        <div>
-          <input type="checkbox" required="" class="d-inline" />
-          <span class="label-body">Remember Me</span>
-        </div>
-
-        <div id="passwordHelpBlock" class="form-text">
-          <a class="text-primary fw-bold"> Forgot Password?</a>
-        </div>
-      </label>
-      <div class="d-grid my-3">
-        <button class="btn btn-dark btn-lg rounded-1">Log In</button>
-      </div>
-    </div>
-  </form>
 </div>
-<app-footer />

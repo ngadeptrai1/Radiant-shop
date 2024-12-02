@@ -1,57 +1,160 @@
-<app-header />
 <div class="container">
   <div class="row">
-    <div class="offset-md-3 col-md-6 my-5">
-      <h2 class="display-3 fw-normal text-center text-primary mb-5">
-        Register
-      </h2>
-      <form id="form2" class="form-group flex-wrap">
-        <div class="form-input col-lg-12 my-4 py-4">
-          <input
-            type="text"
-            formControlName="full_name"
-            placeholder="Your full name"
-            class="form-control mb-3 p-4"
-          />
+    <div class="col-lg-8 offset-lg-2 mt-5">
+      <div class="card p-4 shadow-sm">
+        <h2 class="text-center mb-4">Tạo Tài Khoản</h2>
 
-          <input
-            type="text"
-            formControlName="email"
-            placeholder="Your email address"
-            class="form-control mb-3 p-4"
-          />
-
-          <input
-            type="text"
-            formControlName="account_name"
-            placeholder="Your account name"
-            class="form-control mb-3 p-4"
-          />
-
-          <input
-            type="password"
-            formControlName="password"
-            placeholder="Set your password"
-            class="form-control mb-3 p-4"
-            aria-describedby="passwordHelpBlock"
-          />
-
-          <input
-            type="Password"
-            formControlName="rePassword"
-            placeholder="Retype your password"
-            class="form-control mb-3 p-4"
-            aria-describedby="passwordHelpBlock"
-          />
-
-          <div class="d-grid my-3">
-            <button type="submit" class="btn btn-dark btn-lg rounded-1">
-              Sign Up
-            </button>
+        <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+          <!-- Full Name -->
+          <div class="mb-3">
+            <input
+              type="text"
+              formControlName="fullName"
+              placeholder="Họ và tên"
+              class="form-control form-control-lg"
+            />
+            <div
+              *ngIf="
+                registerForm.get('fullName')?.invalid &&
+                registerForm.get('fullName')?.touched
+              "
+              class="text-danger small mt-1"
+            >
+              Vui lòng nhập họ và tên!
+            </div>
           </div>
-        </div>
-      </form>
+
+          <!-- Phone Number -->
+          <div class="mb-3">
+            <input
+              type="tel"
+              formControlName="phoneNum"
+              placeholder="Số điện thoại"
+              class="form-control form-control-lg"
+            />
+            <div
+              *ngIf="
+                registerForm.get('phoneNum')?.invalid &&
+                registerForm.get('phoneNum')?.touched
+              "
+              class="text-danger small mt-1"
+            >
+              <span *ngIf="registerForm.get('phoneNum')?.errors?.['required']">
+                Vui lòng nhập số điện thoại!
+              </span>
+              <span *ngIf="registerForm.get('phoneNum')?.errors?.['pattern']">
+                Số điện thoại phải có 10 chữ số!
+              </span>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="mb-3">
+            <input
+              type="email"
+              formControlName="email"
+              placeholder="Địa chỉ email"
+              class="form-control form-control-lg"
+            />
+            <div
+              *ngIf="
+                registerForm.get('email')?.invalid &&
+                registerForm.get('email')?.touched
+              "
+              class="text-danger small mt-1"
+            >
+              <span *ngIf="registerForm.get('email')?.errors?.['required']">
+                Vui lòng nhập email!
+              </span>
+              <span *ngIf="registerForm.get('email')?.errors?.['email']">
+                Email không hợp lệ!
+              </span>
+            </div>
+          </div>
+
+          <!-- Username -->
+          <div class="mb-3">
+            <input
+              type="text"
+              formControlName="username"
+              placeholder="Tên đăng nhập"
+              class="form-control form-control-lg"
+            />
+            <div
+              *ngIf="
+                registerForm.get('username')?.invalid &&
+                registerForm.get('username')?.touched
+              "
+              class="text-danger small mt-1"
+            >
+              Vui lòng nhập tên đăng nhập!
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="mb-3">
+            <input
+              type="password"
+              formControlName="password"
+              placeholder="Mật khẩu"
+              class="form-control form-control-lg"
+            />
+            <div
+              *ngIf="
+                registerForm.get('password')?.invalid &&
+                registerForm.get('password')?.touched
+              "
+              class="text-danger small mt-1"
+            >
+              <span *ngIf="registerForm.get('password')?.errors?.['required']">
+                Vui lòng nhập mật khẩu!
+              </span>
+              <span *ngIf="registerForm.get('password')?.errors?.['minlength']">
+                Mật khẩu phải có ít nhất 6 ký tự!
+              </span>
+            </div>
+          </div>
+
+          <!-- Retype Password -->
+          <div class="mb-4">
+            <input
+              type="password"
+              formControlName="rePassword"
+              placeholder="Xác nhận mật khẩu"
+              class="form-control form-control-lg"
+            />
+            <div
+              *ngIf="
+                registerForm.get('rePassword')?.invalid &&
+                registerForm.get('rePassword')?.touched
+              "
+              class="text-danger small mt-1"
+            >
+              Vui lòng xác nhận mật khẩu!
+            </div>
+            <div
+              *ngIf="registerForm.errors?.['mismatch']"
+              class="text-danger small mt-1"
+            >
+              Mật khẩu không khớp!
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            class="btn btn-primary btn-lg w-100 mb-3"
+            [disabled]="registerForm.invalid"
+          >
+            Tạo Tài Khoản
+          </button>
+
+          <p class="text-center mb-0">
+            Đã có tài khoản?
+            <a href="#" class="text-primary text-decoration-none">Đăng nhập</a>
+          </p>
+        </form>
+      </div>
     </div>
   </div>
 </div>
-<app-footer />

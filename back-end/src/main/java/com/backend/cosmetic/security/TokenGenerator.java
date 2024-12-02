@@ -1,7 +1,9 @@
 package com.backend.cosmetic.security;
 
-import com.backend.cosmetic.dto.TokenDto;
-import com.backend.cosmetic.model.User;
+import java.text.MessageFormat;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,10 +15,8 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Component;
 
-import java.text.MessageFormat;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import com.backend.cosmetic.dto.TokenDto;
+import com.backend.cosmetic.model.User;
 
 @Component
 public class TokenGenerator {

@@ -1,0 +1,32 @@
+<div class="voucher-item mb-2">
+  <div class="voucher-container">
+    <div class="voucher-left">
+      <div class="brand-logo">
+        <img src="assets/icons/ic-coupon-payment.svg" alt="voucher icon"/>
+      </div>
+    </div>
+    
+    <div class="voucher-content">
+      <div class="voucher-value">
+        Giảm {{ formatValue(voucher) }}
+      </div>
+      <div class="voucher-info">
+        <div class="code-container">
+          <p class="code">Mã: {{ voucher.code }}</p>
+          <button class="copy-btn" (click)="copyCode()">
+            Sao chép
+          </button>
+        </div>
+        <p class="condition" *ngIf="voucher.minOrderAmount">
+          Đơn tối thiểu {{ voucher.minOrderAmount.toLocaleString() }}đ
+        </p>
+        <p class="max-discount" *ngIf="voucher.type === 'PERCENTAGE' && voucher.maxDiscountAmount">
+          Giảm tối đa {{ voucher.maxDiscountAmount.toLocaleString() }}đ
+        </p>
+        <p class="expiry">
+          HSD: {{ voucher.endDate | date:'dd/MM/yyyy' }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

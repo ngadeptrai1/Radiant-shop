@@ -2,8 +2,10 @@ package com.backend.cosmetic.service.impl;
 
 import java.util.List;
 
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.cosmetic.dto.ProductDetailDTO;
 import com.backend.cosmetic.exception.DataNotFoundException;
@@ -15,6 +17,7 @@ import com.backend.cosmetic.repository.ProductDetailRepository;
 import com.backend.cosmetic.response.ProductDetailResponse;
 import com.backend.cosmetic.service.ProductDetailService;
 
+import jakarta.persistence.LockModeType;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -108,35 +111,49 @@ public class ProductDetailServiceImpl implements ProductDetailService {
     }
 
     @Override
-    public ProductDetailResponse updateQuantityByOne(Long id, String type) {
-        ProductDetail productDetail = productDetailRepository.findById(id).orElseThrow(() -> 
-            new DataNotFoundException("Product detail with id " + id + " not found"));
-        
-        if ("plus".equalsIgnoreCase(type)) {
-            productDetail.setQuantity(productDetail.getQuantity() + 1);
-        } else if ("minus".equalsIgnoreCase(type)) {
-            if (productDetail.getQuantity() <= 0) {
-                throw new DataNotFoundException("Cannot decrease quantity below 0");
-            }
-            productDetail.setQuantity(productDetail.getQuantity() - 1);
-        } else {
-            throw new DataNotFoundException("Invalid type. Must be 'plus' or 'minus'");
-        }
-        
-        return ProductDetailResponse.fromProductDetail(productDetailRepository.save(productDetail));
+    @Transactional
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    public Integer plusQuantity(Long id) {
+        ProductDetail productDetail = productDetailRepository.findById(id).orElseThrow(() -> {
+            return new DataNotFoundException("Product detail with id "+id + " Not found ");
+        });
+        productDetail.setQuantity(productDetail.getQuantity() + 1);
+       return productDetailRepository.save(productDetail).getQuantity();
     }
 
     @Override
-    public ProductDetailResponse updateQuantityByAmount(Long id, int amount) {
-        ProductDetail productDetail = productDetailRepository.findById(id).orElseThrow(() ->
-            new DataNotFoundException("Product detail with id " + id + " not found"));
-        
-        int newQuantity = productDetail.getQuantity() + amount;
-        if (newQuantity < 0) {
-            throw new DataNotFoundException("Cannot set quantity below 0");
+    @Transactional
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    public Integer minusQuantity(Long id) {
+        ProductDetail productDetail = productDetailRepository.findById(id).orElseThrow(() -> {
+            return new DataNotFoundException("Product detail with id "+id + " Not found ");
+        });
+        if(productDetail.getQuantity() > 0){
+            productDetail.setQuantity(productDetail.getQuantity() - 1);
+            return productDetailRepository.save(productDetail).getQuantity();
         }
-        
-        productDetail.setQuantity(newQuantity);
-        return ProductDetailResponse.fromProductDetail(productDetailRepository.save(productDetail));
+        return 0 ;
+    }
+
+    @Override
+    @Transactional
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    public void refillQuantity(Long id, int amount) {
+        ProductDetail productDetail = productDetailRepository.findById(id).orElseThrow(() -> {
+            return new DataNotFoundException("Product detail with id "+id + " Not found ");
+        });
+        productDetail.setQuantity(productDetail.getQuantity() + amount);
+        productDetailRepository.save(productDetail);
+    }   
+
+    @Override
+    @Transactional
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    public Integer minusInPos(Long id, int amount) {
+        ProductDetail productDetail = productDetailRepository.findById(id).orElseThrow(() -> {
+            return new DataNotFoundException("Product detail with id "+id + " Not found ");
+        });
+        productDetail.setQuantity(productDetail.getQuantity() - amount);
+        return productDetailRepository.save(productDetail).getQuantity();
     }
 }

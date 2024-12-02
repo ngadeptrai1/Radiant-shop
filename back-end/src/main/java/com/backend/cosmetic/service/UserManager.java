@@ -1,5 +1,8 @@
 package com.backend.cosmetic.service;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -10,7 +13,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 
+import com.backend.cosmetic.exception.DataNotFoundException;
+import com.backend.cosmetic.model.PasswordResetToken;
 import com.backend.cosmetic.model.User;
+import com.backend.cosmetic.repository.PasswordResetTokenRepository;
 import com.backend.cosmetic.repository.UserRepository;
 
 @Service
@@ -24,6 +30,9 @@ public class UserManager implements UserDetailsManager {
 
     @Autowired
     RoleService roleService;
+
+    @Autowired
+    private PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Override
     public void createUser(UserDetails user) {
@@ -121,5 +130,43 @@ public class UserManager implements UserDetailsManager {
         }
         
         return userRepository.save(user);
+    }
+
+    public String createPasswordResetToken(String email) {
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+        
+        String token = UUID.randomUUID().toString();
+        PasswordResetToken passwordResetToken = new PasswordResetToken();
+        passwordResetToken.setToken(token);
+        passwordResetToken.setUser(user);
+        passwordResetToken.setExpiryDate(LocalDateTime.now().plusHours(24));
+        
+        passwordResetTokenRepository.save(passwordResetToken);
+        return token;
+    }
+
+    public void resetPassword(String token, String newPassword) {
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
+            .orElseThrow(() -> new DataNotFoundException("Invalid token"));
+
+        if (resetToken.isExpired()) {
+            passwordResetTokenRepository.delete(resetToken);
+            throw new DataNotFoundException("Token has expired");
+        }
+
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        
+        passwordResetTokenRepository.delete(resetToken);
+    }
+
+    public boolean checkUsername(String username) {
+           return userRepository.findByUsername(username).isPresent();
+    }
+
+    public boolean checkEmail(String email) {
+        return userRepository.findByEmail(email).isPresent();
     }
 }

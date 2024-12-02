@@ -124,7 +124,7 @@ export class CategoryComponent implements OnInit,AfterViewInit {
   createCategory(category: Category) {
     const cate = {id:category.id,
       name:category.name,
-      parent_id :category.parentCategory?.id,
+      parent_id :category.parentCategory?.id ,
       activate:category.activate
     };
     console.log(cate);

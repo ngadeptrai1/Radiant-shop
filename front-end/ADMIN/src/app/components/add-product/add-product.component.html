@@ -16,6 +16,9 @@
                     @if (formBuilder.get('name')?.hasError('required') && formBuilder.get('name')?.touched) {
                         <mat-error>Tên sản phẩm là bắt buộc</mat-error>
                     }
+                    @if (formBuilder.get('name')?.hasError('duplicate')) {
+                        <mat-error>Tên sản phẩm đã tồn tại</mat-error>
+                    }
                 </mat-form-field>
             </div>
         </div>
@@ -65,7 +68,12 @@
                 <div class="col-lg-3 col-md-3 col-sm-12">
                     <mat-form-field appearance="fill" class="w-100">
                         <mat-label>Giá bán</mat-label>
-                        <input matInput type="number" formControlName="salePrice">
+                        <input matInput type="number" 
+                               formControlName="salePrice" 
+                               min="0" 
+                               (keypress)="numberOnly($event)"
+                               placeholder="Nhập giá bán">
+                        <span matSuffix>VNĐ</span>
                         @if (detail.get('salePrice')?.hasError('required') && detail.get('salePrice')?.touched) {
                             <mat-error>Giá bán là bắt buộc</mat-error>
                         }
@@ -78,7 +86,12 @@
                 <div class="col-lg-3 col-md-3 col-sm-12">
                     <mat-form-field appearance="fill" class="w-100">
                         <mat-label>Số lượng</mat-label>
-                        <input matInput type="number" formControlName="quantity">
+                        <input matInput type="number" 
+                               formControlName="quantity" 
+                               min="1" 
+                               (keypress)="numberOnly($event)"
+                               placeholder="Nhập số lượng">
+                        <span matSuffix>cái</span>
                         @if (detail.get('quantity')?.hasError('required') && detail.get('quantity')?.touched) {
                             <mat-error>Số lượng là bắt buộc</mat-error>
                         }
@@ -91,7 +104,13 @@
                 <div class="col-lg-3 col-md-3 col-sm-12">
                     <mat-form-field appearance="fill" class="w-100">
                         <mat-label>Giảm giá</mat-label>
-                        <input matInput type="number" formControlName="discount">
+                        <input matInput type="number" 
+                               formControlName="discount" 
+                               min="0" 
+                               max="100"
+                               (keypress)="numberOnly($event)"
+                               placeholder="Nhập % giảm giá">
+                        <span matSuffix>%</span>
                         @if (detail.get('discount')?.hasError('min') && detail.get('discount')?.touched) {
                             <mat-error>Giảm giá không được nhỏ hơn 0</mat-error>
                         }
@@ -111,6 +130,9 @@
                         </mat-select>
                         @if (detail.get('colorId')?.hasError('required') && detail.get('colorId')?.touched) {
                             <mat-error>Vui lòng chọn màu sắc</mat-error>
+                        }
+                        @if (detail.get('colorId')?.hasError('duplicateColor')) {
+                            <mat-error>Màu sắc này đã được chọn</mat-error>
                         }
                     </mat-form-field>
                 </div>

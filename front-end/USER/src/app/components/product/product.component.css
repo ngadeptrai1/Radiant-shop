@@ -1,0 +1,140 @@
+.product-card {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+}
+
+.product-image {
+  position: relative;
+  padding-top: 100%; /* 1:1 Aspect Ratio */
+}
+
+.main-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-badges {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.discount-badge {
+  background: #ff4444;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.product-info {
+  padding: 15px;
+}
+
+.brand-name {
+  color: #666;
+  font-size: 0.875rem;
+  margin-bottom: 5px;
+}
+
+.product-name {
+  font-size: 1rem;
+  margin: 5px 0;
+  color: #333;
+  cursor: pointer;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-decoration: none;
+}
+
+.product-name:hover {
+  color: #ed145b;
+}
+
+.price-container {
+  margin: 10px 0;
+}
+
+.current-price {
+  font-size: 1.125rem;
+  font-weight: bold;
+  color: #ed145b;
+}
+
+.original-price {
+  text-decoration: line-through;
+  color: #999;
+  margin-left: 8px;
+  font-size: 0.875rem;
+}
+
+.color-options {
+  display: flex;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.color-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.product-actions {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1;
+}
+
+.wishlist-btn {
+  background: white;
+  border: none;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.wishlist-btn:hover {
+  transform: scale(1.1);
+}
+
+.wishlist-btn i {
+  color: #ed145b;
+  font-size: 1.2rem;
+}
+
+.product-rating {
+  padding: 0 15px 15px;
+}
+
+.rating-value .fas.fa-star,
+.rating-value .fas.fa-star-half-alt {
+  color: #FFD700; /* Màu vàng */
+}
+
+.rating-value .far.fa-star {
+  color: #FFD700; /* Sao không active cũng màu vàng nhưng độ mờ hơn */
+  opacity: 0.5;
+}

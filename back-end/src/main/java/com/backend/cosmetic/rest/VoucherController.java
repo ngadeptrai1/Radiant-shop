@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -48,7 +49,9 @@ public class VoucherController {
     }
 
     @GetMapping("/apply")
-    public ResponseEntity<?> applyCode(@RequestParam("code") String code , @RequestParam("totalAmount") long totalAmount) {
+
+
+    public ResponseEntity<?> applyCode(@RequestParam("code") String code, @RequestParam("totalAmount") long totalAmount) {
         return ResponseEntity.ok(voucherService.applyCode(code, totalAmount));
     }
 
@@ -56,4 +59,10 @@ public class VoucherController {
     public ResponseEntity<?> getValidVouchers(@RequestParam("amount") long amount) {
         return ResponseEntity.ok(voucherService.findValidVouchersByAmount(amount));
     }
+
+    @GetMapping("/active")
+    public ResponseEntity<?> getAllActiveVouchers() {
+        return ResponseEntity.ok(voucherService.findAllActiveVouchers());
+    }
+
 }

@@ -8,16 +8,53 @@
         </div>
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 topbar-login">
           <ul class="account">
-            <li>
-              <a routerLink="/login" title="login">
-                <i class="bi bi-person-plus"></i>Đăng nhập
-              </a>
-            </li>
-            <li>
-              <a routerLink="/register" title="sign-up">
-                <i class="bi bi-box-arrow-in-right"></i>Đăng ký
-              </a>
-            </li>
+            <!-- Hiển thị khi chưa đăng nhập -->
+            <ng-container *ngIf="!isLoggedIn">
+              <li>
+                <a routerLink="/login" title="login">
+                  <i class="bi bi-person-plus"></i>Đăng nhập
+                </a>
+              </li>
+              <li>
+                <a routerLink="/register" title="sign-up">
+                  <i class="bi bi-box-arrow-in-right"></i>Đăng ký
+                </a>
+              </li>
+            </ng-container>
+
+            <!-- Hiển thị khi đã đăng nhập -->
+            <ng-container *ngIf="isLoggedIn">
+              <li class="user-info">
+                <a class="d-flex align-items-center">
+                  <img
+                    [src]="userAvatar"
+                    class="user-avatar"
+                    alt="User avatar"
+                    onerror="this.src='assets/default-avatar.png'"
+                  />
+                  <span class="user-name">{{ userFullName }}</span>
+                  <i class="bi bi-chevron-down"></i>
+                </a>
+                <div class="user-dropdown">
+                  <a routerLink="/my-account">
+                    <i class="bi bi-person"></i>
+                    Tài khoản của tôi
+                  </a>
+                  <a routerLink="/my-orders">
+                    <i class="bi bi-bag"></i>
+                    Đơn hàng
+                  </a>
+                  <a routerLink="/wishlist">
+                    <i class="bi bi-heart"></i>
+                    Sản phẩm yêu thích
+                  </a>
+                  <a (click)="logout()" class="logout">
+                    <i class="bi bi-box-arrow-right"></i>
+                    Đăng xuất
+                  </a>
+                </div>
+              </li>
+            </ng-container>
           </ul>
         </div>
       </div>
@@ -27,10 +64,11 @@
   <!-- Middle header -->
   <div class="container">
     <div class="row">
+      <div class="sticky-placeholder"></div>
       <div class="middle-header clearfix">
         <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 logo">
-          <a routerLink="/" title="logo">
-            <img src="assets/logo/logo.png" alt="Radiant Shop" />
+          <a routerLink="/" title="Radiant Shop">
+            <img src="assets/logos/logo.png" alt="Radiant Shop" />
           </a>
         </div>
 
@@ -51,11 +89,56 @@
         </div>
 
         <div class="mini-cart">
-          <a routerLink="/cart" class="menu-btn">
+          <div class="cart-wrapper" (click)="toggleCartDropdown($event)">
             <i class="bi bi-cart"></i>
             <span class="cart">Giỏ hàng</span>
-            <span class="cart-items-total">0</span>
-          </a>
+            <span class="cart-count" *ngIf="cartItemCount > 0">{{cartItemCount}}</span>
+          </div>
+          
+          <div class="cart-dropdown" [class.show]="isCartDropdownVisible" (click)="onCartDropdownClick($event)">
+            <div class="cart-content">
+              <div *ngIf="cartItems && cartItems.length > 0; else emptyCart">
+                <div class="cart-items">
+                  <div *ngFor="let item of cartItems" class="cart-item">
+                    <div class="item-image">
+                      <img [src]="item.thumbnail || ''"
+                           [alt]="item.name"
+                           (error)="onImageError($event)">
+                    </div>
+                    <div class="item-info">
+                      <div class="item-name">{{item.name}}</div>
+                      <div class="item-variant" *ngIf="item.productDetail.color">
+                        {{item.productDetail.color}}
+                      </div>
+                      <div class="item-price">{{formatPrice(getDiscountedPrice(item.productDetail))}}</div>
+                      <div class="item-quantity">x{{item.quantity}}</div>
+                    </div>
+                    <button class="remove-item" (click)="removeFromCart(item.productDetail.id)">
+                      <i class="bi bi-x"></i>
+                    </button>
+                  </div>
+                </div>
+                
+                <div class="cart-footer">
+                  <div class="cart-total">
+                    <span>Tổng tiền:</span>
+                    <span>{{formatPrice(getTotalAmount())}}</span>
+                  </div>
+                  <div class="cart-actions">
+                    <button class="btn-view-cart" routerLink="/checkout">Xem giỏ hàng</button>
+                    <button class="btn-checkout" routerLink="/payment">Thanh toán</button>
+                  </div>
+                </div>
+              </div>
+              
+              <ng-template #emptyCart>
+                <div class="empty-cart">
+                  <i class="bi bi-cart-x"></i>
+                  <p>Giỏ hàng của bạn đang trống</p>
+                </div>
+              </ng-template>
+            </div>
+          </div>
         </div>
 
         <div class="col-lg-3 col-md-3" style="width: 286px">
@@ -77,53 +160,25 @@
       <div class="main-nav">
         <ul>
           <!-- Danh mục sản phẩm -->
-          <li class="nav-item dropdown">
-            <a href="#" class="dropdown-toggle">
-              <i class="bi bi-list"></i>
-              TẤT CẢ DANH MỤC
-            </a>
-            <ul class="dropdown-menu menu-item">
-              <li>
-                <a href="#" class="menu-btn"> Trang Điểm </a>
-              </li>
-              <li>
-                <a href="#" class="menu-btn"> Son Môi </a>
-              </li>
-              <li>
-                <a href="#" class="menu-btn"> Chăm sóc da </a>
-              </li>
-              <li>
-                <a href="#" class="menu-btn"> Nước hoa </a>
-              </li>
-              <li>
-                <a href="#" class="menu-btn"> Sản phẩm khác </a>
-              </li>
-            </ul>
-          </li>
+          <app-nested-category [categories]="categories"></app-nested-category>
 
           <!-- Các mục khác -->
+          
           <li class="nav-item">
-            <a href="#">KHUYẾN MẠI</a>
+            <a routerLink="/brand">THƯƠNG HIỆU</a>
           </li>
           <li class="nav-item">
-            <a href="#">THƯƠNG HIỆU</a>
+            <a routerLink="/about">GIỚI THIỆU</a>
           </li>
-          <li class="nav-item">
-            <a href="#">GIỚI THIỆU</a>
-          </li>
-          <li class="nav-item">
-            <a href="#">XU HƯỚNG LÀM ĐẸP</a>
-          </li>
+            <li class="nav-item">
+              <a href="#">XU HƯỚNG LÀM ĐẸP</a>
+            </li>
 
           <li class="nav-item dropdown order">
-            <a href="#" class="dropdown-toggle"> TRA CỨU ĐƠN HÀNG </a>
-            <div class="dropdown-menu order-lookup" style="height: 115px">
+            <a href="#" class="dropdown-toggle">TRA CỨU ĐƠN HÀNG</a>
+            <div class="dropdown-menu order-lookup">
               <form>
-                <input
-                  type="text"
-                  placeholder="Nhập email hoặc mã đơn hàng"
-                  class="form-control"
-                />
+                <input type="text" placeholder="Nhập email hoặc mã đơn hàng" class="form-control"/>
                 <button class="btn btn-danger mt-2 fw-bold" type="submit">
                   Kiểm tra đơn hàng
                 </button>
@@ -134,4 +189,5 @@
       </div>
     </div>
   </div>
+  
 </div>

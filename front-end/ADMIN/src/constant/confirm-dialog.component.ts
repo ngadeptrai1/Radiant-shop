@@ -10,8 +10,8 @@ import { MatDialogContent ,MatDialogActions,MatDialogClose} from "@angular/mater
       <h2 mat-dialog-title>{{data.title}}</h2>
       <mat-dialog-content>{{data.message}}</mat-dialog-content>
       <mat-dialog-actions align="end">
-        <button mat-button [mat-dialog-close]="false">Hủy</button>
-        <button mat-raised-button color="warn" [mat-dialog-close]="true">Xác nhận</button>
+        <button class="btn btn-secondary" [mat-dialog-close]="false">Hủy</button>
+        <button class="btn btn-danger" [mat-dialog-close]="true">Xác nhận</button>
       </mat-dialog-actions>
     `,
   })

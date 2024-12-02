@@ -1,102 +1,78 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  NonNullableFormBuilder,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
-import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { LocalStorage } from '../constans/constants';
-import { LoginPayload } from '../../../type';
-import { FooterComponent } from '../footer/footer.component';
-import { HeaderComponent } from '../header/header.component';
+import { CookieService } from 'ngx-cookie-service';
+import { ModalService } from '../../services/modal.service';
+import { ModalComponent } from '../shared/modal/modal.component';
+import { NgxSpinnerModule } from 'ngx-spinner';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [
-    NgxSpinnerModule,
-    CommonModule,
-    ReactiveFormsModule,
-    MatSnackBarModule,
-    FooterComponent,
-    HeaderComponent,
-  ],
+  imports: [CommonModule, ReactiveFormsModule, ModalComponent, NgxSpinnerModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css',
+  styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  modalVisible: boolean = false;
-  modalMessage: string = '';
-  isLoading: boolean = false;
-  form_si: any;
+  loginForm: FormGroup;
+  isLoading = false;
+  errorMessage: string = '';
+  showError = false;
 
   constructor(
-    private spinner: NgxSpinnerService,
-    private si_form: NonNullableFormBuilder,
+    private fb: FormBuilder,
     private authService: AuthService,
-    private matSnackBar: MatSnackBar,
-    private router: Router
+    private router: Router,
+    private cookieService: CookieService,
+    private modalService: ModalService
   ) {
-    this.form_si = this.si_form.group({
-      account_name: [
-        '',
-        [
-          Validators.required,
-          Validators.maxLength(12),
-          Validators.minLength(6),
-        ],
-      ],
-      password: [
-        '',
-        [
-          Validators.required,
-          Validators.maxLength(12),
-          Validators.minLength(6),
-        ],
-      ],
+    this.loginForm = this.fb.group({
+      username: ['', [Validators.required, Validators.minLength(3)]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      rememberMe: [false]
     });
   }
 
-  onModalClose(): void {
-    this.modalVisible = false;
-    this.modalMessage = '';
-  }
-  onSubmitLogin() {
-    if (this.form_si.invalid) {
-      this.form_si.markAllAsTouched();
+  onLogin() {
+    if (this.loginForm.invalid || this.isLoading) {
+      this.markFormGroupTouched(this.loginForm);
       return;
     }
-    this.isLoading = true;
-    this.showSpin();
-    localStorage.removeItem(LocalStorage.token);
-    this.authService.login(this.form_si.value as LoginPayload).subscribe({
-      next: (res) => {
-        setTimeout(() => {
-          this.isLoading = false;
-        }, 5000);
 
-        this.matSnackBar.open('Login Successfuly', '', { duration: 3000 });
-        location.replace('/');
+    this.isLoading = true;
+    this.showError = false;
+    const loginData = this.loginForm.value;
+
+    this.authService.login(loginData).pipe(
+      finalize(() => {
+        this.isLoading = false;
+      })
+    ).subscribe({
+      next: () => {
+        this.router.navigate(['/']);
       },
-      error: (err) => {
-        this.matSnackBar.open(err.error.message);
-      },
-      complete: () => {
-        console.log('ok');
-      },
+      error: (error) => {
+        if (error.status === 401) {
+          this.errorMessage = 'Tên đăng nhập hoặc mật khẩu không đúng';
+        } else if (error.status === 403) {
+          this.errorMessage = 'Tài khoản của bạn đã bị khóa';
+        } else {
+          this.errorMessage = 'Đã có lỗi xảy ra, vui lòng thử lại sau';
+        }
+        this.showError = true;
+      }
     });
   }
 
-  private showSpin(): void {
-    if (this.isLoading) {
-      this.spinner.show();
-    } else {
-      this.spinner.hide();
-    }
+  private markFormGroupTouched(formGroup: FormGroup) {
+    Object.values(formGroup.controls).forEach(control => {
+      control.markAsTouched();
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      }
+    });
   }
 }

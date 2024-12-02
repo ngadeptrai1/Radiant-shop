@@ -1,0 +1,58 @@
+.sidebar {
+  min-height: 100vh;
+  
+  .sidebar-brand {
+    padding: 1.5rem 1rem;
+    
+    .sidebar-brand-icon {
+      font-size: 1.8rem;
+    }
+    
+    .sidebar-brand-text {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+  }
+  
+  .nav-item {
+    .nav-link {
+      padding: 1rem;
+      
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+      
+      i {
+        margin-right: 0.5rem;
+      }
+    }
+  }
+  
+  .collapse-inner {
+    .collapse-item {
+      padding: 0.8rem 1rem;
+      display: block;
+      text-decoration: none;
+      color: #3a3b45;
+      font-size: 0.85rem;
+      
+      &:hover {
+        background-color: #eaecf4;
+      }
+      
+      i {
+        width: 20px;
+        text-align: center;
+      }
+    }
+  }
+}
+
+// Thêm animation cho toggle sidebar
+#sidebarToggle {
+  transition: transform 0.3s;
+  
+  &:hover {
+    transform: rotate(180deg);
+  }
+}

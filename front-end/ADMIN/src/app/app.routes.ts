@@ -11,7 +11,11 @@ import { BrandComponent } from './components/brand/brand.component';
 import { VoucherComponent } from './components/voucher/voucher.component';
 import { ColorComponent } from './components/color/color.component';
 import { AddProductComponent } from './components/add-product/add-product.component';
-
+import { POSComponent } from './components/pos/pos.component';
+import { UserComponent } from './components/user/user.component';
+import { OrderComponent } from './components/order/order.component';
+import { OrderDetailComponent } from './components/order-detail/order-detail.component';
+import { ProductReviewComponent } from './components/product-review/product-review.component';
 export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
@@ -23,8 +27,11 @@ export const routes: Routes = [
   { path:'brands',component:BrandComponent},
   { path:'vouchers',component:VoucherComponent},
   { path:'colors',component:ColorComponent},
-{ path:'add-product',component:AddProductComponent},
+  { path:'add-product',component:AddProductComponent},
+  { path:'pos',component:POSComponent},
+  { path:'user',component:UserComponent},
+  { path:'orders',component:OrderComponent},
+  { path:'orders/:id',component:OrderDetailComponent},
+  { path:'product-review',component:ProductReviewComponent},
   { path: '**',component: NotFoundComponent }
-
- 
 ];

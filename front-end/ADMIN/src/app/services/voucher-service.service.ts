@@ -53,4 +53,7 @@ export class VoucherService {
   deleteVoucher(id: number): Observable<Voucher> {
     return this.apiService.delete<Voucher>(`${this.endpoint}/${id}`);
   }
+  getValidVoucher(amount: number): Observable<Voucher[]> {
+    return this.apiService.get<Voucher[]>(`${this.endpoint}/valid?amount=${amount}`);
+  }
 }

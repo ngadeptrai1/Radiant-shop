@@ -1,7 +1,10 @@
 package com.backend.cosmetic.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 @Getter
 @Setter
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class ProductReview extends BaseModel{
 
     @Id
@@ -32,8 +36,12 @@ public class ProductReview extends BaseModel{
     @Column(name = "reivew_date")
     private LocalDateTime reivewDate = LocalDateTime.now();
 
-    private boolean active = false;
+    private boolean active = true;
 
-    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @NotNull(message = "Rating cannot be null")
+    private int rating;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference("product-reviews")
     private Product product;
 }

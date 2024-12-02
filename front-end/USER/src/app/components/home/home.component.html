@@ -1,182 +1,213 @@
-<app-header />
-<div class="content">
-  <div class="slider">
-    <div
-      id="carouselExampleInterval"
-      class="carousel slide"
-      data-bs-ride="carousel"
-    >
-      <div class="carousel-indicators">
-        <button
-          type="button"
-          data-bs-target="#carouselExampleInterval"
-          data-bs-slide-to="0"
-          class="active"
-          aria-current="true"
-          aria-label="Slide 1"
-        ></button>
-        <button
-          type="button"
-          data-bs-target="#carouselExampleInterval"
-          data-bs-slide-to="1"
-          aria-label="Slide 2"
-        ></button>
-        <button
-          type="button"
-          data-bs-target="#carouselExampleInterval"
-          data-bs-slide-to="2"
-          aria-label="Slide 3"
-        ></button>
-      </div>
-      <div class="carousel-inner">
-        <div class="carousel-item active" data-bs-interval="3000">
-          <img src="assets/slides/slide1.jpg" class="d-block w-100" alt="..." />
-        </div>
-        <div class="carousel-item" data-bs-interval="3000">
-          <img src="assets/slides/slide2.jpg" class="d-block w-100" alt="..." />
-        </div>
-        <div class="carousel-item" data-bs-interval="3000">
-          <img src="assets/slides/slide3.jpg" class="d-block w-100" alt="..." />
-        </div>
-      </div>
-      <button
-        class="carousel-control-prev"
-        type="button"
-        data-bs-target="#carouselExampleInterval"
-        data-bs-slide="prev"
+<div class="content home-page">
+  <!-- Hero Slider Section -->
+  <section class="hero-section">
+    <div class="slider">
+      <div
+        id="carouselExampleInterval"
+        class="carousel slide"
+        data-bs-ride="carousel"
       >
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
-      </button>
-      <button
-        class="carousel-control-next"
-        type="button"
-        data-bs-target="#carouselExampleInterval"
-        data-bs-slide="next"
-      >
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
-      </button>
+        <div class="carousel-indicators">
+          <button
+            type="button"
+            data-bs-target="#carouselExampleInterval"
+            data-bs-slide-to="0"
+            class="active"
+            aria-current="true"
+            aria-label="Slide 1"
+          ></button>
+          <button
+            type="button"
+            data-bs-target="#carouselExampleInterval"
+            data-bs-slide-to="1"
+            aria-label="Slide 2"
+          ></button>
+          <button
+            type="button"
+            data-bs-target="#carouselExampleInterval"
+            data-bs-slide-to="2"
+            aria-label="Slide 3"
+          ></button>
+        </div>
+        <div class="carousel-inner">
+          <div class="carousel-item active" data-bs-interval="3000">
+            <img
+              ngSrc="assets/slides/slide1.jpg"
+              class="d-block w-100 carousel-image"
+              [width]="1920"
+              [height]="766"
+              priority
+              alt="Slide 1"
+            />
+          </div>
+          <div class="carousel-item" data-bs-interval="3000">
+            <img
+              ngSrc="assets/slides/slide2.jpg"
+              class="d-block w-100 carousel-image"
+              [width]="1366"
+              [height]="515"
+              priority
+              alt="Slide 2"
+            />
+          </div>
+          <div class="carousel-item" data-bs-interval="3000">
+            <img
+              ngSrc="assets/slides/slide3.jpg"
+              class="d-block w-100 carousel-image"
+              [width]="1920"
+              [height]="766"
+              priority
+              alt="Slide 3"
+            />
+          </div>
+        </div>
+        <button
+          class="carousel-control-prev"
+          type="button"
+          data-bs-target="#carouselExampleInterval"
+          data-bs-slide="prev"
+        >
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button
+          class="carousel-control-next"
+          type="button"
+          data-bs-target="#carouselExampleInterval"
+          data-bs-slide="next"
+        >
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <div class="banner">
+  <!-- Promotional Banners -->
+  <section class="promo-banners py-4">
     <div class="container">
-      <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-          <a href="#">
-            <img src="assets/banner/banner_mini1.jpg" alt="Sale" />
-          </a>
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="promo-banner-item">
+            <a href="#" class="d-block overflow-hidden rounded">
+              <img
+                src="assets/banners/banner_mini1.jpg"
+                alt="Sale"
+                class="img-fluid hover-scale"
+              />
+            </a>
+          </div>
         </div>
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-          <a href="#">
-            <img src="assets/banner/banner_mini2.jpg" alt="Sale" />
-          </a>
+        <div class="col-lg-6">
+          <div class="promo-banner-item">
+            <a href="#" class="d-block overflow-hidden rounded">
+              <img
+                src="assets/banners/banner_mini2.jpg"
+                alt="Sale"
+                class="img-fluid hover-scale"
+              />
+            </a>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <section class="section1">
-    <section class="product-noibat">
-      <div class="container">
-        <div class="title">
-          <h2><a href="#"></a>Sản phẩm nổi bật</h2>
+  <!-- Vouchers Section -->
+  <section class="vouchers-section py-4">
+    <div class="container">
+      <div class="section-header text-center mb-4">
+        <h2 class="section-title">Mã giảm giá</h2>
+        <div class="section-divider"></div>
+      </div>
+      <div class="position-relative">
+        <app-loading *ngIf="loadingVouchers" [overlay]="true"></app-loading>
+        <div class="row g-4" [class.opacity-50]="loadingVouchers">
+          <div *ngFor="let voucher of vouchers | slice:0:4" class="col-lg-3 col-md-6">
+            <app-nested-voucher [voucher]="voucher"></app-nested-voucher>
+          </div>
         </div>
-        <div class="products">
-          <div class="row">
-            <div class="col-lg-3 col-md-3 col-sm-3 mb-4">
-              <div class="product">
-                <div class="product-main">
-                  <a (click)="onProductClick(1)">
-                    <img
-                      src="assets/products/product1.jpg"
-                      alt="Kem dưỡng ẩm"
-                    />
-                  </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Section -->
+  <section class="categories-section py-4">
+    <div class="container">
+      <div class="section-header text-center mb-4">
+        <h2 class="section-title">Danh mục sản phẩm</h2>
+        <div class="section-divider"></div>
+      </div>
+      <div class="position-relative">
+        <app-loading *ngIf="loadingCategories" [overlay]="true"></app-loading>
+        <div class="row g-4" [class.opacity-50]="loadingCategories">
+          <div *ngFor="let category of categories | slice:0:12" class="col-lg-3 col-md-4 col-6">
+            <div class="category-card text-center">
+              <a href="/product-list?category={{category.id}}" class="category-link">
+                <div class="category-icon mb-2">
+                  <i class="bi bi-grid"></i>
                 </div>
-                <div class="product-infor">
-                  <div class="product-name">
-                    <h3>
-                      <a href="#">Kem dưỡng da 1</a>
-                    </h3>
-                  </div>
-                  <div class="product-price">
-                    <span class="price">500.000đ</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-3 col-md-3 col-sm-3 mb-4">
-              <div class="product">
-                <div class="product-main">
-                  <a (click)="onProductClick(1)">
-                    <img
-                      src="assets/products/product2.jpg"
-                      alt="Kem dưỡng ẩm"
-                    />
-                  </a>
-                </div>
-                <div class="product-infor">
-                  <div class="product-name">
-                    <h3>
-                      <a href="#">Kem dưỡng da 1</a>
-                    </h3>
-                  </div>
-                  <div class="product-price">
-                    <span class="price">500.000đ</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-3 col-md-3 col-sm-3 mb-4">
-              <div class="product">
-                <div class="product-main">
-                  <a (click)="onProductClick(1)">
-                    <img
-                      src="assets/products/product3.jpg"
-                      alt="Kem dưỡng ẩm"
-                    />
-                  </a>
-                </div>
-                <div class="product-infor">
-                  <div class="product-name">
-                    <h3>
-                      <a href="#">Kem dưỡng da 1</a>
-                    </h3>
-                  </div>
-                  <div class="product-price">
-                    <span class="price">500.000đ</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-3 col-md-3 col-sm-3 mb-4">
-              <div class="product">
-                <div class="product-main">
-                  <a (click)="onProductClick(1)">
-                    <img
-                      src="assets/products/product4.jpg"
-                      alt="Kem dưỡng ẩm"
-                    />
-                  </a>
-                </div>
-                <div class="product-infor">
-                  <div class="product-name">
-                    <h3>
-                      <a href="#">Kem dưỡng da 1</a>
-                    </h3>
-                  </div>
-                  <div class="product-price">
-                    <span class="price">500.000đ</span>
-                  </div>
-                </div>
-              </div>
+                <h3 class="category-name">{{category.name}}</h3>
+              </a>
             </div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
+
+  <!-- Brands Section -->
+  <section class="brands-section py-4 bg-light">
+    <div class="container">
+      <div class="section-header text-center mb-4">
+        <h2 class="section-title">Thương hiệu</h2>
+        <div class="section-divider"></div>
+      </div>
+      <div class="position-relative">
+        <app-loading *ngIf="loadingBrands" [overlay]="true"></app-loading>
+        <div class="row g-4" [class.opacity-50]="loadingBrands">
+          <div *ngFor="let brand of brands | slice:0:12" class="col-lg-2 col-md-3 col-6">
+            <div class="brand-card text-center">
+              <a href="/product-list?brand={{brand.id}}">
+                <img [src]="brand.thumbnail" [alt]="brand.name" class="img-fluid brand-logo">
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="text-center mt-4">
+          <a routerLink="/brands" class="btn btn-outline-primary">Xem tất cả thương hiệu</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Products Section -->
+  <section class="featured-products py-5">
+    <div class="container">
+      <div class="section-header text-center mb-5">
+        <h2 class="section-title">Sản phẩm nổi bật</h2>
+        <div class="section-divider"></div>
+      </div>
+
+      <div class="position-relative">
+        <app-loading *ngIf="loadingProducts" [overlay]="true" message="Đang tải sản phẩm..."></app-loading>
+        <div class="row g-4" [class.opacity-50]="loadingProducts">
+          <div *ngFor="let product of products" class="col-lg-3 col-md-6">
+            <app-product [product]="product"></app-product>
+          </div>
+        </div>
+      </div>
+
+      <!-- Load More Button -->
+      <div class="text-center mt-4" *ngIf="currentPage < totalPages - 1">
+        <button class="btn btn-outline-primary" (click)="loadMore()" [disabled]="loadingProducts">
+          {{ loadingProducts ? 'Đang tải...' : 'Xem thêm sản phẩm' }}
+        </button>
+      </div>
+
+      <div class="text-center mt-4">
+        <a routerLink="/product-list" class="btn btn-outline-primary">Xem tất cả sản phẩm</a>
+      </div>
+    </div>
   </section>
 </div>
-<app-footer />

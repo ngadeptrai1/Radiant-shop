@@ -4,23 +4,25 @@ import com.backend.cosmetic.model.OrderDetail;
 import lombok.*;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
-@Builder
 public class OrderDetailResponse {
-    private long id;
+    private Long id;
     private int quantity;
-    private Long price;
-    private ProductDetailResponse productDetail;
+    private long price;
+    private String productName;
+    private String productColor;
+    private String thumbnail;
 
-    public static OrderDetailResponse fromOrderDetail(OrderDetail orderDetail) {
+    public static OrderDetailResponse fromOrderDetail(OrderDetail detail) {
         return OrderDetailResponse.builder()
-                .id(orderDetail.getId())
-                .quantity(orderDetail.getQuantity())
-                .price(orderDetail.getPrice())
-                .productDetail(ProductDetailResponse.fromProductDetail(orderDetail.getProductDetail()))
+                .id(detail.getId())
+                .quantity(detail.getQuantity())
+                .price(detail.getPrice())
+                .productColor(detail.getProductDetail().getColor().getName())
+                .productName(detail.getProductDetail().getProduct().getName())
+                .thumbnail(detail.getProductDetail().getProduct().getThumbnail())
                 .build();
     }
 }

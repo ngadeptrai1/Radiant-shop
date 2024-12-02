@@ -1,13 +1,12 @@
 package com.backend.cosmetic.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.backend.cosmetic.dto.CategoryDTO;
 import com.backend.cosmetic.model.Category;
 import com.backend.cosmetic.response.CategoryResponse;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public interface CategoryService {
@@ -17,4 +16,6 @@ public interface CategoryService {
     List<CategoryResponse> findAll();
     CategoryResponse findByName(String name);
     CategoryResponse delete(int id);
+    List<Category> findAllParents();
+    Category findParentCategoryById(Integer id);
 }

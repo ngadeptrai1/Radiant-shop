@@ -1,0 +1,315 @@
+<div class="container">
+  <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
+    <div class="layout-page-payment mt-4 mb-5">
+      <div class="layout-form">
+        <div class="layout-title bg-white">
+          <span class="fw-bold">Thông tin nhận hàng</span>
+        </div>
+
+        <!-- Saved Addresses -->
+        <div class="form-detail bg-white mb-4">
+          <!-- Hiển thị danh sách địa chỉ cho người dùng đã đăng nhập -->
+          <div *ngIf="isLoggedIn" class="saved-addresses mb-4">
+            <div class="address-header">
+              <h4>Địa chỉ đã lưu</h4>
+            </div>
+
+            <!-- Danh sách địa chỉ -->
+            <div class="address-list">
+              <div *ngFor="let address of userAddresses" 
+                   class="address-item" 
+                   [class.selected]="selectedAddress?.id === address.id"
+                   (click)="selectUserAddress(address)">
+                <div class="address-content">
+                  <div class="name-phone">
+                    <span class="name">{{address.fullname}}</span>
+                    <span class="phone">{{address.phoneNumber}}</span>
+                  </div>
+                  <div class="email">{{address.email}}</div>
+                  <div class="address">
+                    {{address.address}}, {{address.wardName}}, 
+                    {{address.districtName}}, {{address.provinceName}}
+                  </div>
+                </div>
+              </div>
+              
+              <div *ngIf="userAddresses.length === 0" class="no-address">
+                <p>Bạn chưa có địa chỉ nào được lưu.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form nhập thông tin - luôn hiển thị -->
+          <div class="shipping-form">
+            <div class="form-box">
+              <label>
+                Họ và tên
+                <span class="text-danger">*</span>
+              </label>
+              <input type="text" class="form-control" formControlName="fullName">
+              <div class="invalid-feedback" 
+                   *ngIf="paymentForm.get('fullName')?.touched && 
+                          paymentForm.get('fullName')?.errors?.['required']">
+                Vui lòng nhập họ tên
+              </div>
+            </div>
+
+            <div class="form-box">
+              <label>
+                Số điện thoại
+                <span class="text-danger">*</span>
+              </label>
+              <input 
+                type="text" 
+                class="form-control" 
+                formControlName="phoneNumber" 
+                [class.is-invalid]="paymentForm.get('phoneNumber')?.invalid && paymentForm.get('phoneNumber')?.touched"
+              />
+              <div class="invalid-feedback" *ngIf="paymentForm.get('phoneNumber')?.errors?.['required']">
+                Vui lòng nhập số điện thoại
+              </div>
+              <div class="invalid-feedback" *ngIf="paymentForm.get('phoneNumber')?.errors?.['pattern']">
+                Số điện thoại không hợp lệ
+              </div>
+            </div>
+
+            <div class="form-box">
+              <label>
+                Email
+                <span>*</span>
+              </label>
+              <input type="email" class="form-control" formControlName="email" />
+              <div class="invalid-feedback" 
+                   *ngIf="paymentForm.get('email')?.touched && paymentForm.get('email')?.errors">
+                <span *ngIf="paymentForm.get('email')?.errors?.['required']">
+                  Vui lòng nhập email
+                </span>
+                <span *ngIf="paymentForm.get('email')?.errors?.['email']">
+                  Email không hợp lệ
+                </span>
+              </div>
+            </div>
+
+            <div class="address-section">
+              <div class="row">
+                <div class="col-md-4 form-box">
+                  <label>
+                    Tỉnh/Thành phố
+                    <span class="text-danger">*</span>
+                  </label>
+                  <select class="form-select" 
+                          formControlName="provinceId" 
+                          (change)="onProvinceChange($event)"
+                          [attr.disabled]="isLoading">
+                    <option value="">Chọn Tỉnh/Thành phố</option>
+                    <option *ngFor="let province of provinces" [value]="province.ProvinceID">
+                      {{province.ProvinceName}}
+                    </option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="paymentForm.get('provinceId')?.touched && paymentForm.get('provinceId')?.errors?.['required']">
+                    Vui lòng chọn Tỉnh/Thành phố
+                  </div>
+                </div>
+
+                <div class="col-md-4 form-box">
+                  <label>
+                    Quận/Huyện
+                    <span class="text-danger">*</span>
+                  </label>
+                  <select class="form-select" 
+                          formControlName="districtId" 
+                          (change)="onDistrictChange($event)"
+                          [attr.disabled]="isLoading">
+                    <option value="">Chọn Quận/Huyện</option>
+                    <option *ngFor="let district of districts" [value]="district.DistrictID">
+                      {{district.DistrictName}}
+                    </option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="paymentForm.get('districtId')?.touched && paymentForm.get('districtId')?.errors?.['required']">
+                    Vui lòng chọn Quận/Huyện
+                  </div>
+                </div>
+
+                <div class="col-md-4 form-box">
+                  <label>
+                    Phường/Xã
+                    <span class="text-danger">*</span>
+                  </label>
+                  <select class="form-select" 
+                          formControlName="wardCode"
+                          (change)="onWardChange()"
+                          [attr.disabled]=" isLoading">
+                    <option value="">Chọn Phường/Xã</option>
+                    <option *ngFor="let ward of wards" [value]="ward.WardCode">
+                      {{ward.WardName}}
+                    </option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="paymentForm.get('wardCode')?.touched && paymentForm.get('wardCode')?.errors?.['required']">
+                    Vui lòng chọn Phường/Xã
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-box mt-3">
+                <label>
+                  Địa chỉ cụ thể
+                  <span class="text-danger">*</span>
+                </label>
+                <input type="text" class="form-control" formControlName="address" 
+                       placeholder="Số nhà, tên đường, tòa nhà, khu dân cư,..." />
+                <div class="invalid-feedback" *ngIf="paymentForm.get('address')?.touched && paymentForm.get('address')?.errors?.['required']">
+                  Vui lòng nhập địa chỉ cụ thể
+                </div>
+              </div>
+
+              <!-- Nút lưu địa chỉ chỉ hiển thị khi đã đăng nhập -->
+              <div class="form-box mt-3" *ngIf="isLoggedIn">
+                <button type="button" 
+                        class="btn btn-outline-primary" 
+                        (click)="saveCurrentAddress()"
+                        [disabled]="!isAddressValid()">
+                  <i class="fas fa-save me-2"></i>
+                  Lưu địa chỉ này
+                </button>
+              </div>
+            </div>
+
+            <div class="form-box">
+              <label>
+                Ghi chú
+              </label>
+              <textarea rows="4" class="form-control" formControlName="note"
+                        placeholder="Nhập ghi chú nếu có"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Methods -->
+        <div class="layout-title bg-white">
+          <span class="fw-bold">Vận chuyển & Thanh toán</span>
+        </div>
+        <div class="form-detail bg-white">
+          <p class="fw-bold mb-2">Hình thức thanh toán</p>
+          <div class="form-check mb-3">
+            <input type="radio" class="form-check-input" 
+                   formControlName="paymentMethod" value="CASH" id="cod" />
+            <label class="form-check-label" for="cod">
+              Thanh toán khi nhận hàng (COD)
+            </label>
+          </div>
+          <div class="form-check">
+            <input type="radio" class="form-check-input" 
+                   formControlName="paymentMethod" value="CARD" id="transfer" />
+            <label class="form-check-label" for="transfer">
+              Chuyển khoản
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="layout-detail">
+        <div class="detail-payment">
+          <div class="layout-title bg-white">Danh sách sản phẩm</div>
+          <div class="form-detail bg-white">
+            <div class="list-product mb-4">
+              <div *ngFor="let item of cartItems" class="item-product">
+                <img [src]="item.thumbnail" class="img-fluid" [alt]="item.name"/>
+                <div class="item-info">
+                  <p class="item-title mb-0">{{item.name}}</p>
+                  <p class="item-color mb-0">Màu: {{item.color}}</p>
+                  <p class="item-quantity mb-0">
+                    SL: <span class="fw-bold">{{item.quantity}}</span>
+                  </p>
+                </div>
+                <div class="item-price fw-bold">
+                  <div class="public-price">{{item.productDetail.salePrice | number}}đ</div>
+                  <div class="total-price">
+                    {{item.productDetail.salePrice * item.quantity | number}}đ
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <span>Tạm tính:</span>
+              <span>{{subTotal | number}}đ</span>
+            </div>
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <span>Phí vận chuyển:</span>
+              <span>{{shippingFee | number}}đ</span>
+            </div>
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <span>Mã giảm giá:</span>
+              <div class="d-flex gap-2">
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="voucherCode" 
+                  [disabled]="isApplyingVoucher"
+                  placeholder="Nhập mã giảm giá"
+                />
+                <button 
+                  type="button" 
+                  class="btn btn-warning" 
+                  (click)="applyCoupon()"
+                  [disabled]="isApplyingVoucher || !paymentForm.get('voucherCode')?.value"
+                >
+                  <span *ngIf="isApplyingVoucher" class="spinner-border spinner-border-sm me-2"></span>
+                  {{ isApplyingVoucher ? 'Đang áp dụng...' : 'Áp dụng' }}
+                </button>
+              </div>
+            </div>
+            <hr />
+            <div class="list-coupon-view mb-4" *ngIf="availableVouchers.length > 0">
+              <h2 class="text-right mb-3">Mã giảm giá có thể áp dụng</h2>
+              <div class="voucher-list">
+                <div *ngFor="let voucher of availableVouchers" class="voucher-item mb-2">
+                  <button
+                    type="button"
+                    class="btn btn-voucher d-flex align-items-center gap-2"
+                    (click)="applyVoucher(voucher)"
+                    [class.active]="selectedVoucher?.code === voucher.code"
+                    [disabled]="isApplyingVoucher || selectedVoucher?.code === voucher.code"
+                  >
+                    <img
+                      src="assets/icons/ic-coupon-payment.svg"
+                      class="img-fluid"
+                      alt="voucher icon"
+                    />
+                    <div class="voucher-info">
+                      <p class="sub-title-coupon mb-0">
+                        Giảm {{ voucher.type === 'FIXED_AMOUNT' ? (voucher.value | number) + 'đ' : voucher.value + '%' }}
+                      </p>
+                      <small class="text-muted" *ngIf="voucher.minOrderAmount">
+                        Đơn tối thiểu {{ voucher.minOrderAmount | number }}đ
+                      </small>
+                      <small class="text-muted" *ngIf="voucher.type === 'PERCENTAGE' && voucher.maxDiscountAmount">
+                        Giảm tối đa {{ voucher.maxDiscountAmount | number }}đ
+                      </small>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <span>Giảm giá:</span>
+              <span>-{{ voucherAmount | number }}đ</span>
+            </div>
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <span class="text-uppercase">Tổng cộng</span>
+              <span class="fw-bold text-danger">{{totalAmount | number}}đ</span>
+            </div>
+            <button 
+              type="submit" 
+              class="btn submit-layoutForm w-100" 
+              [disabled]="isProcessing || !cartItems.length || paymentForm.invalid"
+            >
+              <span *ngIf="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
+              {{isProcessing ? 'Đang xử lý đơn hàng...' : 'Đặt hàng'}}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

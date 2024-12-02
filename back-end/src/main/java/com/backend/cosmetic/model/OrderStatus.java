@@ -2,25 +2,25 @@ package com.backend.cosmetic.model;
 
 public class OrderStatus {
 
-    public static final String PENDING = "pending";
+    public static final String PENDING = "PENDING";
 
-    public static final String PROCESSING = "processing";
+    public static final String PROCESSING = "PROCESSING";
 
-    public static final String SHIPPED = "shipped";
+    public static final String SHIPPED = "SHIPPED";
 
-    public static final String DELIVERED = "delivered";
+    public static final String DELIVERED = "DELIVERED";
 
-    public static final String CANCELLED = "cancelled";
+    public static final String CANCELLED = "CANCELLED";
 
-    public static final String SUCCESS = "success";
+    public static final String SUCCESS = "SUCCESS";
 
-    public static final String PAYMENT_PENDING = "payment_pending";
+    public static final String PAID = "PAID";
 
-    public static final String PAYMENT_SUCCESS = "payment_success";
+    public static final String UNPAID = "UNPAID";
 
-    public static final String PAYMENT_FAILED = "payment_failed";
+    public static final String PAYMENT_FAILED = "FAILED";
 
-    public static final String TYPE_ONLINE = "online";
+    public static final String TYPE_ONLINE = "WEB";
 
-    public static final String TYPE_COUNTER = "counter";
+    public static final String TYPE_COUNTER = "POS";
 }

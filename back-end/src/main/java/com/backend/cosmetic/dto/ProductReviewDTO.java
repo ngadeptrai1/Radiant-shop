@@ -1,12 +1,7 @@
 package com.backend.cosmetic.dto;
 
-import com.backend.cosmetic.model.Product;
 import jakarta.annotation.Nullable;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -36,10 +31,15 @@ public class ProductReviewDTO {
     @NotEmpty
     private String reviewText;
 
+    @NotNull(message = "Rating cannot be null")
+    @Min(1)
+    @Max(5)
+    private int rating;
+
     @Nullable
     private LocalDateTime reviewDate = LocalDateTime.now();
 
-    private boolean active = false;
+    private boolean active = true;
 
     @NotNull(message = "Product ID cannot be null")
     private Long productId;

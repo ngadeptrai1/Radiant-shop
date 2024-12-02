@@ -1,0 +1,164 @@
+<div class="order-detail-container">
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Đang tải thông tin đơn hàng...</p>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    <p>Có lỗi xảy ra khi tải thông tin đơn hàng. Vui lòng thử lại sau.</p>
+  </div>
+
+  <div *ngIf="!loading && !error && order" class="order-content">
+    <div class="order-header">
+      <h2>Chi tiết đơn hàng #{{order.id}}</h2>
+      <span class="order-date">Ngày đặt: {{order.createdDate | date:'dd/MM/yyyy HH:mm'}}</span>
+    </div>
+
+    <!-- Timeline section -->
+    <div class="timeline-section">
+      <!-- Timeline for normal order status -->
+      <div class="timeline" *ngIf="order.status !== 'CANCELLED'">
+        <div class="timeline-item" [class.active]="getTimelineStatus(order.status) >= 0">
+          <div class="timeline-icon">
+            <i class="bi bi-box-seam"></i>
+          </div>
+          <div class="timeline-content">
+            <span class="timeline-title">Đặt hàng</span>
+            <span class="timeline-date" *ngIf="getTimelineStatus(order.status) >= 0">
+              {{order.createdDate | date:'dd/MM/yyyy HH:mm'}}
+            </span>
+          </div>
+        </div>
+        
+        <div class="timeline-line" [class.active]="getTimelineStatus(order.status) >= 1"></div>
+        
+        <div class="timeline-item" [class.active]="getTimelineStatus(order.status) >= 1">
+          <div class="timeline-icon">
+            <i class="bi bi-check-circle"></i>
+          </div>
+          <div class="timeline-content">
+            <span class="timeline-title">Xác nhận</span>
+            <span class="timeline-status">Đơn hàng đã được xác nhận</span>
+          </div>
+        </div>
+        
+        <div class="timeline-line" [class.active]="getTimelineStatus(order.status) >= 2"></div>
+        
+        <div class="timeline-item" [class.active]="getTimelineStatus(order.status) >= 2">
+          <div class="timeline-icon">
+            <i class="bi bi-truck"></i>
+          </div>
+          <div class="timeline-content">
+            <span class="timeline-title">Đang giao hàng</span>
+            <span class="timeline-status">Đơn hàng đang được giao</span>
+          </div>
+        </div>
+        
+        <div class="timeline-line" [class.active]="getTimelineStatus(order.status) >= 3"></div>
+        
+        <div class="timeline-item" [class.active]="getTimelineStatus(order.status) >= 3">
+          <div class="timeline-icon">
+            <i class="bi bi-check2-circle"></i>
+          </div>
+          <div class="timeline-content">
+            <span class="timeline-title">Hoàn thành</span>
+            <span class="timeline-status">Giao hàng thành công</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline for cancelled order -->
+      <div class="timeline cancelled" *ngIf="order.status === 'CANCELLED'">
+        <div class="timeline-item active">
+          <div class="timeline-icon cancelled">
+            <i class="bi bi-x-circle"></i>
+          </div>
+          <div class="timeline-content">
+            <span class="timeline-title">Đơn hàng đã hủy</span>
+            <span class="timeline-date">{{order.createdDate | date:'dd/MM/yyyy HH:mm'}}</span>
+            <span class="timeline-reason" *ngIf="order.reason">
+              Lý do: {{order.reason}}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Info -->
+    <div class="info-section">
+      <div class="info-card">
+        <h3>Thông tin người nhận</h3>
+        <p><strong>Họ tên:</strong> {{order.fullName}}</p>
+        <p><strong>Số điện thoại:</strong> {{order.phoneNumber}}</p>
+        <p><strong>Địa chỉ:</strong> {{order.address}}</p>
+        <p><strong>Email:</strong> {{order.email}}</p>
+      </div>
+
+      <div class="info-card">
+        <h3>Thông tin thanh toán</h3>
+        <p><strong>Phương thức:</strong> 
+          {{ order.paymentMethod === 'CASH' ? 'Thanh toán khi nhận hàng' : 'Thanh toán qua tài khoản ngân hàng' }}
+        </p>
+        <p><strong>Trạng thái:</strong> 
+          <span [class]="'payment-badge ' + (order.paymentStatus === 'PAID' ? 'paid' : 'unpaid')">
+            {{ order.paymentStatus === 'PAID' ? 'Đã thanh toán' : 'Chưa thanh toán' }}
+          </span>
+          <button *ngIf="canShowQRCode()" 
+                  class="btn-qr-payment" 
+                  (click)="showQRCode()">
+            <i class="bi bi-qr-code"></i> Hiển thị QR Code
+          </button>
+        </p>
+      </div>
+    </div>
+
+    <!-- Order Items -->
+    <div class="items-section">
+      <h3>Sản phẩm đã đặt</h3>
+      <div class="items-list">
+        <div *ngFor="let item of orderDetails" class="item-card">
+          <img [src]="item.thumbnail" [alt]="item.productName" class="item-image">
+          <div class="item-info">
+            <h4>{{item.productName}}</h4>
+            <p>Màu sắc: {{item.productColor}}</p>
+            <p>Số lượng: {{item.quantity}}</p>
+          </div>
+          <div class="item-price">
+            {{item.price | number}} ₫
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="order-summary">
+      <div class="summary-row">
+        <span>Tổng tiền hàng:</span>
+        <span>{{order.totalOrderAmount | number}} ₫</span>
+      </div>
+      <div class="summary-row">
+        <span>Phí vận chuyển:</span>
+        <span>{{order.shippingCost | number}} ₫</span>
+      </div>
+      <div class="summary-row" *ngIf="order.voucherAmount">
+        <span>Giảm giá:</span>
+        <span>-{{order.voucherAmount | number}} ₫</span>
+      </div>
+      <div class="summary-row total">
+        <span>Tổng thanh toán:</span>
+        <span>{{order.finalAmount | number}} ₫</span>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="order-actions">
+      <button *ngIf="canCancel()" 
+              class="btn-cancel" 
+              (click)="cancelOrder()"
+              [disabled]="isCancelling">
+        <span *ngIf="isCancelling" class="spinner-border spinner-border-sm me-2"></span>
+        {{ isCancelling ? 'Đang hủy đơn hàng...' : 'Hủy đơn hàng' }}
+      </button>
+    </div>
+  </div>
+</div>

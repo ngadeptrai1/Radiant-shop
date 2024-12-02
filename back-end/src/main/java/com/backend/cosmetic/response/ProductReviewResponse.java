@@ -22,27 +22,33 @@ public class ProductReviewResponse {
     private String phoneNumber;
 
 
-    private String fullName;
+    private String fullname;
 
 
     private String reviewText;
 
     private LocalDateTime reivewDate ;
 
-    private boolean active = false;
+    private boolean active;
 
-    private ProductResponse product;
+    private int rating;
+
+    private String productName;
+
+    private String thumbnail;
 
     public static ProductReviewResponse fromProductReview(ProductReview productReview) {
         return ProductReviewResponse.builder()
                 .id(productReview.getId())
                 .email(productReview.getEmail())
                 .phoneNumber(productReview.getPhoneNumber())
-                .fullName(productReview.getFullName())
+                .fullname(productReview.getFullName())
                 .reviewText(productReview.getReviewText())
                 .reivewDate(productReview.getReivewDate())
                 .active(productReview.isActive())
-                .product(ProductResponse.fromProduct(productReview.getProduct()))
+                .rating(productReview.getRating())
+                .productName(productReview.getProduct().getName())
+                .thumbnail(productReview.getProduct().getThumbnail())
                 .build();
     }
 }

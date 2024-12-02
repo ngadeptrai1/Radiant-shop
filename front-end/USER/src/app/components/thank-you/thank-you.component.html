@@ -1,0 +1,39 @@
+<div class="thank-you-container">
+  <div class="thank-you-content">
+    <div class="success-icon">
+      <i class="fas fa-check-circle"></i>
+    </div>
+    
+    <h1>Cảm ơn bạn đã đặt hàng!</h1>
+    <p>Mã đơn hàng của bạn: <strong>{{currentOrder?.id}}</strong></p>
+    <p>Chúng tôi sẽ xử lý đơn hàng của bạn trong thời gian sớm nhất.</p>
+
+    <!-- Hiển thị QR code và thông tin thanh toán nếu thanh toán bằng card -->
+    <div *ngIf="currentOrder?.paymentMethod === 'CARD'" class="qr-code-section">
+      <h3>Quét mã QR để thanh toán</h3>
+      <div class="bank-info">
+        <p><strong>Ngân hàng:</strong> {{bankInfo.bankName}}</p>
+        <p><strong>Số tài khoản:</strong> {{bankInfo.accountNumber}}</p>
+        <p><strong>Chủ tài khoản:</strong> {{bankInfo.accountName}}</p>
+        <p><strong>Số tiền:</strong> {{bankInfo.amount | number}}đ</p>
+        <p><strong>Nội dung:</strong> {{bankInfo.description}}</p>
+      </div>
+      <img [src]="qrCodeUrl" alt="QR Code thanh toán" class="qr-code-image">
+      <p class="payment-note">
+        Vui lòng quét mã QR để hoàn tất thanh toán.<br>
+        Đơn hàng sẽ được xử lý sau khi nhận được thanh toán.
+      </p>
+    </div>
+
+    <div class="order-summary">
+      <h3>Thông tin đơn hàng</h3>
+      <p>Tổng tiền: {{currentOrder?.finalAmount | number}}đ</p>
+      <p>Phương thức thanh toán: {{currentOrder?.paymentMethod === 'CARD' ? 'Chuyển khoản' : 'Tiền mặt'}}</p>
+    </div>
+
+    <div class="action-buttons">
+      <button class="btn btn-primary" routerLink="/order-detail/{{currentOrder?.id}}">Xem đơn hàng</button>
+      <button class="btn btn-secondary" routerLink="/">Tiếp tục mua sắm</button>
+    </div>
+  </div>
+</div>

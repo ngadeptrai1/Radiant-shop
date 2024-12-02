@@ -1,24 +1,26 @@
 import { Component, Inject } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatButton } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
-import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatInput } from '@angular/material/input';
-import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { Category, Brand, ProductDetailResponse, ProductRequest, ProductResponse, Color } from '../../../type';
-import { MatOption, MatSelect } from '@angular/material/select';
-import { MatIcon } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-product-dialog',
   standalone: true,
-  imports: [MatDialogContent,MatFormField,MatLabel
-    ,MatError,MatDialogActions,MatSlideToggle,
-    ReactiveFormsModule,MatInput,MatButton,
-  MatSelect,MatOption,MatIcon,CommonModule],
-  templateUrl: './product-dialog.component.html',
-  styleUrl: './product-dialog.component.scss'
+  imports: [
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatSlideToggleModule,
+    CommonModule,MatDialogContent,MatDialogActions
+  ],
+  templateUrl: './product-dialog.component.html'
 })
 export class ProductDialogComponent {
   form: FormGroup;
@@ -26,28 +28,29 @@ export class ProductDialogComponent {
   categories: Category[] = [];
   brands: Brand[] = [];
   colors: Color[] = [];
-  thumbnailPreview: string | undefined;
-  productImagePreviews: string[] = [];
-  file: File | undefined;
-  files: File[] | undefined;
 
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<ProductDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { product?: ProductResponse, categories: Category[], brands: Brand[], colors: Color[] }
+    @Inject(MAT_DIALOG_DATA) public data: { 
+      product?: ProductResponse, 
+      categories: Category[], 
+      brands: Brand[], 
+      colors: Color[] 
+    }
   ) {
     this.categories = this.data.categories;
     this.brands = this.data.brands;
     this.colors = this.data.colors;
-    this.dialogTitle = 'Cập nhật sản phẩm';
+    this.dialogTitle = data.product ? 'Cập nhật sản phẩm' : 'Thêm mới sản phẩm';
 
     this.form = this.fb.group({
       id: [data.product?.id],
       name: [data.product?.name, [Validators.required]],
       description: [data.product?.description, [Validators.required]],
       activate: [data.product?.activate ?? true],
-      categoryId: [data.product?.category.id, [Validators.required]],
-      brandId: [data.product?.brand.id, [Validators.required]],
+      categoryId: [this.getCategoryId(data.product?.category), [Validators.required]],
+      brandId: [this.getBrandId(data.product?.brand), [Validators.required]],
       productDetails: this.fb.array([])
     });
 
@@ -58,9 +61,24 @@ export class ProductDialogComponent {
     } else {
       this.addProductDetail();
     }
+  }
 
-    this.thumbnailPreview = data.product?.thumbnail;
-    this.productImagePreviews = data.product?.productImages?.map(img => img.url) || [];
+  private getCategoryId(categoryName?: string): number | null {
+    if (!categoryName) return null;
+    const category = this.categories.find(c => c.name === categoryName);
+    return category?.id || null;
+  }
+
+  private getBrandId(brandName?: string): number | null {
+    if (!brandName) return null;
+    const brand = this.brands.find(b => b.name === brandName);
+    return brand?.id || null;
+  }
+
+  private getColorId(colorName?: string): number | null {
+    if (!colorName) return null;
+    const color = this.colors.find(c => c.name === colorName);
+    return color?.id || null;
   }
 
   get productDetails(): FormArray {
@@ -70,23 +88,34 @@ export class ProductDialogComponent {
   addProductDetail(detail?: ProductDetailResponse) {
     const productDetailForm = this.fb.group({
       id: [detail?.id],
-      salePrice: [detail?.salePrice, [Validators.required, Validators.min(0)]],
-      discount: [detail?.discount, [Validators.required, Validators.min(0), Validators.max(100)]],
-      quantity: [detail?.quantity, [Validators.required, Validators.min(0)]],
-      colorId: [detail?.color.id?.toString(), [Validators.required]],
+      salePrice: [detail?.salePrice ?? null, [Validators.required, Validators.min(0)]],
+      discount: [detail?.discount ?? 0, [Validators.required, Validators.min(0), Validators.max(100)]],
+      quantity: [detail?.quantity ?? null, [Validators.required, Validators.min(0)]],
+      colorId: [this.getColorId(detail?.color), [Validators.required]],
       active: [detail?.active ?? true]
     });
-    
-    // Check for duplicate colors before adding
-    const newColorId = detail?.color.id;
-    const existingColors = this.productDetails.controls.map(control => control.get('colorId')?.value);
-    
-    if (Number(newColorId) && existingColors.includes(newColorId)) {
-      alert('Không thể thêm chi tiết sản phẩm với màu đã tồn tại');
-      return;
-    }
+
+    productDetailForm.get('colorId')?.valueChanges.subscribe(newColorId => {
+      if (newColorId) {
+        const currentIndex = this.productDetails.controls.length;
+        const existingColors = this.productDetails.controls
+          .filter((_, index) => index !== currentIndex - 1)
+          .map(control => control.get('colorId')?.value);
+
+        if (existingColors.includes(Number(newColorId))) {
+          productDetailForm.get('colorId')?.setErrors({ duplicateColor: true });
+        } else {
+          const errors = productDetailForm.get('colorId')?.errors;
+          if (errors) {
+            delete errors['duplicateColor'];
+            productDetailForm.get('colorId')?.setErrors(Object.keys(errors).length ? errors : null);
+          }
+        }
+      }
+    });
     
     this.productDetails.push(productDetailForm);
+    this.form.updateValueAndValidity();
   }
 
   removeProductDetail(index: number) {
@@ -97,20 +126,21 @@ export class ProductDialogComponent {
 
     const detail = this.productDetails.at(index);
     if (detail.get('id')?.value) {
-      alert('Không thể xóa chi tiết sản phẩm đã tồn tại');
+      alert('Không thể xóa chi tiết sản phẩm đã có trong hệ thống.');
       return;
     }
-
     this.productDetails.removeAt(index);
   }
 
   onSubmit() {
     if (this.form.valid) {
-      // Check for duplicate colors
-      const colors = this.productDetails.controls.map(control => control.get('colorId')?.value);
+      const colors = this.productDetails.controls
+        .filter(control => control.get('active')?.value)
+        .map(control => control.get('colorId')?.value);
+      
       const uniqueColors = new Set(colors);
       if (colors.length !== uniqueColors.size) {
-        alert('Không thể có hai chi tiết sản phẩm cùng màu!');
+        alert('Không thể có hai chi tiết sản phẩm đang hoạt động cùng màu!');
         return;
       }
 
@@ -120,12 +150,16 @@ export class ProductDialogComponent {
         name: formValue.name,
         description: formValue.description,
         activate: formValue.activate,
-        thumbnail: formValue.thumbnail,
-        productImages: formValue.productImages,
         categoryId: formValue.categoryId,
         brandId: formValue.brandId,
-        productDetails: formValue.productDetails
+        productDetails: formValue.productDetails.map((detail: any) => ({
+          ...detail,
+          colorId: Number(detail.colorId)
+        })),
+        thumbnail: null,
+        productImages: []
       };
+      
       this.dialogRef.close(productRequest);
     }
   }
@@ -133,5 +167,4 @@ export class ProductDialogComponent {
   onCancel() {
     this.dialogRef.close();
   }
-
 }

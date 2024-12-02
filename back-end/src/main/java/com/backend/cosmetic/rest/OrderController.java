@@ -2,11 +2,10 @@ package com.backend.cosmetic.rest;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -23,8 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.cosmetic.dto.OrderCounterDTO;
 import com.backend.cosmetic.dto.OrderDTO;
+import com.backend.cosmetic.dto.OrderDetailDTO;
 import com.backend.cosmetic.exception.DataInvalidException;
+import com.backend.cosmetic.repository.OrderDetailRepository;
+import com.backend.cosmetic.response.OrderResponse;
+import com.backend.cosmetic.service.OrderDetailService;
 import com.backend.cosmetic.service.OrderService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,14 +38,16 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("api/v1/orders")
 public class OrderController {
     private final OrderService orderService;
+    private final OrderDetailService orderDetailService;
+    private final OrderDetailRepository orderDetailRepository;
+    @Autowired
+    ObjectMapper objectMapper;
 
     @GetMapping({"","/"})
-    public ResponseEntity<?> getAll(@RequestParam("page") Optional<Integer> pageNum,
-                                    @RequestParam("size") Optional<Integer> size,
-                                    @RequestParam("sort")Optional<String> sort){
-        Pageable page = PageRequest.of(pageNum.orElse(0),size.orElse(5), Sort.by(sort.orElse("id")).descending());
+    public ResponseEntity<?> getAll(){
+
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(orderService.findAll(page));
+            return ResponseEntity.status(HttpStatus.OK).body(orderService.findAll());
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -94,24 +100,16 @@ public class OrderController {
 
     }
     @GetMapping("user/{id}")
-    public ResponseEntity<?> findOrdersByUser(@PathVariable("id") Long id,
-                                              @RequestParam("page") Optional<Integer> pageNum,
-                                              @RequestParam("size") Optional<Integer> size,
-                                              @RequestParam("sort")Optional<String> sort) {
+    public ResponseEntity<?> findOrdersByUser(@PathVariable("id") Long id){
         try {
-            Pageable page = PageRequest.of(pageNum.orElse(0),size.orElse(5),Sort.by(sort.orElse("id")).descending());
-            return  ResponseEntity.status(HttpStatus.OK).body(orderService.findByUserId(id,page));
+            return  ResponseEntity.status(HttpStatus.OK).body(orderService.findByUserId(id));
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
     @GetMapping("/{id}")
-    public ResponseEntity<?> findOrdersById(@PathVariable("id") Long id) {
-        try {
-            return  ResponseEntity.status(HttpStatus.OK).body(orderService.findById(id));
-        }catch (Exception e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<OrderResponse> findOrderById(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(orderService.findById(id));
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteOrder(@PathVariable("id") Long id){
@@ -124,26 +122,23 @@ public class OrderController {
 
     @GetMapping("/status/{status}")
     public ResponseEntity<?> getOrdersByStatus(
-            @PathVariable String status,
-            @RequestParam("page") Optional<Integer> pageNum,
-            @RequestParam("size") Optional<Integer> size) {
+            @PathVariable String status, @RequestParam("startDate") Optional<LocalDateTime> startDate, @RequestParam("endDate") Optional<LocalDateTime> endDate) {
         try {
-            Pageable page = PageRequest.of(pageNum.orElse(0), size.orElse(5));
-            return ResponseEntity.ok(orderService.findOrdersByStatus(status, page));
+            System.out.println(startDate);
+            System.out.println(endDate);
+            return ResponseEntity.ok(orderService.findAllByStatusAndCreatedDateBetween(status, startDate.orElse(null), endDate.orElse(null)));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
     @GetMapping("/date-range")
     public ResponseEntity<?> getOrdersByDateRange(
             @RequestParam LocalDateTime startDate,
-            @RequestParam LocalDateTime endDate,
-            @RequestParam("page") Optional<Integer> pageNum,
-            @RequestParam("size") Optional<Integer> size) {
+            @RequestParam LocalDateTime endDate) {
         try {
-            Pageable page = PageRequest.of(pageNum.orElse(0), size.orElse(5));
-            return ResponseEntity.ok(orderService.findOrdersByDateRange(startDate, endDate, page));
+
+            return ResponseEntity.ok(orderService.findOrdersByDateRange(startDate, endDate));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -181,5 +176,45 @@ public class OrderController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateStatus(@PathVariable("id") Long orderId, @RequestParam String status){
+        return ResponseEntity.ok(orderService.updateStatus(orderId, status));
+    }
 
+    @GetMapping("/order-details/{id}")
+    public ResponseEntity<?> getOrderDetail(@PathVariable("id") Long orderId){
+        return ResponseEntity.ok(orderDetailRepository.findByOrderId(orderId));
+    }
+    
+
+    @PutMapping("/{id}/confirm")
+    public ResponseEntity<?> confirmOrder(@PathVariable("id") Long orderId){
+        return ResponseEntity.ok(orderService.confirmOrder(orderId));
+    }
+    @GetMapping("/status-statistics")
+    public ResponseEntity<Map<String, Long>> getOrderStatusStatistics() {
+        Map<String, Long> statistics = orderService.getOrderStatusStatistics();
+        return ResponseEntity.ok(statistics);
+    }
+
+    @GetMapping("/get-order-by-email")
+    public ResponseEntity<?> getOrderByEmail(@RequestParam String email) {
+        return ResponseEntity.ok(orderService.getOrderByEmail(email));
+    }
+
+    @PostMapping("/{id}/order-details")
+    public ResponseEntity<?> addOrderDetail(@PathVariable("id") Long orderId, @RequestBody OrderDetailDTO orderDetailDTO) {
+        return ResponseEntity.ok(orderDetailService.addOrderDetail(orderId, orderDetailDTO));
+    }
+
+    @PutMapping("/details/{id}")
+    public ResponseEntity<?> updateOrderDetail(@PathVariable("id") Long orderDetailId, @RequestParam("quantity") int quantity) {
+        return ResponseEntity.ok(orderDetailService.updateOrderDetail(orderDetailId, quantity));
+    }
+
+    @DeleteMapping("/details/{id}")
+    public ResponseEntity<?> deleteOrderDetail(@PathVariable("id") Long orderDetailId) {
+        orderDetailService.deleteOrderDetail(orderDetailId);
+        return ResponseEntity.noContent().build();
+    }
 }

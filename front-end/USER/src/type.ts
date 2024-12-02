@@ -1,124 +1,214 @@
 import { HttpContext, HttpHeaders, HttpParams } from '@angular/common/http';
 
-export interface Options {
-  headers?:
-    | HttpHeaders
-    | {
-        [header: string]: string | string[];
-      };
-  observe?: 'body';
-  context?: HttpContext;
-  params?:
-    | HttpParams
-    | {
-        [param: string]:
-          | string
-          | number
-          | boolean
-          | ReadonlyArray<string | number | boolean>;
-      };
-  reportProgress?: boolean;
-  responseType?: 'json';
-  withCredentials?: boolean;
-  transferCache?:
-    | {
-        includeHeaders?: string[];
-      }
-    | boolean;
-}
-export interface UserInterface {
-  email: String;
-  token: String;
-  accountName: string;
-}
-export interface ApiResponse<T> {
-  message?: String;
-  error?: string;
-  status?: boolean;
-  token?: string;
-  data: T;
-}
-
-export interface LoginPayload {
-  account_name: String;
+export interface LoginDto {
+  userName: string;
   password: string;
 }
-export interface RegisterPayload {
-  full_name: string;
-  account_name: string;
-  password: string;
+export interface RegisterDto {
+  username: string;
   email: string;
-  rePassword: string;
-}
-export interface ProductImage {
-  id: number;
-  name: string;
-}
-
-export interface Product {
-  id: number;
-  name: string;
-  description: string;
-  quantity: number;
-  activate: boolean;
-  thumbnail: string;
-  product_images: ProductImage[];
-  origin_price: number;
-  sale_price: number;
-  category_id: number;
-  brand_id: number;
-}
-
-export interface Products {
-  content: [Product];
-  totalElements: number;
-  totalPages: number;
-  first: boolean;
-  last: boolean;
-  size: number;
-  empty: boolean;
-  number: number;
-}
-export interface PaginationParams {
-  [param: string]:
-    | string
-    | number
-    | boolean
-    | ReadonlyArray<string | number | boolean>;
-  page: number;
-  size: number;
-  sort: string;
-  direction: string;
+  password: string;
+  fullName: string;
+  phoneNum: string;
 }
 export interface Brand {
   id: number;
   name: string;
-  activate: boolean;
-  description: string;
+  thumbnail: string;
+  active: boolean;
 }
+
 export interface Category {
   id: number;
   name: string;
+  parentCategory?: Category ;
+  subCategories?: Category[];
   activate: boolean;
+}
+export interface Product {
+  active: boolean;
+  id: number;
+  name: string;
   description: string;
+  thumbnail: string;
+  productImages: ProductImage[];
+  productDetails: ProductDetail[];
+
 }
 
-export interface Order {
-  user_id: number;
-  full_name: string;
-  phone_number: string;
-  address: string;
-  note: string;
-  status: string;
-  total_money: number;
-  discount_money: number;
-  created_date: Date;
-  quantity_product: number;
-  attribute_discount: number;
-  code: string;
-  order_details: Order_detail[];
+export interface ProductImage {
+  id: number;
+  url: string;
 }
-export interface Order_detail {
-  product_id: number;
+export interface Color {
+  id: number
+  hexCode: string
+  name: string
+  active: boolean
+}
+
+
+export interface ProductDetail {
+  active: boolean;
+  id: number;
+  salePrice: number;
+  discount: number;
   quantity: number;
+  thumbnail: string;
+  product:Product;
+  color:string;
+}
+
+export interface Products{
+  content:[Product];
+  totalElements:number;
+  totalPages:number;
+  first:boolean;
+  last:boolean;
+  size:number;
+  empty:boolean;
+  number:number;
+}
+export interface PaginationParams{
+  [param: string]: string | number | boolean | ReadonlyArray<string | number | boolean >;
+  page:number;
+  size:number;
+  sort:string;
+  direction:string;
+}
+export interface Options{
+  headers?: HttpHeaders | {
+      [header: string]: string | string[];
+  };
+  observe?: 'body';
+  context?: HttpContext;
+  params?: HttpParams | {
+      [param: string]: string | number | boolean | ReadonlyArray<string | number | boolean>;
+  };
+  reportProgress?: boolean;
+  responseType?: 'json';
+  withCredentials?: boolean;
+  transferCache?: {
+      includeHeaders?: string[];
+  } | boolean;
+}
+export interface Voucher {
+  id: number
+  code: string
+  type: 'FIXED_AMOUNT' | 'PERCENTAGE'
+  value: number
+  maxDiscountAmount: any
+  minOrderAmount: number
+  startDate: Date
+  endDate: Date
+  usageLimit: number
+  description: any
+  usedAmount: number
+  active: boolean
+}
+export interface OrderRequest {
+  fullName: string;
+  phoneNumber: string;
+  address: string;
+  orderDetails: OrderDetail[];
+  voucherCode: string;
+  paymentMethod: 'CASH' | 'CARD';
+  status: 'PENDING' | 'CONFIRMED' | 'DELIVERED' | 'CANCELLED';
+  paymentStatus: 'PAID' | 'UNPAID';
+  shippingCost: number;
+  type: 'WEB';
+  note: string;
+  userId: number|null;
+  email: string;
+}
+export interface OrderDetail {
+
+  productDetailId: number;
+  quantity: number;
+
+}
+export interface OrderResponse {
+  id: number
+  fullName: string
+  phoneNumber: string
+  email: any
+  address: any
+  status: 'PENDING' | 'CONFIRMED' | 'DELIVERED' | 'CANCELLED'|'PROCESSING'|'SUCCESS' |string;
+  paymentStatus: string
+  paymentMethod: string
+  totalOrderAmount: number
+  shippingCost: number
+  voucherAmount: number
+  finalAmount: number
+  totalItems: number
+  type: string
+  createdDate: string
+  note: string
+  userId: number
+  voucherCode: any
+  reason: string;
+}
+
+export interface OrderDetailResponse {
+  id: number
+  quantity: number
+  price: number
+  productName: string
+  productColor: string
+  thumbnail: string
+}
+export interface CartItem {
+  productDetail: ProductDetail;
+  quantity: number;
+  thumbnail: string;
+  name: string;
+  color: string;
+}
+
+export interface ProductReview {
+  id: number;
+  rating: number;
+  email: string;
+  fullName: string;
+  reviewText: string;
+  productName: string;
+  thumbnail: string;
+  active: boolean;
+  phoneNumber: string;
+  reviewDate: Date;
+  productId: number;
+}
+export interface WishlistItem {
+  id: number;
+  productId: number;
+}
+export interface User {
+  id: number;
+  username: string;
+  email: string;
+  fullName: string;
+  phoneNumber: string;
+}
+
+
+export interface AuthResponse {
+  accessToken: string;
+  refreshToken: string;
+  userId: number;
+}
+
+export interface UserAddress {
+  id: number;
+  address: string;
+  fullname: string;
+  phoneNumber: string;
+  email: string;
+  userId: number;
+  active: boolean;
+  provinceId: number;
+  provinceName: string;
+  districtId: number;
+  districtName: string;
+  wardCode: string;
+  wardName: string;
 }

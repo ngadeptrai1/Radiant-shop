@@ -35,6 +35,7 @@
               "src/styles.scss",
               "src/assets/vendor/fontawesome-free/css/all.min.css",
               "src/assets/css/sb-admin-2.min.css"
+          
             ],
             "scripts": [
               "src/assets/vendor/jquery/jquery.min.js",

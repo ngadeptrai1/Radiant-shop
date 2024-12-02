@@ -38,7 +38,7 @@ import { ColorService } from '../../services/color.service';
   styleUrl: './product.component.scss',
 })
 export class ProductComponent {
-  displayedColumns: string[] = ['id', 'name', 'description', 'activate', 'category', 'brand', 'actions'];
+  displayedColumns: string[] = ['id', 'name', 'thumbnail', 'activate', 'category', 'brand', 'actions'];
   dataSource: MatTableDataSource<ProductResponse>;
   isLoading = false;
   categories: Category[] = [];
@@ -73,9 +73,7 @@ export class ProductComponent {
     this.isLoading = true;
     this.productService.getProducts().subscribe({
       next: (products) => {
-        console.log(products);
         this.product = products;
-        console.log(this.product);
         this.dataSource.data = this.product;
         this.isLoading = false;
       },

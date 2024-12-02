@@ -1,30 +1,40 @@
 package com.backend.cosmetic.mapper;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
+import com.backend.cosmetic.model.ProductDetail;
+import com.backend.cosmetic.response.ProductDetailResponse;
+import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;
 
 import com.backend.cosmetic.dto.UserResponseDto;
 import com.backend.cosmetic.model.User;
 
-@Component
-public class UserMapper {
-    
-    public UserResponseDto toResponseDto(User user) {
-        return UserResponseDto.builder()
-            .id(user.getId())
-            .username(user.getUsername())
-            .email(user.getEmail())
-            .fullName(user.getFullName())
-            .phoneNumber(user.getPhoneNum())
-            .provider(user.getProvider())
-            .blocked(user.isBlocked())
-            .enabled(user.isEnabled())
-            .roles(user.getRoles().stream()
+@Mapper(componentModel= "spring")
+public interface UserMapper {
+
+    default UserResponseDto toResponseDto(User user) {
+        UserResponseDto response = new UserResponseDto();
+        response.setId(user.getId());
+        response.setUsername(user.getUsername());
+        response.setEmail(user.getEmail());
+        response.setFullName(user.getFullName());
+        response.setPhoneNumber(user.getPhoneNum());
+        response.setProvider(user.getProvider());
+        response.setBlocked(user.isBlocked());
+        response.setEnabled(user.isEnabled());
+        response.setRoles(user.getRoles().stream()
                 .map(role -> role.getName().name())
-                .collect(Collectors.toSet()))
-            .createdAt(user.getCreatedDate())
-            .updatedAt(user.getUpdatedDate())
-            .build();
+                .collect(Collectors.toSet()));
+        response.setCreatedAt(user.getCreatedDate());
+        response.setUpdatedAt(user.getUpdatedDate());
+        return response;
+    }
+
+    default List<UserResponseDto> toResponseDtoList(List<User> users) {
+        return users.stream()
+                .map(this::toResponseDto)
+                .collect(Collectors.toList());
     }
 } 

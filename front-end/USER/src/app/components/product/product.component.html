@@ -1,0 +1,38 @@
+<div class="product-card">
+    <a [routerLink]="['/products', product.id]" class="text-decoration-none">  <!-- Product Image -->
+  <div class="product-image">
+    <img [src]="product.thumbnail" [alt]="product.name" class="main-image">
+    <div class="product-badges" *ngIf="product.productDetails[0]?.discount">
+      <span class="discount-badge">-{{product.productDetails[0].discount}}%</span>
+    </div>
+  </div>
+
+  <!-- Product Info -->
+  <div class="product-info">
+        
+    <!-- Product Name -->
+    <h3 class="product-name" [routerLink]="['/products', product.id]">
+      {{product.name}}
+    </h3>
+
+    <!-- Price -->
+    <div class="price-container">
+      <span class="current-price">{{getFirstActivePrice() | number:'1.0-0'}}₫</span>
+      <span class="original-price" *ngIf="product.productDetails[0]?.active && product.productDetails[0]?.discount">
+        {{product.productDetails[0].salePrice | number:'1.0-0'}}₫
+      </span>
+    </div>
+  </div></a>
+  <div class="product-rating">
+    <span class="rating-value">
+      <i *ngFor="let star of [1,2,3,4,5]" 
+         [class]="getStarClass(star)">
+      </i>
+    </span>
+  </div>
+  <div class="product-actions">
+    <button class="wishlist-btn" (click)="toggleWishlist()">
+      <i [class]="isInWishlistFlag ? 'fas fa-heart' : 'far fa-heart'"></i>
+    </button>
+  </div>
+</div>

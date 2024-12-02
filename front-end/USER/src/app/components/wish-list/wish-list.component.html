@@ -1,0 +1,27 @@
+<div class="wishlist-container">
+  <h2>Danh sách yêu thích</h2>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Đang tải danh sách yêu thích...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-state">
+    <p>{{ error }}</p>
+    <button (click)="loadWishlist()" class="retry-btn">Thử lại</button>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && !error && products.length === 0" class="empty-state">
+    <i class="bi bi-heart"></i>
+    <p>Danh sách yêu thích của bạn đang trống</p>
+    <a routerLink="/products" class="browse-btn">Khám phá sản phẩm</a>
+  </div>
+
+  <!-- Product List -->
+  <div *ngIf="!loading && !error && products.length > 0" class="products-grid">
+    <app-product *ngFor="let product of products" [product]="product"></app-product>
+  </div>
+</div>

@@ -1,0 +1,68 @@
+// Modal styles
+.modal {
+  background-color: rgba(0, 0, 0, 0.5);
+  
+  &.show {
+    opacity: 1;
+  }
+}
+
+.modal-dialog {
+  max-width: 500px;
+}
+
+.modal img {
+  max-width: 300px;
+  height: auto;
+}
+
+// Product card styles
+.product-card {
+  transition: transform 0.2s;
+  border: 1px solid #eee;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+
+  .product-image {
+    position: relative;
+    overflow: hidden;
+    
+    img {
+      transition: transform 0.3s;
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+  }
+
+  .card-body {
+    padding: 0.8rem;
+  }
+
+  .price-section {
+    line-height: 1.2;
+  }
+
+  .btn {
+    opacity: 0.9;
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .product-card {
+    .card-title {
+      font-size: 0.9rem;
+    }
+    
+    .price-section {
+      font-size: 0.9rem;
+    }
+  }
+}

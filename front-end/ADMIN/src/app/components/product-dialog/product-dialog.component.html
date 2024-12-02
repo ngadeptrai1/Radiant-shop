@@ -27,14 +27,14 @@
 
         <div class="col-md-6">
           <div class="form-group">
-            <label class="form-label">Danh mục</label><br>
+            <label class="form-label">Danh mục</label>
             <select class="form-control" formControlName="categoryId" required>
-              <option value="">Chọn danh mục</option>
+              <option [ngValue]="null">Chọn danh mục</option>
               @for (category of categories; track category.id) {
                 <option [value]="category.id">{{ category.name }}</option>
               }
             </select>
-            @if (form.get('categoryId')?.hasError('required')) {
+            @if (form.get('categoryId')?.hasError('required') && form.get('categoryId')?.touched) {
               <div class="text-danger">
                 Danh mục là bắt buộc
               </div>
@@ -44,14 +44,14 @@
 
         <div class="col-md-6">
           <div class="form-group">
-            <label class="form-label">Thương hiệu</label><br>
+            <label class="form-label">Thương hiệu</label>
             <select class="form-control" formControlName="brandId" required>
-              <option value="">Chọn thương hiệu</option>
+              <option [ngValue]="null">Chọn thương hiệu</option>
               @for (brand of brands; track brand.id) {
                 <option [value]="brand.id">{{ brand.name }}</option>
               }
             </select>
-            @if (form.get('brandId')?.hasError('required')) {
+            @if (form.get('brandId')?.hasError('required') && form.get('brandId')?.touched) {
               <div class="text-danger">
                 Thương hiệu là bắt buộc
               </div>
@@ -108,30 +108,37 @@
               </div>
             </div>
 
-            <div class="col-lg-5 col-md-5 col-sm-12 mt-3">
+            <div class="col-lg-4 col-md-4 col-sm-12">
               <div class="form-group">
                 <label class="form-label">Màu sắc</label>
                 <select class="form-control" formControlName="colorId" required>
-                  <option value="">Chọn màu sắc</option>
+                  <option [ngValue]="null">Chọn màu sắc</option>
                   @for (color of colors; track color.id) {
                     @if (color.active) {
-                      
-                    <option [value]="color.id">{{ color.name }}</option>
+                      <option [value]="color.id">{{ color.name }}</option>
                     }
                   }
                 </select>
-                <div class="text-danger" *ngIf="detail.get('colorId')?.hasError('required')">
-                  Màu sắc là bắt buộc
-                </div>
+                @if (detail.get('colorId')?.hasError('required') && detail.get('colorId')?.touched) {
+                  <div class="text-danger">
+                    Màu sắc là bắt buộc
+                  </div>
+                }
+                @if (detail.get('colorId')?.hasError('duplicateColor')) {
+                  <div class="text-danger">
+                    Màu sắc này đã tồn tại
+                  </div>
+                }
               </div>
             </div>
 
-            <div class="col-lg-5 col-md-5 col-sm-12 mt-3">
-            
-              <label class="form-label">Trạng thái </label><br>
-              <mat-slide-toggle formControlName="active" class="full-width">
-                Kích hoạt
-            </mat-slide-toggle>
+            <div class="col-lg-4 col-md-4 col-sm-12">
+              <div class="form-group">
+                <label class="form-label">Trạng thái </label><br>
+                <mat-slide-toggle formControlName="active" class="full-width">
+                  Kích hoạt
+              </mat-slide-toggle>
+              </div>
             </div>
 
             <div class="col-lg-2 col-md-2">
@@ -164,7 +171,7 @@
 
   <mat-dialog-actions align="end">
     <button class="btn btn-secondary me-2" type="button" (click)="onCancel()">Hủy</button>
-    <button class="btn btn-primary" type="submit" [disabled]="form.invalid">
+    <button class="btn btn-primary" type="submit" [disabled]="!form.valid || productDetails.length === 0">
       {{ data.product ? 'Cập nhật' : 'Thêm mới' }}
     </button>
   </mat-dialog-actions>

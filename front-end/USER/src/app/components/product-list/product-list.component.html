@@ -1,0 +1,162 @@
+<div class="page-container" *ngIf="dataLoaded">
+  <!-- Filter Sidebar -->
+  <div class="filter-sidebar">
+    <form [formGroup]="filterForm" (ngSubmit)="onFilter()">
+      <!-- Categories -->
+      <div class="filter-section">
+        <h4>Danh mục</h4>
+        <div class="search-box">
+          <input type="text" 
+                 [(ngModel)]="categorySearch" 
+                 [ngModelOptions]="{standalone: true}"
+                 placeholder="Tìm danh mục">
+        </div>
+        <div class="checkbox-group">
+          <div *ngFor="let cat of getVisibleCategories()">
+            <label>
+              <input type="checkbox" 
+                     [value]="cat.id" 
+                     [checked]=" cat.id == paramCategories"
+                     (change)="onCategoryChange($event, cat.id)">
+              {{cat.name}}
+            </label>
+          </div>
+          <button type="button" 
+                  class="show-more-btn" 
+                  *ngIf="getFilteredCategories().length > maxVisibleItems"
+                  (click)="toggleCategories()">
+            {{ showAllCategories ? 'Thu gọn' : 'Xem thêm' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Brands -->
+      <div class="filter-section">
+        <h4>Thương hiệu</h4>
+        <div class="search-box">
+          <input type="text" 
+                 [(ngModel)]="brandSearch" 
+                 [ngModelOptions]="{standalone: true}"
+                 placeholder="Tìm thương hiệu">
+        </div>
+        <div class="checkbox-group">
+          <div *ngFor="let brand of getVisibleBrands()">
+            <label>
+              <input type="checkbox" 
+                     [value]="brand.id"
+                     [checked]="brand.id == paramBrands"
+                     (change)="onBrandChange($event, brand.id)">
+              {{brand.name}}
+            </label>
+          </div>
+          <button type="button" 
+                  class="show-more-btn" 
+                  *ngIf="getFilteredBrands().length > maxVisibleItems"
+                  (click)="toggleBrands()">
+            {{ showAllBrands ? 'Thu gọn' : 'Xem thêm' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Price Range -->
+      <div class="filter-section">
+        <h4>Khoảng giá</h4>
+        <div class="price-range-slider">
+          <ngx-slider
+            [(value)]="priceRange.currentMin"
+            [(highValue)]="priceRange.currentMax"
+            [options]="sliderOptions"
+            (userChangeEnd)="onSliderChange($event)">
+          </ngx-slider>
+        </div>
+      </div>
+
+      <!-- Search by name -->
+      <div class="filter-section">
+        <h4>Tìm kiếm</h4>
+        <input class="form-control" type="text" formControlName="name" 
+               placeholder="Tên sản phẩm">
+      </div>
+
+      <!-- Sort -->
+      <div class="filter-section">
+        <h4>Sắp xếp</h4>
+        <select formControlName="sortBy">
+          <option value="name">Tên</option>
+          <option value="createdDate">Ngày tạo</option>
+        </select>
+        <select formControlName="direction">
+          <option value="ASC">Tăng dần</option>
+          <option value="DESC">Giảm dần</option>
+        </select>
+      </div>
+
+      <button type="submit" class="filter-button">
+        Tìm kiếm
+      </button>
+    </form>
+  </div>
+
+  <!-- Products Content -->
+  <div class="content-area">
+    <!-- Loading Spinner -->
+    <div class="loading-container" *ngIf="isLoading">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Đang tải...</span>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div class="alert alert-danger" *ngIf="error">
+      {{ error }}
+    </div>
+
+    <!-- Products Grid -->
+    <div class="products-grid" *ngIf="!isLoading && !error">
+      <app-product 
+        *ngFor="let product of products.content" 
+        [product]="product"
+      ></app-product>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!isLoading && !error && products.totalElements === 0">
+      <p>Không tìm thấy sản phẩm nào</p>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-container" *ngIf="totalItems > 0">
+      <nav aria-label="Page navigation">
+        <ul class="pagination">
+          <!-- First Page -->
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <a class="page-link" (click)="onPageChange(1)" role="button">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+
+          <!-- Page Numbers -->
+          <ng-container *ngFor="let page of getPaginationRange()">
+            <li class="page-item" [class.active]="currentPage === page">
+              <a class="page-link" (click)="onPageChange(page)" role="button">{{ page }}</a>
+            </li>
+          </ng-container>
+
+          <!-- Last Page -->
+          <li class="page-item" [class.disabled]="currentPage === getMaxPages()">
+            <a class="page-link" (click)="onPageChange(getMaxPages())" role="button">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- Loading state for entire page -->
+<div class="loading-container" *ngIf="!dataLoaded">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Đang tải...</span>
+  </div>
+</div>

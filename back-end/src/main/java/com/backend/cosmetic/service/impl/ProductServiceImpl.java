@@ -3,14 +3,17 @@ package com.backend.cosmetic.service.impl;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
 
+import com.backend.cosmetic.mapper.ProductDetailMapper;
+import com.backend.cosmetic.repository.ProductDetailRepository;
+import com.backend.cosmetic.response.ProductDetailResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +35,8 @@ import com.backend.cosmetic.service.FileHandleService;
 import com.backend.cosmetic.service.ProductDetailService;
 import com.backend.cosmetic.service.ProductImageService;
 import com.backend.cosmetic.service.ProductService;
+import com.backend.cosmetic.specification.ProductSpecification;
+import com.backend.cosmetic.mapper.ProductMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -47,7 +52,9 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
     private final BrandRepository brandRepository;
     private final ProductDetailService productDetailService;
-
+    private final ProductDetailRepository productDetailRepository;
+    private final ProductDetailMapper productDetailMapper;
+    private final ProductMapper productMapper;
     @Override
     @Transactional(rollbackFor = {DataNotFoundException.class,IOException.class,NullPointerException.class})
     public ProductResponse saveProduct(ProductDTO product) throws IOException, IdNotFoundException {
@@ -107,7 +114,7 @@ public class ProductServiceImpl implements ProductService {
             entityProduct.setThumbnail(thumbnailUrl);
             entityProduct.setProductImages(productImageService.saveAll(productImages));
             
-            return ProductResponse.fromProduct(entityProduct);
+            return productMapper.toDTO(entityProduct);
         } catch (CompletionException e) {
             throw new RuntimeException("Error processing product data: " + e.getMessage(), e.getCause());
         }
@@ -174,20 +181,34 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
-    public Page<ProductResponse> findAll(Map<String, Object> filterCriteria, Pageable pageable) {
-//        ProductSpecification spec = new ProductSpecification(filterCriteria);
-        return productRepository.findAll(pageable).map(ProductResponse::fromProduct);
+    public Page<ProductResponse> findAll(
+            List<Integer> categoryIds,
+            List<Long> brandIds,
+            String name,
+            Double minPrice,
+            Double maxPrice,
+            Boolean active,
+            String sort,
+            String direction,
+            Pageable pageable) {
+        
+        Specification<Product> spec = ProductSpecification.getProductSpecification(
+            categoryIds, brandIds, name, minPrice, maxPrice, active,sort,direction
+        );
+        
+
+        return productMapper.toDTOs(productRepository.findAll(spec, pageable));
     }
 
     @Override
     public ProductResponse findById(Long id) {
-        return ProductResponse.fromProduct(productRepository.findById(id).orElseThrow(
-                () ->  new DataNotFoundException("Not found product with id  " + id)) ) ;
+        return productMapper.toDTO(productRepository.findById(id).orElseThrow(
+                () ->  new DataNotFoundException("Not found product with id  " + id) ));
     }
 
     @Override
     public List<ProductResponse> getAllProducts() {
-        return productRepository.findAll().stream().map(ProductResponse::fromProduct).toList();
+        return productMapper.toDTOs(productRepository.findAll());
     }
 
     @Override
@@ -219,4 +240,18 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public Page<Product> findProductsByCategoryAndSubcategories(Integer categoryId,Pageable pageable) {
+
+        categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new DataNotFoundException("Category not found"));
+
+        return productRepository.findProductsByCategoryAndSubcategories(categoryId,pageable);
+
+    }
+    @Override
+   public List<ProductDetailResponse> getAllProductDetails(){
+        return productDetailMapper.toResponseDtoList( productDetailRepository.findActiveProductDetailsWithStock());
+
+    }
 }

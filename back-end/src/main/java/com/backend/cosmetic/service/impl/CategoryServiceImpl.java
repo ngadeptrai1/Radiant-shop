@@ -95,4 +95,15 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
 
+    @Override
+    public List<Category> findAllParents() {
+        return categoryRepository.findAllByParentCategoryIsNull();
+    }
+
+    @Override
+    public Category findParentCategoryById(Integer id) {
+        return categoryRepository.findParentCategoryById(id).orElseThrow(() ->{
+            return new DataNotFoundException("Not found category with id " + id);
+        });
+    }
 }

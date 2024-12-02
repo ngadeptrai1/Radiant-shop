@@ -3,15 +3,17 @@ package com.backend.cosmetic.service;
 import java.util.List;
 
 import com.backend.cosmetic.dto.ProductReviewDTO;
+import com.backend.cosmetic.response.ProductReviewResponse;
 
 public interface ProductReviewService {
-    ProductReviewDTO createReview(ProductReviewDTO reviewDTO);
-    ProductReviewDTO updateReview(Long id, ProductReviewDTO reviewDTO);
+    ProductReviewResponse createReview(ProductReviewDTO reviewDTO);
+    ProductReviewResponse updateReview(Long id, ProductReviewDTO reviewDTO);
     void deleteReview(Long id);
-    ProductReviewDTO getReviewById(Long id);
-    List<ProductReviewDTO> getAllReviews();
-    List<ProductReviewDTO> getReviewsByProductId(Long productId);
-    List<ProductReviewDTO> getActiveReviews();
+    ProductReviewResponse getReviewById(Long id);
+    List<ProductReviewResponse> getAllReviews();
+    List<ProductReviewResponse> getReviewsByProductId(Long productId);
+    List<ProductReviewResponse> getActiveReviews();
     void approveReview(Long id);
     void rejectReview(Long id);
+    Double getAverageRating(Long productId);
 } 
