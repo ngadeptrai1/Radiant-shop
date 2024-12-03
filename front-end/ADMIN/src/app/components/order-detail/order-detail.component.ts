@@ -283,7 +283,7 @@ export class OrderDetailComponent implements OnInit {
     return methods[method] || method;
   }
 
-  openModal(type: 'confirm' | 'update' | 'cancel') {
+  openModal(type: 'confirm' | 'update' | 'cancel' | 'confirmPayment') {
     const modalElement = this.getModalElement(type);
     if (modalElement) {
       this.modalInstances[type] = new bootstrap.Modal(modalElement);
@@ -291,7 +291,7 @@ export class OrderDetailComponent implements OnInit {
     }
   }
 
-  closeModal(type: 'confirm' | 'update' | 'cancel') {
+  closeModal(type: 'confirm' | 'update' | 'cancel' | 'confirmPayment') {
     if (this.modalInstances[type]) {
       this.modalInstances[type].hide();
       if (type == 'cancel') {
@@ -522,7 +522,7 @@ export class OrderDetailComponent implements OnInit {
 
   // Thêm method helper để kiểm tra trạng thái
   canExportPDF(): boolean {
-    return this.order?.status == 'SUCCESS' || this.order?.status == 'DELIVERED';
+    return this.order?.status == 'SUCCESS' ;
   }
 
   // Thêm trackBy function
@@ -626,16 +626,6 @@ export class OrderDetailComponent implements OnInit {
     }
   }
 
-  // Helper method để lấy sản phẩm từ availableProducts
-  private getAvailableProduct(productDetailId: number): ProductDetailResponse | undefined {
-    return this.availableProducts.find(p => p.productDetailId == productDetailId);
-  }
-
-  // Helper method để lấy sản phẩm từ orderDetails
-  private getExistingOrderDetail(productDetailId: number): OrderDetailResponse | undefined {
-    return this.orderDetails.find(od => od.id == productDetailId);
-  }
-
   // Add this helper method to the component class
   canDeleteOrderDetail(): boolean {
     return this.orderDetails.length > 1;
@@ -648,7 +638,7 @@ export class OrderDetailComponent implements OnInit {
     this.orderService.confirmPayment(this.order.id).subscribe({
       next: (response) => {
         this.order = response;
-        this.closeModal('confirm');
+        this.closeModal('confirmPayment');
         this.snackBar.open('Đã xác nhận thanh toán thành công', 'Đóng', {
           duration: 3000,
         });
