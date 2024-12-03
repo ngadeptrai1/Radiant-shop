@@ -217,4 +217,8 @@ public class OrderController {
         orderDetailService.deleteOrderDetail(orderDetailId);
         return ResponseEntity.noContent().build();
     }
+    @PutMapping("/{id}/confirm-payment")
+    public ResponseEntity<?> confirmPayment(@PathVariable("id") Long orderId){
+        return ResponseEntity.ok(orderService.confirmPayment(orderId));
+    }
 }

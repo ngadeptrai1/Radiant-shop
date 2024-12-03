@@ -73,22 +73,24 @@ export class OrderDetailComponent implements OnInit {
   getTimelineStatus(status: string): number {
     const statusOrder = {
       'PENDING': 0,
-      'CONFIRMED': 1,
+      'PROCESSING': 1,
       'SHIPPING': 2,
-      'SUCCESS': 3
+      'DELIVERED': 3,
+      'SUCCESS': 4
     };
-    return statusOrder[status as keyof typeof statusOrder] || -1;
+    return statusOrder[status as keyof typeof statusOrder] ?? -1;
   }
 
   getStatusText(status: string): string {
     const statusText = {
       'PENDING': 'Chờ xác nhận',
-      'CONFIRMED': 'Đã xác nhận',
-      'SHIPPING': 'Đang giao hàng',
+      'PROCESSING': 'Đang xử lý',
+      'SHIPPED': 'Đang giao hàng',
+      'DELIVERED': 'Đã giao hàng',
       'SUCCESS': 'Giao hàng thành công',
       'CANCELLED': 'Đã hủy'
     };
-    return statusText[status as keyof typeof statusText] || status;
+    return statusText[status as keyof typeof statusText] ?? status;
   }
 
   canShowQRCode(): boolean {
@@ -98,7 +100,9 @@ export class OrderDetailComponent implements OnInit {
   }
 
   canCancel(): boolean {
-    return this.order?.status === 'PENDING' && !this.isCancelling;
+    return this.order?.status === 'PENDING' && 
+           this.order?.paymentStatus === 'UNPAID' && 
+           !this.isCancelling;
   }
 
   cancelOrder() {

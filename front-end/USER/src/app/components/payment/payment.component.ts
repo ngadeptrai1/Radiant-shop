@@ -79,45 +79,16 @@ export class PaymentComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.isLoggedIn = this.authService.isAuthenticated();
     
-    // Load cart items và provinces trước
+    // Load cart items và provinces cho tất cả người dùng
     this.loadCartItems();
     this.loadProvinces();
     
-    // Nếu đã đăng nhập thì load địa chỉ người dùng
+    // Chỉ load địa chỉ người dùng nếu đã đăng nhập
     if (this.isLoggedIn) {
       this.loadUserAddresses();
-    }
-    
-    // Khôi phục form data từ session storage
-    const savedFormData = sessionStorage.getItem('paymentFormData');
-    if (savedFormData) {
-      const formData = JSON.parse(savedFormData);
-      this.paymentForm.patchValue(formData);
-      
-      // Load districts và wards nếu có province và district
-      if (formData.provinceId) {
-        this.ghnService.getDistricts(formData.provinceId).subscribe({
-          next: (response) => {
-            if (response.code === 200 && response.data) {
-              this.districts = response.data;
-              
-              if (formData.districtId) {
-                this.ghnService.getWards(formData.districtId).subscribe({
-                  next: (wardResponse) => {
-                    if (wardResponse.code === 200 && wardResponse.data) {
-                      this.wards = wardResponse.data;
-                      // Tính phí ship sau khi có đầy đủ thông tin
-                      if (formData.wardCode) {
-                        this.loadAvailableServices(formData.districtId);
-                      }
-                    }
-                  }
-                });
-              }
-            }
-          }
-        });
-      }
+    } else {
+      // Nếu chưa đăng nhập, khôi phục form data từ session storage nếu có
+      this.restoreAddressFromSession();
     }
   }
 
@@ -181,8 +152,9 @@ export class PaymentComponent implements OnInit, OnDestroy {
   // }
 
   selectUserAddress(address: UserAddress) {
-    this.selectedAddress = address;
+    if (!this.isLoggedIn) return; // Chỉ cho phép chọn địa chỉ khi đã đăng nhập
     
+    this.selectedAddress = address;
     sessionStorage.setItem('selectedAddressId', address.id.toString());
     
     this.paymentForm.patchValue({
@@ -568,6 +540,11 @@ export class PaymentComponent implements OnInit, OnDestroy {
 
   // Save current address
   saveCurrentAddress() {
+    if (!this.isLoggedIn) {
+      this.showError('Vui lòng đăng nhập để lưu địa chỉ');
+      return;
+    }
+
     if (this.isAddressValid()) {
       const formValue = this.paymentForm.value;
       const address: AddressData = {

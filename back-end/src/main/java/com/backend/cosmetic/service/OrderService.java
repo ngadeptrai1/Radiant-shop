@@ -31,4 +31,5 @@ public interface OrderService {
     List<OrderDetailResponse> getOrderDetail(Long orderId);
     Map<String, Long> getOrderStatusStatistics();
     List<OrderResponse> getOrderByEmail(String email);
+    OrderResponse confirmPayment(Long orderId);
 }

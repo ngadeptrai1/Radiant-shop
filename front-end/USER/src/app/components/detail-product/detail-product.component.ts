@@ -142,7 +142,7 @@ export class DetailProductComponent implements OnInit {
 
   showInactiveProductMessage() {
     alert('Sản phẩm hiện không hoạt động');
-    this.router.navigate(['/products']);
+    this.router.navigate(['/product-list']);
   }
 
   changeMainImage(index: number) {

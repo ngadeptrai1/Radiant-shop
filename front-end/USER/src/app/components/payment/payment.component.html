@@ -8,7 +8,7 @@
 
         <!-- Saved Addresses -->
         <div class="form-detail bg-white mb-4">
-          <!-- Hiển thị danh sách địa chỉ cho người dùng đã đăng nhập -->
+          <!-- Chỉ hiển thị địa chỉ đã lưu khi đã đăng nhập -->
           <div *ngIf="isLoggedIn" class="saved-addresses mb-4">
             <div class="address-header">
               <h4>Địa chỉ đã lưu</h4>
@@ -39,14 +39,17 @@
             </div>
           </div>
 
-          <!-- Form nhập thông tin - luôn hiển thị -->
+          <!-- Form nhập thông tin - luôn hiển thị và cho phép nhập -->
           <div class="shipping-form">
             <div class="form-box">
               <label>
                 Họ và tên
                 <span class="text-danger">*</span>
               </label>
-              <input type="text" class="form-control" formControlName="fullName">
+              <input type="text" 
+                     class="form-control" 
+                     formControlName="fullName"
+                     [class.is-invalid]="paymentForm.get('fullName')?.invalid && paymentForm.get('fullName')?.touched">
               <div class="invalid-feedback" 
                    *ngIf="paymentForm.get('fullName')?.touched && 
                           paymentForm.get('fullName')?.errors?.['required']">

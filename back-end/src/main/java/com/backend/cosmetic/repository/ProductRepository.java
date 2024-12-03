@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.backend.cosmetic.model.Product;
+import com.backend.cosmetic.dto.ProductProjection;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
 
@@ -21,12 +22,18 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 @Query("SELECT p FROM Product p WHERE p.category.id = :categoryId OR p.category.parentCategory.id = :categoryId")
 Page<Product> findProductsByCategoryAndSubcategories(@Param("categoryId") Integer categoryId,
                                                      Pageable pageable);
-
-//    @Query("SELECT new com.backend.cosmetic.response.ProductResponse(" +
-//           "p.id, p.name, p.description, p.active, p.thumbnail, " +
-//           "p.category.id, p.brand.id) " +
-//           "FROM Product p")
-//    Page<ProductResponse> findAllProductsWithProjection(Pageable pageable);
+//  Long getId();
+//     String getName();
+//     String getDescription();
+//     boolean isActivate();
+//     String getThumbnail();
+//     String getCategory();
+//     String getBrand();
+   @Query(nativeQuery = true, value = "select p.id, p.name as Category, " +
+           "p.description, p.active as  activate , p.thumbnail, c.name, b.name as Brand from Products p " +
+   "join Categories c on c.id = p.category_id " +
+   "join Brands b on b.id = p.brand_id")
+   List<ProductProjection> findAllProjected();
 
 @Query("SELECT c.name as categoryName, " +
        "COUNT(p) as productCount, " +

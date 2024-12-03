@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import com.backend.cosmetic.dto.ProductDTO;
 import com.backend.cosmetic.model.Product;
 import com.backend.cosmetic.response.ProductResponse;
-
+import com.backend.cosmetic.dto.ProductProjection;
 @Service
 public interface ProductService {
     ProductResponse saveProduct(ProductDTO product  ) throws IOException;
@@ -29,7 +29,7 @@ public interface ProductService {
     );
 //    Page<ProductResponse> productShop (Pageable pageable,String cateName,String brandName,);
     ProductResponse findById(Long id);
-    List<ProductResponse> getAllProducts();
+    List<ProductProjection> getAllProducts();
     ProductResponse deleteProduct(Long id);
     List<ProductResponse> searchProductsByName(String name);
     Page<Product> findProductsByCategoryAndSubcategories(Integer categoryId,Pageable pageable);

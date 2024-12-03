@@ -23,7 +23,7 @@
             <i class="bi bi-box-seam"></i>
           </div>
           <div class="timeline-content">
-            <span class="timeline-title">Đặt hàng</span>
+            <span class="timeline-title">Chờ xác nhận</span>
             <span class="timeline-date" *ngIf="getTimelineStatus(order.status) >= 0">
               {{order.createdDate | date:'dd/MM/yyyy HH:mm'}}
             </span>
@@ -34,11 +34,11 @@
         
         <div class="timeline-item" [class.active]="getTimelineStatus(order.status) >= 1">
           <div class="timeline-icon">
-            <i class="bi bi-check-circle"></i>
+            <i class="bi bi-gear"></i>
           </div>
           <div class="timeline-content">
-            <span class="timeline-title">Xác nhận</span>
-            <span class="timeline-status">Đơn hàng đã được xác nhận</span>
+            <span class="timeline-title">Đang xử lý</span>
+            <span class="timeline-status">Đơn hàng đang được xử lý</span>
           </div>
         </div>
         
@@ -58,10 +58,22 @@
         
         <div class="timeline-item" [class.active]="getTimelineStatus(order.status) >= 3">
           <div class="timeline-icon">
+            <i class="bi bi-box-seam-fill"></i>
+          </div>
+          <div class="timeline-content">
+            <span class="timeline-title">Đã giao hàng</span>
+            <span class="timeline-status">Đơn hàng đã được giao</span>
+          </div>
+        </div>
+
+        <div class="timeline-line" [class.active]="getTimelineStatus(order.status) >= 4"></div>
+        
+        <div class="timeline-item" [class.active]="getTimelineStatus(order.status) >= 4">
+          <div class="timeline-icon">
             <i class="bi bi-check2-circle"></i>
           </div>
           <div class="timeline-content">
-            <span class="timeline-title">Hoàn thành</span>
+            <span class="timeline-title">Thành công</span>
             <span class="timeline-status">Giao hàng thành công</span>
           </div>
         </div>

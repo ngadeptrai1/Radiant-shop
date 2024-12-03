@@ -45,6 +45,13 @@
   <div class="card mb-4">
     <div class="card-body">
       <div class="d-flex gap-2 flex-wrap">
+        <!-- Nút xác nhận thanh toán cho đơn hàng card -->
+        <button *ngIf="canConfirmPayment()" 
+                class="btn btn-warning" 
+                (click)="openModal('confirm')">
+          <i class="fas fa-credit-card me-2"></i>Xác nhận thanh toán
+        </button>
+
         <!-- Nút xác nhận đơn -->
         <button *ngIf="canConfirm()" 
                 class="btn btn-primary" 
@@ -52,11 +59,12 @@
           <i class="fas fa-check me-2"></i>Xác nhận đơn
         </button>
 
-        <!-- Nút chuyển trạng thái tiếp theo - ẩn khi đơn hàng đang ở trạng thái PENDING -->
+        <!-- Nút chuyển trạng thái tiếp theo -->
         <button *ngIf="canUpdateStatus() && order.status !== 'PENDING'" 
-                class="btn btn-success" 
+                [class]="'btn ' + getNextStatusButtonClass()"
                 (click)="openModal('update')">
-          <i class="fas fa-arrow-right me-2"></i>Chuyển trạng thái tiếp theo
+          <i class="fas" [class]="getNextStatusIcon() + ' me-2'"></i>
+          {{getNextStatusLabel()}}
         </button>
 
         <!-- Nút hủy đơn -->
@@ -66,9 +74,9 @@
           <i class="fas fa-times me-2"></i>Hủy đơn
         </button>
 
-        <!-- Nút xuất PDF - đặt bên ngoài điều kiện *ngIf của các nút action khác -->
+        <!-- Nút xuất PDF -->
         <button class="btn btn-secondary" 
-                *ngIf="order?.status === 'SUCCESS' || order?.status === 'DELIVERED'"
+                *ngIf="order?.status == 'SUCCESS' || order?.status == 'DELIVERED'"
                 (click)="exportToPDF()">
           <i class="fas fa-file-pdf me-2"></i>Xuất hóa đơn
         </button>
@@ -162,13 +170,21 @@
               </td>
               <td class="text-end">{{formatCurrency(item.price)}}</td>
               <td class="text-center">
-                <!-- Hiển thị form edit số lượng -->
-                <div *ngIf="isEditing && editingDetailId === item.id" class="d-flex align-items-center justify-content-center gap-2">
-                  <input type="number" class="form-control form-control-sm w-auto" 
-                         [(ngModel)]="newQuantity" min="1">
+                <!-- Hiển thị form edit số lượng chỉ khi có thể edit -->
+                <div *ngIf="isEditing && editingDetailId === item.id && canEditOrder()" 
+                     class="d-flex align-items-center justify-content-center gap-2">
+                  <input type="number" 
+                         class="form-control form-control-sm w-auto" 
+                         [(ngModel)]="newQuantity" 
+                         min="1"
+                         [max]="selectedProduct?.quantity || item.quantity">
+                  <small class="text-muted d-block">
+                    Còn {{selectedProduct?.quantity || 'N/A'}} trong kho
+                  </small>
                   <button class="btn btn-sm btn-success" 
                           (click)="updateOrderDetail(item.id)"
-                          [disabled]="isLoading">
+                          [disabled]="isLoading || newQuantity < 1 || 
+                                     (selectedProduct && newQuantity > selectedProduct.quantity)">
                     <i class="fas" [class.fa-spinner]="isLoading" [class.fa-spin]="isLoading" [class.fa-check]="!isLoading"></i>
                   </button>
                   <button class="btn btn-sm btn-secondary" 
@@ -180,7 +196,7 @@
                 <!-- Hiển thị số lượng bình thường -->
                 <span *ngIf="!isEditing || editingDetailId !== item.id">
                   {{item.quantity}}
-                  <button *ngIf="isEditing" 
+                  <button *ngIf="isEditing && canEditOrder()" 
                           class="btn btn-sm btn-link" 
                           (click)="startEditDetail(item)">
                     <i class="fas fa-edit"></i>
@@ -189,9 +205,10 @@
               </td>
               <td class="text-end">{{formatCurrency(item.price * item.quantity)}}</td>
               <td *ngIf="canEditOrder()" class="text-center">
-                <button class="btn btn-sm btn-danger" 
-                        (click)="deleteOrderDetail(item.id)"
-                        [disabled]="editingDetailId === item.id">
+                <button 
+                  *ngIf="isEditing && canDeleteOrderDetail()"
+                  class="btn btn-danger btn-sm"
+                  (click)="deleteOrderDetail(item.id)">
                   <i class="fas fa-trash"></i>
                 </button>
               </td>
@@ -276,15 +293,25 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Cập nhật trạng thái</h5>
+        <h5 class="modal-title">{{getNextStatusLabel()}}</h5>
         <button type="button" class="btn-close" (click)="closeModal('update')"></button>
       </div>
       <div class="modal-body">
-        Bạn có chắc chắn muốn chuyển đơn hàng #{{order?.id}} sang trạng thái tiếp theo không?
+        <p *ngIf="order?.status === 'DELIVERED'">
+          Bạn có chắc chắn muốn xác nhận giao hàng thành công cho đơn hàng #{{order?.id}} không?
+        </p>
+        <p *ngIf="order?.status !== 'DELIVERED'">
+          Bạn có chắc chắn muốn chuyển đơn hàng #{{order?.id}} sang trạng thái tiếp theo không?
+        </p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="closeModal('update')">Hủy</button>
-        <button type="button" class="btn btn-success" (click)="handleUpdateStatus()">Xác nhận</button>
+        <button type="button" 
+                [class]="'btn ' + getNextStatusButtonClass()" 
+                (click)="handleUpdateStatus()">
+          <i class="fas" [class]="getNextStatusIcon() + ' me-2'"></i>
+          Xác nhận
+        </button>
       </div>
     </div>
   </div>
@@ -316,40 +343,82 @@
   </div>
 </div>
 
-<!-- Thêm nút Edit khi đơn hàng ở trạng thái PENDING -->
+<!-- Nút chỉnh sửa đơn hàng -->
 <div class="card mb-4" *ngIf="canEditOrder()">
   <div class="card-body">
-    <button class="btn btn-primary" (click)="toggleEditMode()">
-      <i class="fas" [class.fa-edit]="!isEditing" [class.fa-times]="isEditing"></i>
-      {{isEditing ? 'Hủy chỉnh sửa' : 'Chỉnh sửa đơn hàng'}}
-    </button>
+    <div class="d-flex justify-content-between align-items-center">
+      <button class="btn btn-primary" (click)="toggleEditMode()">
+        <i class="fas" [class.fa-edit]="!isEditing" [class.fa-times]="isEditing"></i>
+        {{isEditing ? 'Hủy chỉnh sửa' : 'Chỉnh sửa đơn hàng'}}
+      </button>
+      <div *ngIf="!isEditing" class="text-muted">
+        <small>
+          <i class="fas fa-info-circle me-1"></i>
+          Chỉ có thể chỉnh sửa đơn hàng chưa thanh toán và đang chờ xác nhận
+        </small>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- Form thêm sản phẩm mới -->
-<div class="card mb-4" *ngIf="isEditing">
+<!-- Form thêm sản phẩm -->
+<div class="card mb-4" *ngIf="isEditing && canEditOrder()">
   <div class="card-body">
     <h5 class="card-title">Thêm sản phẩm</h5>
     <div class="row g-3">
       <div class="col-md-6">
-        <select class="form-select" [(ngModel)]="selectedProductId" [disabled]="isLoadingProducts">
+        <select class="form-select" 
+                [(ngModel)]="selectedProductId" 
+                (ngModelChange)="onProductSelect($event)"
+                [disabled]="isLoadingProducts">
           <option value="0">{{ isLoadingProducts ? 'Đang tải...' : 'Chọn sản phẩm' }}</option>
           <option *ngFor="let product of availableProducts" [value]="product.id">
-            {{product.productName}} - {{product.color}}
+            {{product.productName}} - {{product.color}} 
+            (Còn {{product.quantity}} trong kho)
           </option>
         </select>
       </div>
       <div class="col-md-3">
-        <input type="number" class="form-control" 
-               [(ngModel)]="newQuantity" min="1" 
+        <input type="number" 
+               class="form-control" 
+               [(ngModel)]="newQuantity" 
+               min="1"
+               [max]="selectedProduct?.quantity || 1"
                placeholder="Số lượng">
+        <small class="text-muted" *ngIf="selectedProduct">
+          Còn {{selectedProduct.quantity}} trong kho
+        </small>
       </div>
       <div class="col-md-3">
         <button class="btn btn-success w-100" 
                 (click)="addOrderDetail()"
-                [disabled]="!selectedProductId || newQuantity < 1 || isLoadingProducts">
+                [disabled]="!selectedProductId || 
+                           newQuantity < 1 || 
+                           isLoadingProducts || 
+                           (selectedProduct && newQuantity > selectedProduct.quantity)">
           <i class="fas" [class.fa-spinner]="isLoading" [class.fa-spin]="isLoading" [class.fa-plus]="!isLoading"></i>
           {{isLoading ? 'Đang thêm...' : 'Thêm'}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add this modal at the bottom of your file with other modals -->
+<div class="modal fade" id="confirmPaymentModal" tabindex="-1" #confirmPaymentModal>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Xác nhận thanh toán</h5>
+          <button type="button" class="btn-close" (click)="closeModal('confirm')"></button>
+      </div>
+      <div class="modal-body">
+        Bạn có chắc chắn muốn xác nhận thanh toán cho đơn hàng #{{order?.id}} không?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal('confirm')">Hủy</button>
+        <button type="button" class="btn btn-warning" (click)="handleConfirmPayment()">
+          <i class="fas fa-credit-card me-2"></i>Xác nhận thanh toán
         </button>
       </div>
     </div>

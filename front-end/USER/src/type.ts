@@ -133,7 +133,7 @@ export interface OrderResponse {
   phoneNumber: string
   email: any
   address: any
-  status: 'PENDING' | 'CONFIRMED' | 'DELIVERED' | 'CANCELLED'|'PROCESSING'|'SUCCESS' |string;
+  status: 'PENDING'|'SHIPPED' | 'DELIVERED' | 'CANCELLED'|'PROCESSING'|'SUCCESS' |string;
   paymentStatus: string
   paymentMethod: string
   totalOrderAmount: number

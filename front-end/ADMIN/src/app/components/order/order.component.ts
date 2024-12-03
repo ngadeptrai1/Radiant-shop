@@ -33,6 +33,7 @@ export class OrderComponent implements OnInit {
     PROCESSING: 0,
     DELIVERED: 0,
     SUCCESS: 0,
+    SHIPPED: 0,
     CANCELLED: 0
   };
 
@@ -42,6 +43,7 @@ export class OrderComponent implements OnInit {
     { value: 'PROCESSING', label: 'Đang xử lý', icon: 'fas fa-cog fa-spin' },
     { value: 'SHIPPED', label: 'Đang giao hàng', icon: 'fas fa-truck' },
     { value: 'SUCCESS', label: 'Thành công', icon: 'fas fa-check-circle' },
+    { value: 'DELIVERED', label: 'Đã giao hàng', icon: 'fas fa-user-check' },
     { value: 'CANCELLED', label: 'Đã hủy', icon: 'fas fa-ban' }
   ];
 
@@ -50,6 +52,48 @@ export class OrderComponent implements OnInit {
   ngOnInit() {
     this.loadOrders();
     this.loadOrderStatusCount();
+    
+    // Theo dõi sự thay đổi của startDate và endDate
+    this.watchDateChanges();
+  }
+
+  watchDateChanges() {
+    // Sử dụng debounceTime để tránh gọi API quá nhiều lần
+    const debounceTime = 500; // 500ms
+    
+    let dateChangeTimer: any;
+    
+    // Theo dõi startDate
+    this.watchFormControl('startDate', () => {
+      clearTimeout(dateChangeTimer);
+      dateChangeTimer = setTimeout(() => {
+        if (this.startDate && this.endDate) {
+          this.onDateFilterChange();
+        }
+      }, debounceTime);
+    });
+
+    // Theo dõi endDate
+    this.watchFormControl('endDate', () => {
+      clearTimeout(dateChangeTimer);
+      dateChangeTimer = setTimeout(() => {
+        if (this.startDate && this.endDate) {
+          this.onDateFilterChange();
+        }
+      }, debounceTime);
+    });
+  }
+
+  private watchFormControl(property: string, callback: () => void) {
+    let oldValue = (this as any)[property];
+    
+    Object.defineProperty(this, property, {
+      get: () => oldValue,
+      set: (newValue) => {
+        oldValue = newValue;
+        callback();
+      }
+    });
   }
 
   loadOrders() {

@@ -1,11 +1,10 @@
 import { Component, ViewChild } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { Color, Brand, Category, Product, ProductRequest, ProductResponse } from '../../../type';
+import { Color, Brand, Category, ProductRequest, ProductResponse } from '../../../type';
 import { MatPaginator } from '@angular/material/paginator';
 import { ProductService } from '../../services/product.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ProductDialogComponent } from '../product-dialog/product-dialog.component';
 import { ConfirmDialogComponent } from '../../../constant/confirm-dialog.component';
 import { MatSort } from '@angular/material/sort';
 import { RouterLink } from '@angular/router';
@@ -20,6 +19,7 @@ import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { BrandService } from '../../services/brand-service.service';
 import { CategoryService } from '../../services/category-service.service';
 import { ColorService } from '../../services/color.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-tables',
@@ -53,7 +53,8 @@ export class ProductComponent {
     private snackBar: MatSnackBar,
     private categoryService: CategoryService,
     private brandService: BrandService,
-    private colorService: ColorService 
+    private colorService: ColorService,
+    private router: Router
   ) {
     this.dataSource = new MatTableDataSource<ProductResponse>();
   }
@@ -104,21 +105,12 @@ export class ProductComponent {
     });
   }
   
-  openDialog(product?: Product) {
-    const dialogRef = this.dialog.open(ProductDialogComponent, {
-      height: '100%',
-      data: { product, categories: this.categories, brands: this.brands, colors: this.colors }
-    });
-  
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        if (result.id) {
-          this.updateProduct(result);
-        } else {
-         
-        }
-      }
-    });
+  openDialog(product?: ProductResponse) {
+    if (product) {
+      this.router.navigate(['/update-product', product.id]);
+    } else {
+      this.router.navigate(['/add-product']);
+    }
   }
   
   
@@ -142,7 +134,7 @@ export class ProductComponent {
     });
   }
   
-  deleteProduct(product: Product) {
+  deleteProduct(product: ProductResponse) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
       data: { title: 'Xác nhận xóa', message: `Bạn có chắc chắn muốn xóa sản phẩm "${product.name}"?` }

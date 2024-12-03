@@ -79,11 +79,30 @@
       font-size: 1.5rem;
     }
     
-    &.pending i { color: #ffc107; }
-    &.processing i { color: #17a2b8; }
-    &.shipped i { color: #28a745; }
-    &.success i { color: #28a745; }
-    &.cancelled i { color: #dc3545; }
+    &.pending { 
+      background-color: #fff3cd;
+      i { color: #ffc107; }
+    }
+    &.processing { 
+      background-color: #cff4fc;
+      i { color: #17a2b8; }
+    }
+    &.shipped { 
+      background-color: #d1e7dd;
+      i { color: #28a745; }
+    }
+    &.delivered { 
+      background-color: #d1e7dd;
+      i { color: #198754; }
+    }
+    &.success { 
+      background-color: #d1e7dd;
+      i { color: #28a745; }
+    }
+    &.cancelled { 
+      background-color: #f8d7da;
+      i { color: #dc3545; }
+    }
   }
   
   .status-info {
@@ -320,5 +339,37 @@
     background-color: #f8d7da;
     color: #721c24;
     border-color: #f5c6cb;
+  }
+}
+
+// Thêm style cho status badge trong table
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-weight: 500;
+  
+  &.pending {
+    background-color: #fff3cd;
+    color: #997404;
+  }
+  &.processing {
+    background-color: #cff4fc;
+    color: #055160;
+  }
+  &.shipped {
+    background-color: #d1e7dd;
+    color: #0f5132;
+  }
+  &.delivered {
+    background-color: #d1e7dd;
+    color: #146c43;
+  }
+  &.success {
+    background-color: #d1e7dd;
+    color: #0f5132;
+  }
+  &.cancelled {
+    background-color: #f8d7da;
+    color: #842029;
   }
 }

@@ -4,9 +4,13 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +39,7 @@ import com.backend.cosmetic.service.VoucherService;
 import com.backend.cosmetic.specification.OrderSpecification;
 import com.cloudinary.utils.StringUtils;
 
+import jakarta.annotation.PreDestroy;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 @Component
@@ -64,38 +69,26 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(rollbackFor = {DataNotFoundException.class, Exception.class})
     public OrderResponse createInWebsite(OrderDTO orderDTO) {
-        // Validate input
         validateOrderInput(orderDTO);
-        
-        // Build order
         Order order = buildInitialOrder(orderDTO);
-        
-        // Set user if provided
         setOrderUser(order, orderDTO.getUserId());
-        
-        // Save initial order
-        order = orderRepository.save(order);
-        
-        // Process order details
-        List<OrderDetail> orderDetails = processOrderDetails(order, orderDTO.getOrderDetails());
+        final Order savedOrder = orderRepository.save(order);
+
+        List<OrderDetail> orderDetails =   processOrderDetails(savedOrder, orderDTO.getOrderDetails());
         order.setOrderDetails(orderDetails);
         
-        // Calculate totals
         calculateOrderTotals(order);
-        
-        // Apply voucher if provided
         applyVoucherIfPresent(order, orderDTO.getVoucherCode());
         
-        // Set additional fields
         order.setType(OrderStatus.TYPE_ONLINE);
         order.setPaymentStatus("UNPAID");
         order.setPaymentMethod(orderDTO.getPaymentMethod());
-        // Save final order
+        
         order = orderRepository.save(order);
         
-        // TODO: Send confirmation email
-        
-        emailService.createOrderConfirmationEmailContent(order);
+
+        emailService.createOrderConfirmationEmailContent(savedOrder);
+
         
         return orderMapper.toResponseDto(order);
     }
@@ -206,8 +199,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private List<OrderDetail> processOrderDetails(Order order, List<OrderDetailDTO> detailDTOs) {
-
-        return  detailDTOs.stream()
+        return detailDTOs.parallelStream()
                 .map(detail -> createOrderDetail(order, detail))
                 .collect(Collectors.toList());
     }
@@ -352,16 +344,17 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toResponseDto(orderRepository.save(order));
     }
 
+    @Cacheable(value = "orderStatistics")
     @Override
     public Map<String, Object> getOrderStatistics(LocalDateTime startDate, LocalDateTime endDate) {
         List<Order> orders = orderRepository.findAllByCreatedDateBetween(startDate, endDate);
         
         long totalOrders = orders.size();
-        long totalRevenue = orders.stream()
+        long totalRevenue = orders.parallelStream()
                 .filter(o -> o.getStatus().equals(OrderStatus.SUCCESS))
                 .mapToLong(Order::getFinalAmount)
                 .sum();
-        long successfulOrders = orders.stream()
+        long successfulOrders = orders.parallelStream()
                 .filter(o -> o.getStatus().equals(OrderStatus.SUCCESS))
                 .count();
         
@@ -417,11 +410,7 @@ public class OrderServiceImpl implements OrderService {
         
         order.setStatus(status);
         
-        // If status is DELIVERED, automatically set order to SUCCESS
-        if (OrderStatus.DELIVERED.equals(status)) {
-            order.setStatus(OrderStatus.SUCCESS);
-        }
-
+        
         // Check if the order status is SUCCESS and set payment status to PAID
         if (OrderStatus.SUCCESS.equals(order.getStatus())) {
             order.setPaymentStatus(OrderStatus.PAID);
@@ -510,6 +499,7 @@ public class OrderServiceImpl implements OrderService {
         // Initialize all possible statuses with 0
         statistics.put(OrderStatus.PENDING, 0L);
         statistics.put(OrderStatus.PROCESSING, 0L);
+        statistics.put(OrderStatus.SHIPPED, 0L);
         statistics.put(OrderStatus.DELIVERED, 0L);
         statistics.put(OrderStatus.SUCCESS, 0L);
         statistics.put(OrderStatus.CANCELLED, 0L);
@@ -529,4 +519,15 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderResponse> getOrderByEmail(String email) {
         return orderMapper.toResponseDtoList(orderRepository.findAllByEmailOrderByCreatedDateDesc(email));
     }
+
+    @Override
+    public OrderResponse confirmPayment(Long orderId) {
+        
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new DataNotFoundException("Order not found"));
+        order.setPaymentStatus(OrderStatus.PAID);
+        return orderMapper.toResponseDto(orderRepository.save(order));  
+    }
+
+
 }

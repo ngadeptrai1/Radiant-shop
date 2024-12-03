@@ -70,17 +70,7 @@ export interface BrandReq {
     name: string;
     active: boolean;
   }
-  export interface Product {
-    id: number;
-    name: string;
-    description: string;
-    activate: boolean;
-    thumbnail: string;
-    productImages: ProductImage[];
-    category: Category;
-    brand: Brand;
-    productDetails: ProductDetail[];
-  }
+
   
   export interface ProductDetail {
     id: number;
@@ -101,7 +91,7 @@ export interface BrandReq {
     description: string;
     activate: boolean;
     thumbnail: File | null;
-    productImages: File[];
+    productImages: File[]|null;
     categoryId: number;
     brandId: number;
     productDetails: ProductDetail[];
@@ -113,11 +103,12 @@ export interface BrandReq {
     description: string;
     activate: boolean;
     thumbnail: string;
-    productImages: ProductImage[];
     category: string;
     brand: string;
-    productDetails: ProductDetailResponse[];
+ 
   }
+
+
   export interface ProductDetailResponse {
     id: number;
     salePrice: number;
@@ -127,6 +118,7 @@ export interface BrandReq {
     productName: string;
     color: string;
     active: boolean;
+    productDetailId: number;
   }
   export interface OrderRequest {
     id: number;
@@ -136,7 +128,7 @@ export interface BrandReq {
     orderDetails: OrderDetail[];
     voucherCode: string;
     paymentMethod: 'CASH' | 'CARD';
-    status: 'PENDING' | 'CONFIRMED' | 'DELIVERED' | 'CANCELLED'|'PROCESSING'|'SUCCESS' |string;
+    status: 'PENDING' | 'DELIVERED' | 'CANCELLED'|'SHIPPED'  | 'PROCESSING' | 'SUCCESS' |string;
     paymentStatus: 'PAID' | 'UNPAID';
     shippingFee: number;
     type: 'POS' | 'WEB';
@@ -203,12 +195,14 @@ export interface BrandReq {
     productName: string
     productColor: string
     thumbnail: string
+    productDetailId: number
   }
 
   export interface OrderStatusCount {
     PENDING: number;
     PROCESSING: number;
     DELIVERED: number;
+    SHIPPED: number;
     SUCCESS: number;
     CANCELLED: number;
 }

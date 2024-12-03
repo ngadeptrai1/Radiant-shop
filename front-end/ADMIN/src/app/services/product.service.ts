@@ -30,6 +30,14 @@ export class ProductService {
     return this.apiService.post<ProductResponse>(this.endpoint, product);
   }
 
+  getProductById(id: number): Observable<ProductResponse> {
+    return this.apiService.get<ProductResponse>(`${this.endpoint}/${id}`);
+  }
+
+  getProductDetailsById(id: number): Observable<ProductDetailResponse[]> {
+    return this.apiService.get<ProductDetailResponse[]>(`${this.endpoint}/${id}/product-details`);
+  }
+
   updateProduct(product: ProductRequest, id: number): Observable<ProductResponse> {
     return this.apiService.put<ProductResponse>(`${this.endpoint}/${id}`, product);
   }
@@ -37,27 +45,7 @@ export class ProductService {
   deleteProduct(id: number): Observable<ProductResponse> {
     return this.apiService.delete<ProductResponse>(`${this.endpoint}/${id}`);
   }
-  private buildFormData(product: ProductRequest): FormData {
-    const formData = new FormData();
-    formData.append('name', product.name);
-    formData.append('description', product.description);
-    formData.append('activate', product.activate.toString());
-    if (product.thumbnail) {
-      formData.append('thumbnail', product.thumbnail);
-    }
-    product.productImages.forEach(image => formData.append('productImages', image));
-    formData.append('categoryId', product.categoryId.toString());
-    formData.append('brandId', product.brandId.toString());
-    product.productDetails.forEach(detail => {
-      formData.append('productDetails[salePrice]', detail.salePrice.toString());
-      formData.append('productDetails[discount]', detail.discount.toString());
-      formData.append('productDetails[quantity]', detail.quantity.toString());
-      formData.append('productDetails[colorId]', detail.colorId.toString());
-    });
-    return formData;
-  }
 
-  
   searchByName(name: string): Observable<ProductResponse[]> {
     return this.apiService.get<ProductResponse[]>(`${this.endpoint}/search`,{params: {name: name}});
   }

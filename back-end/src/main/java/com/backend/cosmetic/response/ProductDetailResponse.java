@@ -22,7 +22,7 @@ public class ProductDetailResponse {
     private String productName;
     private Boolean active;
     private String thumbnail;
-
+    private long productDetailId;
     public static ProductDetailResponse fromProductDetail(ProductDetail product) {
         return ProductDetailResponse.builder()
                 .id(product.getId())
@@ -31,6 +31,7 @@ public class ProductDetailResponse {
                 .quantity(product.getQuantity())
                 .productName(product.getProduct().getName())
                 .color((product.getColor().getName()))
+                .productDetailId(product.getId())
                 .thumbnail(product.getProduct().getThumbnail())
                 .active(product.isActive())
                 .build();

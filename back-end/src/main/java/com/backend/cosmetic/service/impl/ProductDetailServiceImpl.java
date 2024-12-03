@@ -2,6 +2,7 @@ package com.backend.cosmetic.service.impl;
 
 import java.util.List;
 
+import com.backend.cosmetic.dto.ProductDetailProjection;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -155,5 +156,10 @@ public class ProductDetailServiceImpl implements ProductDetailService {
         });
         productDetail.setQuantity(productDetail.getQuantity() - amount);
         return productDetailRepository.save(productDetail).getQuantity();
+    }
+
+    @Override
+    public List<ProductDetailProjection> findByProductId(Long id) {
+        return productDetailRepository.findAllProductDetailsByProductId(id);
     }
 }

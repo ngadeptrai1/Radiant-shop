@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.backend.cosmetic.dto.ProductDTO;
+import com.backend.cosmetic.dto.ProductProjection;
 import com.backend.cosmetic.exception.DataNotFoundException;
 import com.backend.cosmetic.exception.FileException;
 import com.backend.cosmetic.exception.IdNotFoundException;
@@ -207,8 +208,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponse> getAllProducts() {
-        return productMapper.toDTOs(productRepository.findAll());
+    public List<ProductProjection> getAllProducts() {
+        return productRepository.findAllProjected();
     }
 
     @Override

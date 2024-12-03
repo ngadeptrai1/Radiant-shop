@@ -9,4 +9,5 @@ public interface ProductDetailProjection {
     String getProductName();
     Boolean getActive();
     String getThumbnail();
+    Long getProductDetailId();
 }

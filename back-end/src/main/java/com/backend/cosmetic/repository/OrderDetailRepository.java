@@ -1,14 +1,17 @@
 package com.backend.cosmetic.repository;
 
 import java.util.List;
+import java.util.Optional;
 
-import com.backend.cosmetic.dto.OrderDetailProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.backend.cosmetic.dto.OrderDetailProjection;
+import com.backend.cosmetic.model.Order;
 import com.backend.cosmetic.model.OrderDetail;
+import com.backend.cosmetic.model.ProductDetail;
 
 @Repository
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> {
@@ -21,7 +24,8 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
         od.price,
         p.name as productName,
         c.name as productColor,
-        p.thumbnail
+        p.thumbnail,
+        pd.id as productDetailId
      FROM order_details od
      JOIN product_details pd ON od.product_detail_id = pd.id
      JOIN products p ON pd.product_id = p.id
@@ -29,4 +33,6 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> 
      WHERE od.order_id = :orderId
     """)
     List<OrderDetailProjection> findByOrderId(@Param("orderId") Long orderId);
+
+    Optional<OrderDetail> findByOrderAndProductDetail(Order order, ProductDetail productDetail);
 }

@@ -127,6 +127,10 @@ export class OrderService {
       quantity
     });
   }
+  
+  confirmPayment(orderId: number): Observable<OrderResponse> {
+    return this.apiService.put<OrderResponse>(`${this.endpoint}/${orderId}/confirm-payment`, {});
+  }
 
   updateOrderDetail( orderDetailId: number, quantity: number): Observable<OrderDetailResponse> {
     return this.apiService.put<OrderDetailResponse>(

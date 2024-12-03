@@ -50,22 +50,30 @@ public class OrderDetailSeviceImpl implements OrderDetailService {
 
     @Override
     public OrderDetailResponse addOrderDetail(Long orderId, OrderDetailDTO orderDetailRequest) {
-        OrderDetail orderDetail = new OrderDetail();
-        ProductDetail productDetail = productDetailRepository.findById(orderDetailRequest.getProductDetailId())
-                .orElseThrow(() -> new DataNotFoundException("Product detail not found"));
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new DataNotFoundException("Order not found"));
+        ProductDetail productDetail = productDetailRepository.findById(orderDetailRequest.getProductDetailId())
+                .orElseThrow(() -> new DataNotFoundException("Product detail not found"));
 
-        orderDetail.setOrder(order);
-        
-        Long price = productDetail.getSalePrice() - (productDetail.getSalePrice() * productDetail.getDiscount() / 100);
-        orderDetail.setPrice(price);
-        orderDetail.setProductDetail(productDetail);
-        orderDetail.setQuantity(orderDetailRequest.getQuantity());
+        OrderDetail existingOrderDetail = orderDetailRepository.findByOrderAndProductDetail(order, productDetail).orElse(null);
 
-        OrderDetailResponse response = orderDetailMapper.toResponseDto(orderDetailRepository.save(orderDetail));
-        updateOrderInformation(order);
-        return response;
+        if (existingOrderDetail != null) {
+            existingOrderDetail.setQuantity(existingOrderDetail.getQuantity() + orderDetailRequest.getQuantity());
+            OrderDetailResponse response = orderDetailMapper.toResponseDto(orderDetailRepository.save(existingOrderDetail));
+            updateOrderInformation(order);
+            return response;
+        } else {
+            OrderDetail orderDetail = new OrderDetail();
+            orderDetail.setOrder(order);
+            Long price = productDetail.getSalePrice() - (productDetail.getSalePrice() * productDetail.getDiscount() / 100);
+            orderDetail.setPrice(price);
+            orderDetail.setProductDetail(productDetail);
+            orderDetail.setQuantity(orderDetailRequest.getQuantity());
+
+            OrderDetailResponse response = orderDetailMapper.toResponseDto(orderDetailRepository.save(orderDetail));
+            updateOrderInformation(order);
+            return response;
+        }
     }
 
     @Override

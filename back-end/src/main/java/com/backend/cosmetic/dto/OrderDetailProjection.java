@@ -13,4 +13,5 @@ public interface OrderDetailProjection {
 
     String getThumbnail();
 
+    long getProductDetailId();
 }

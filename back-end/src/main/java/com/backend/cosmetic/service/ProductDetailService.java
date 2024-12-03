@@ -2,6 +2,7 @@ package com.backend.cosmetic.service;
 
 import java.util.List;
 
+import com.backend.cosmetic.dto.ProductDetailProjection;
 import org.springframework.stereotype.Service;
 
 import com.backend.cosmetic.dto.ProductDetailDTO;
@@ -18,4 +19,5 @@ public interface ProductDetailService {
     Integer minusQuantity(Long id);
     void refillQuantity(Long id, int amount);
     Integer minusInPos(Long id, int amount);
+    List<ProductDetailProjection> findByProductId(Long id);
 }

@@ -16,6 +16,7 @@ import { UserComponent } from './components/user/user.component';
 import { OrderComponent } from './components/order/order.component';
 import { OrderDetailComponent } from './components/order-detail/order-detail.component';
 import { ProductReviewComponent } from './components/product-review/product-review.component';
+import { UpdateProductComponent } from './components/update-product/update-product.component';
 export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
@@ -33,5 +34,6 @@ export const routes: Routes = [
   { path:'orders',component:OrderComponent},
   { path:'orders/:id',component:OrderDetailComponent},
   { path:'product-review',component:ProductReviewComponent},
+  { path:'update-product/:id',component:UpdateProductComponent},
   { path: '**',component: NotFoundComponent }
 ];

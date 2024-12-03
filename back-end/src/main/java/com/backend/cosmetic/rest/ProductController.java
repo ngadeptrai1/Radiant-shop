@@ -187,5 +187,8 @@ private final RateLimiter rateLimiter = RateLimiter.create(2.0);
         return ResponseEntity.status(HttpStatus.OK).body(productDetailRepository.findAllProductDetails());
     }
 
-
+    @GetMapping("/{id}/product-details")
+    public ResponseEntity<?> findProductDetails(@PathVariable Long id) {
+        return ResponseEntity.ok(productDetailService.findByProductId(id));
+    }
 }

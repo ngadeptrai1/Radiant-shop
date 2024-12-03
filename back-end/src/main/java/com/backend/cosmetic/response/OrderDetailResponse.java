@@ -14,7 +14,7 @@ public class OrderDetailResponse {
     private String productName;
     private String productColor;
     private String thumbnail;
-
+    private long productDetailId;
     public static OrderDetailResponse fromOrderDetail(OrderDetail detail) {
         return OrderDetailResponse.builder()
                 .id(detail.getId())
@@ -23,6 +23,7 @@ public class OrderDetailResponse {
                 .productColor(detail.getProductDetail().getColor().getName())
                 .productName(detail.getProductDetail().getProduct().getName())
                 .thumbnail(detail.getProductDetail().getProduct().getThumbnail())
+                .productDetailId(detail.getProductDetail().getId())
                 .build();
     }
 }
