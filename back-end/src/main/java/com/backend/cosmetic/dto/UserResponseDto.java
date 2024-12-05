@@ -1,6 +1,6 @@
 package com.backend.cosmetic.dto;
 
-import com.backend.cosmetic.model.Role;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

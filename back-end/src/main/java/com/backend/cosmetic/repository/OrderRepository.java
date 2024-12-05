@@ -33,12 +33,12 @@ public interface OrderRepository extends JpaRepository<Order, Long>,
            "SUM(o.finalAmount) as revenue " +
            "FROM Order o " +
            "WHERE o.status = 'SUCCESS' " +
-           "GROUP BY DATE(o.createdDate) " )
+           "GROUP BY DATE(o.updatedDate) " )
     List<Object[]> getRevenueStats();
 
     @Query("SELECT SUM(o.finalAmount) FROM Order o " +
            "WHERE o.status = 'SUCCESS' " +
-           "AND DATE(o.createdDate) = DATE(:date)")
+           "AND DATE(o.updatedDate) = DATE(:date)")
     Long getTodayRevenue(@Param("date") LocalDateTime date);
 
     @Query("SELECT COUNT(o) FROM Order o WHERE o.status = :status")
@@ -46,23 +46,23 @@ public interface OrderRepository extends JpaRepository<Order, Long>,
 
     @Query("SELECT SUM(o.finalAmount) FROM Order o " +
            "WHERE o.status = 'SUCCESS' " +
-           "AND o.createdDate BETWEEN :startDate AND :endDate")
+           "AND o.updatedDate BETWEEN :startDate AND :endDate")
     Long getTotalRevenue(@Param("startDate") LocalDateTime startDate, 
                         @Param("endDate") LocalDateTime endDate);
 
     List<Order> findAllByEmailOrderByCreatedDateDesc(String email);
 
-    @Query("SELECT MONTH(o.createdDate) as month, COUNT(o) as orderCount, SUM(o.finalAmount) as revenue " +
+    @Query("SELECT MONTH(o.updatedDate) as month, COUNT(o) as orderCount, SUM(o.finalAmount) as revenue " +
            "FROM Order o " +
            "WHERE o.status = 'SUCCESS' " +
-           "AND YEAR(o.createdDate) = :year " +
-           "GROUP BY MONTH(o.createdDate) " +
+           "AND YEAR(o.updatedDate) = :year " +
+           "GROUP BY MONTH(o.updatedDate) " +
            "ORDER BY month")
     List<Object[]> getMonthlyRevenueStats(@Param("year") int year);
 
-    @Query("SELECT DISTINCT YEAR(o.createdDate) " +
+    @Query("SELECT DISTINCT YEAR(o.updatedDate) " +
            "FROM Order o " +
            "WHERE o.status = 'SUCCESS' " +
-           "ORDER BY YEAR(o.createdDate) DESC")
+           "ORDER BY YEAR(o.updatedDate) DESC")
     List<Integer> getAvailableYears();
 }

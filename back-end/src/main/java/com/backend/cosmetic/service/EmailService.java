@@ -39,21 +39,21 @@ public class EmailService {
             content.append("<tr>");
             content.append("<td>").append(item.getProductDetail().getProduct().getName()).append("</td>");
             content.append("<td>").append(item.getQuantity()).append("</td>");
-            content.append("<td>").append(currencyFormatter.format(item.getPrice())).append("</td>");
-            content.append("<td>").append(currencyFormatter.format(item.getPrice() * item.getQuantity())).append("</td>");
+            content.append("<td>").append(item.getPrice()).append("đ</td>");
+            content.append("<td>").append(item.getPrice() * item.getQuantity()).append("đ</td>");
             content.append("</tr>");
         }
-        
+
         content.append("</table>");
-        content.append("<p><strong>Tổng tiền: </strong>").append(currencyFormatter.format(order.getFinalAmount())).append("</p>");
+        content.append("<p><strong>Tổng tiền: </strong>").append(order.getFinalAmount()).append("đ</p>");
         content.append("<p><strong>Địa chỉ giao hàng: </strong>").append(order.getAddress()).append("</p>");
         
         if (order.getPaymentMethod().equalsIgnoreCase("CARD")) {
             content.append("<p><strong>Thông tin chuyển khoản:</strong></p>");
             content.append("<p>Để xác nhận đơn hàng, vui lòng chuyển khoản vào tài khoản của chúng tôi.</p>");
             content.append("<p>Số tài khoản: 123456789</p>");
-            content.append("<p>Ngân hàng: Vietcombank</p>");
-            content.append("<p>Số tiền: ").append(currencyFormatter.format(order.getFinalAmount())).append("</p>");
+            content.append("<p>Ngân hàng: TPBANK</p>");
+            content.append("<p>Số tiền: ").append(order.getFinalAmount()).append("đ</p>");
             content.append("<p>Chúng tôi sẽ xác nhận đơn hàng sau khi nhận được tiền.</p>");
         }
         

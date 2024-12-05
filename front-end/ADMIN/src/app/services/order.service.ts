@@ -145,6 +145,6 @@ export class OrderService {
     return this.apiService.delete<OrderResponse>(`${this.endpoint}/${orderId}/voucher`);
   }
   addVoucher(orderId: number, voucherCode: string): Observable<OrderResponse> {
-    return this.apiService.post<OrderResponse>(`${this.endpoint}/${orderId}/voucher?voucherCode=${voucherCode}`, {});
+    return this.apiService.put<OrderResponse>(`${this.endpoint}/${orderId}/voucher?code=${voucherCode}`, {});
   }
 }

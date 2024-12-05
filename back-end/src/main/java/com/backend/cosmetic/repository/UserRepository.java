@@ -1,7 +1,9 @@
 package com.backend.cosmetic.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.backend.cosmetic.dto.UserProjection;
 import com.backend.cosmetic.model.RoleType;
 import com.backend.cosmetic.model.User;
 
@@ -48,4 +51,24 @@ public interface UserRepository extends JpaRepository<User, Long> {
         @Param("email") String email, 
         @Param("phone") String phone
     );
+
+        @Query(nativeQuery = true, value = "SELECT u.id, u.username as userName, u.email, u.full_name as fullName,\n" +
+                "       u.phone_num as phoneNumber,  u.blocked, u.enabled , r.role_name as roles,\n" +
+                "       u.created_date, u.created_date FROM users u\n" +
+                "           JOIN User_roles ur ON u.id = ur.user_id\n" +
+                "           join Roles r on ur.role_id = r.id\n" +
+                "WHERE r.role_name = 'CUSTOMER' AND u.active = true and u.enabled = true and u.blocked = false")
+    List<UserProjection> findAllCustomers();
+
+    //  Long getId();
+    // String getUsername();
+    // String getEmail();
+    // String getFullName();
+    // String getPhoneNumber();
+    // String getProvider();
+    // boolean isBlocked();
+    // boolean isEnabled();
+    // Set<String> getRoles();
+    // LocalDateTime getCreatedAt();
+    // LocalDateTime getUpdatedAt();
 }

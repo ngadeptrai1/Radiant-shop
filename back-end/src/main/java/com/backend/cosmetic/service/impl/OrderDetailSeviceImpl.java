@@ -54,10 +54,10 @@ public class OrderDetailSeviceImpl implements OrderDetailService {
             } else {
                 // Tính lại số tiền giảm giá
                 long voucherAmount;
-                if ("PERCENT".equals(voucher.getType())) {
+                if ("PERCENTAGE".equals(voucher.getType())) {
                     voucherAmount = (totalOrderAmount * voucher.getValue()) / 100;
-                    if (voucher.getMaxDiscountAmount() != null) {
-                        voucherAmount = Math.min(voucherAmount, voucher.getMaxDiscountAmount());
+                    if (voucherAmount >= voucher.getMaxDiscountAmount() ) {
+                        voucherAmount = voucher.getMaxDiscountAmount();
                     }
                 } else {
                     voucherAmount = voucher.getValue();

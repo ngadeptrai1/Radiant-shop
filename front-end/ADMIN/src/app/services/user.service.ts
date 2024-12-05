@@ -181,5 +181,9 @@ export class UserService {
       params: { username, phone, email } 
     });
   }
+
+  getAllCustomer(): Observable<UserResponse[]> {
+    return this.apiService.get<UserResponse[]>(`${this.endpoint}/customer`);
+  }
   
 }

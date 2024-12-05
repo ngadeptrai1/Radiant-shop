@@ -45,6 +45,7 @@ export class OrderDetailComponent implements OnInit {
   
   cancelReason: string = '';
   private modalInstances: { [key: string]: any } = {};
+  newVoucherCode: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -163,7 +164,7 @@ export class OrderDetailComponent implements OnInit {
     if (!this.order) return false;
     
     // Nếu là đơn POS hoặc đã hủy, không có trạng thái completed
-    if (this.order.type === 'POS' || this.order.status === 'CANCELLED') {
+    if (this.order.type == 'POS' || this.order.status == 'CANCELLED') {
       return false;
     }
     
@@ -393,7 +394,7 @@ export class OrderDetailComponent implements OnInit {
       return false;
     }
 
-    const existingOrderDetail = this.orderDetails.find(detail => detail.productDetailId === productDetailId);
+    const existingOrderDetail = this.orderDetails.find(detail => detail.productDetailId == productDetailId);
     const totalQuantity = existingOrderDetail ? existingOrderDetail.quantity + newQuantity : newQuantity;
 
     if (totalQuantity > productInStock.quantity) {
@@ -463,11 +464,11 @@ export class OrderDetailComponent implements OnInit {
 
   async updateOrderDetail(detailId: number) {
     if (!this.canEditOrder()) return;
-
-    const orderDetail = this.orderDetails.find(detail => detail.id === detailId);
+    this.isLoading = true;
+    const orderDetail = this.orderDetails.find(detail => detail.id == detailId);
     if (!orderDetail || !this.order || this.newQuantity < 1) return;
 
-    const productInStock = this.availableProducts.find(p => p.productDetailId === orderDetail.productDetailId);
+    const productInStock = this.availableProducts.find(p => p.productDetailId == orderDetail.productDetailId);
     if (!productInStock || this.newQuantity > productInStock.quantity) {
       this.snackBar.open(`Số lượng vượt quá số trong kho (${productInStock?.quantity || 0})`, 'Đóng', { duration: 3000 });
       return;
@@ -485,7 +486,7 @@ export class OrderDetailComponent implements OnInit {
       return;
     }
 
-    this.isLoading = true;
+    
     this.orderService.updateOrderDetail(detailId, this.newQuantity)
       .subscribe({
         next: () => {
@@ -515,7 +516,8 @@ export class OrderDetailComponent implements OnInit {
     if (!this.order || !confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) return;
 
     // Calculate new total
-    const orderDetail = this.orderDetails.find(detail => detail.id === detailId);
+    this.isLoading = true;
+    const orderDetail = this.orderDetails.find(detail => detail.id == detailId);
     if (!orderDetail) return;
 
     const newTotal = this.order.totalOrderAmount - (orderDetail.price * orderDetail.quantity);
@@ -526,7 +528,7 @@ export class OrderDetailComponent implements OnInit {
       return;
     }
 
-    this.isLoading = true;
+    
     this.orderService.deleteOrderDetail(this.order.id, detailId)
       .subscribe({
         next: () => {
@@ -543,7 +545,7 @@ export class OrderDetailComponent implements OnInit {
 
   exportToPDF() {
     if (this.order && this.orderDetails && 
-        (this.order.status == 'SUCCESS' || this.order.status == 'DELIVERED')) {
+        (this.order.status == 'SUCCESS' )) {
       this.pdfExportService.generateOrderPDF(this.order, this.orderDetails);
     } else {
       console.warn('Chỉ có thể xuất hóa đơn cho đơn hàng đã hoàn thành');
@@ -608,7 +610,7 @@ export class OrderDetailComponent implements OnInit {
 
   // Cập nhật method khi chọn sản phẩm
   onProductSelect(productId: number) {
-    this.selectedProduct = this.availableProducts.find(p => p.productDetailId === productId) || null;
+    this.selectedProduct = this.availableProducts.find(p => p.productDetailId == productId) || null;
     if (this.selectedProduct) {
       // Reset số lượng khi chọn sản phẩm mới
       this.newQuantity = 1;
@@ -692,7 +694,7 @@ export class OrderDetailComponent implements OnInit {
   }
 
   getAvailableQuantity(productDetailId: number): number {
-    const product = this.availableProducts.find(p => p.productDetailId === productDetailId);
+    const product = this.availableProducts.find(p => p.productDetailId == productDetailId);
     return product?.quantity || 0;
   }
 
@@ -702,7 +704,7 @@ export class OrderDetailComponent implements OnInit {
     try {
       // Get voucher details
       const vouchers = await this.voucherService.getValidVoucher(newTotal).toPromise();
-      const isVoucherValid = vouchers?.some(v => v.code === this.order?.voucherCode);
+      const isVoucherValid = vouchers?.some(v => v.code == this.order?.voucherCode);
       
       if (!isVoucherValid) {
         const confirmRemove = await this.showVoucherWarningDialog();
@@ -742,5 +744,44 @@ export class OrderDetailComponent implements OnInit {
       console.error('Error removing voucher:', error);
       this.snackBar.open('Có lỗi xảy ra khi xóa voucher', 'Đóng', { duration: 3000 });
     }
+  }
+
+  applyVoucher() {
+    if (!this.order || !this.newVoucherCode.trim()) {
+      this.snackBar.open('Vui lòng nhập mã giảm giá hợp lệ', 'Đóng', { duration: 3000 });
+      return;
+    }
+
+    this.isLoading = true;
+    this.orderService.addVoucher(this.order.id, this.newVoucherCode.trim()).subscribe({
+      next: (updatedOrder) => {
+        this.order = updatedOrder;
+        this.snackBar.open('Áp dụng mã giảm giá thành công', 'Đóng', { duration: 3000 });
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error applying voucher:', error);
+        this.snackBar.open('Mã giảm giá không hợp lệ hoặc không áp dụng được với đơn hàng này', 'Đóng', { duration: 3000 });
+        this.isLoading = false;
+      }
+    });
+  }
+
+  removeVoucher() {
+    if (!this.order) return;
+
+    this.isLoading = true;
+    this.orderService.removeVoucher(this.order.id).subscribe({
+      next: (updatedOrder) => {
+        this.order = updatedOrder;
+        this.snackBar.open('Đã xóa mã giảm giá', 'Đóng', { duration: 3000 });
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error removing voucher:', error);
+        this.snackBar.open('Có lỗi xảy ra khi xóa mã giảm giá', 'Đóng', { duration: 3000 });
+        this.isLoading = false;
+      }
+    });
   }
 }

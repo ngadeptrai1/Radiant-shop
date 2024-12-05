@@ -2,6 +2,8 @@ package com.backend.cosmetic.rest;
 
 import java.util.List;
 
+import com.backend.cosmetic.mapper.UserMapper;
+import com.backend.cosmetic.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
     private final UserService userService;
+    private final UserRepository userRepository;
 
     @GetMapping
     public ResponseEntity<?> getUsers() {
@@ -117,6 +120,10 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+    @GetMapping("/customer")
+    public ResponseEntity<?> getCustomers() {
+        return ResponseEntity.ok(userRepository.findAllCustomers());
     }
     
 }

@@ -113,7 +113,7 @@ export class POSComponent implements OnInit, OnDestroy {
     // Load existing data
     const loadData$ = forkJoin({
       productDetails: this.productService.getAllProductDetails(),
-      customers: this.userService.getUserByRole('CUSTOMER')
+      customers: this.userService.getAllCustomer()
     });
 
     loadData$.subscribe({
@@ -651,7 +651,7 @@ export class POSComponent implements OnInit, OnDestroy {
   }
 
   private loadCustomers(): void {
-    this.userService.getUserByRole('CUSTOMER').subscribe({
+    this.userService. getAllCustomer().subscribe({
       next: (customers) => {
         this.allCustomers = customers;
         this.filteredCustomers = customers; // Ban đầu hiển thị tất cả
