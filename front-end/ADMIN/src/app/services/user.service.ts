@@ -18,6 +18,24 @@ export class UserService {
     return this.apiService.get<UserResponse>(`${this.endpoint}/me`);
   }
   createUser(userData: UserRequest): Observable<UserResponse> {
+    // Validate required fields
+    if (!userData.fullName?.trim()) {
+      throw new Error('Họ tên không được để trống');
+    }
+    if (!userData.phoneNumber?.match(/^[0-9]{10}$/)) {
+      throw new Error('Số điện thoại không hợp lệ');
+    }
+    if (userData.email && !userData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+      throw new Error('Email không hợp lệ');
+    }
+
+    // For staff/admin users
+    if (userData.role.includes('STAFF') || userData.role.includes('ADMIN')) {
+      if (!userData.password?.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/)) {
+        throw new Error('Mật khẩu phải có ít nhất 6 ký tự, bao gồm chữ và số');
+      }
+    }
+
     if (userData.role.includes('STAFF') || userData.role.includes('ADMIN')) {
       return this.searchStaff('', userData.phoneNumber, userData.email).pipe(
         switchMap(staffs => {
@@ -55,18 +73,29 @@ export class UserService {
     });
   }
   updateUser(id: number, userData: UserRequest): Observable<UserResponse> {
+    // Similar validations as createUser
+    if (!userData.fullName?.trim()) {
+      throw new Error('Họ tên không được để trống');
+    }
+    if (!userData.phoneNumber?.match(/^[0-9]{10}$/)) {
+      throw new Error('Số điện thoại không hợp lệ');
+    }
+    if (userData.email && !userData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+      throw new Error('Email không hợp lệ');
+    }
+
     if (userData.role.includes('STAFF') || userData.role.includes('ADMIN')) {
       return this.searchStaff('', userData.phoneNumber, userData.email).pipe(
         switchMap(staffs => {
           const duplicateStaff = staffs.find(staff => 
             staff.id !== id && (
-              staff.phoneNumber === userData.phoneNumber || 
-              (userData.email && staff.email === userData.email)
+              staff.phoneNumber == userData.phoneNumber || 
+              (userData.email && staff.email == userData.email)
             )
           );
           
           if (duplicateStaff) {
-            if (duplicateStaff.email === userData.email) {
+            if (duplicateStaff.email == userData.email) {
               throw new Error('Email đã được sử dụng');
             }
             throw new Error('Số điện thoại đã được sử dụng');
@@ -80,9 +109,9 @@ export class UserService {
     return this.searchCustomer('', userData.phoneNumber, userData.email).pipe(
       switchMap(customers => {
         const duplicateCustomer = customers.find(customer => 
-          customer.id !== id && (
-            customer.phoneNumber === userData.phoneNumber || 
-            (userData.email && customer.email === userData.email)
+          customer.id != id && (
+            customer.phoneNumber == userData.phoneNumber || 
+            (userData.email && customer.email == userData.email)
           )
         );
         
@@ -109,7 +138,7 @@ export class UserService {
 
   // crud staff
   createStaff(staff: UserRequest): Observable<UserResponse> {
-    return this.searchCustomer('', staff.phoneNumber, staff.email).pipe(
+    return this.searchStaff('', staff.phoneNumber, staff.email).pipe(
       switchMap(users => {
         const isDuplicate = users.some(user => 
           user.phoneNumber === staff.phoneNumber || 
@@ -127,13 +156,13 @@ export class UserService {
       switchMap(users => {
         const duplicateUser = users.find(user => 
           user.id !== id && (
-            user.phoneNumber === staff.phoneNumber || 
-            (staff.email && user.email === staff.email)
+            user.phoneNumber == staff.phoneNumber || 
+            (staff.email && user.email == staff.email)
           )
         );
         
         if (duplicateUser) {
-          if (duplicateUser.email === staff.email) {
+          if (duplicateUser.email == staff.email) {
             throw new Error('Email đã được sử dụng');
           }
           throw new Error('Số điện thoại đã được sử dụng');
@@ -152,4 +181,5 @@ export class UserService {
       params: { username, phone, email } 
     });
   }
+  
 }

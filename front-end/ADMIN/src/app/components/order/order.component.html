@@ -1,18 +1,18 @@
 <div class="container-fluid p-4">
   <div class="order-header mb-4">
-    <h2><i class="fas fa-shopping-cart me-2"></i>Quản lý đơn hàng</h2>
+    <h2><i class="fas fa-shopping-cart me-2"></i>Quản lý hóa đơn</h2>
   </div>
 
   <!-- Order Type Tabs -->
   <ul class="nav nav-pills mb-4">
     <li class="nav-item">
       <a class="nav-link" [class.active]="selectedType == 'POS'" (click)="onTypeChange('POS')">
-        <i class="fas fa-store me-2"></i>Đơn hàng tại quầy
+        <i class="fas fa-store me-2"></i>Hóa đơn tại quầy
       </a>
     </li>
     <li class="nav-item">
       <a class="nav-link" [class.active]="selectedType == 'WEB'" (click)="onTypeChange('WEB')">
-        <i class="fas fa-globe me-2"></i>Đơn hàng website
+        <i class="fas fa-globe me-2"></i>Hóa đơn website
       </a>
     </li>
   </ul>
@@ -80,6 +80,59 @@
       </div>
     </div>
     
+    <!-- Thêm ngay sau Date Range Filter và trước Orders Table -->
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="card-title mb-0">
+                <i class="fas fa-search me-2"></i>Tìm kiếm
+              </h5>
+              <button class="btn btn-outline-secondary btn-sm" 
+                      (click)="resetSearchFilter()"
+                      *ngIf="name || email || phone">
+                <i class="fas fa-times me-1"></i>Xóa tìm kiếm
+              </button>
+            </div>
+            <div class="row g-3">
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label class="form-label">Tên khách hàng</label>
+                  <input type="text" 
+                         class="form-control" 
+                         [(ngModel)]="name">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label class="form-label">Email</label>
+                  <input type="email" 
+                         class="form-control" 
+                         [(ngModel)]="email">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group">
+                  <label class="form-label">Số điện thoại</label>
+                  <input type="text" 
+                         class="form-control" 
+                         [(ngModel)]="phone">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label d-block">&nbsp;</label>
+                <button class="btn btn-primary w-100" 
+                        (click)="onSearch()">
+                  <i class="fas fa-search me-1"></i>Tìm kiếm
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Order Statistics -->
  
   </div>
@@ -97,18 +150,19 @@
       <!-- Thông báo không có đơn hàng -->
       <div *ngIf="!isLoading && filteredOrders.length == 0" class="text-center py-5">
         <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
-        <h4 class="text-muted">Không có đơn hàng nào</h4>
-        <p class="text-muted">Chưa có đơn hàng nào trong mục này</p>
+        <h4 class="text-muted">Không có hóa đơn nào</h4>
+        <p class="text-muted">Chưa có hóa đơn nào trong mục này</p>
       </div>
 
       <!-- Bảng đơn hàng -->
       <table class="table" *ngIf="filteredOrders.length > 0">
         <thead>
           <tr>
-            <th><i class="fas fa-hashtag me-2"></i>Mã đơn</th>
+            <th><i class="fas fa-hashtag me-2"></i>Mã hóa đơn</th>
             <th><i class="fas fa-user me-2"></i>Khách hàng</th>
+            <th><i class="fas fa-phone me-2"></i>Số điện thoại</th>
+            <th><i class="fas fa-envelope me-2"></i>Email</th>
             <th><i class="fas fa-box me-2"></i>Số lượng SP</th>
-            <th><i class="fas fa-money-bill me-2"></i>Tổng tiền</th>
             <th><i class="fas fa-dollar-sign me-2"></i>Thanh toán</th>
             <th><i class="fas fa-calendar me-2"></i>Ngày tạo</th>
             <th><i class="fas fa-credit-card me-2"></i>Thanh toán</th>
@@ -118,10 +172,11 @@
         </thead>
         <tbody>
           <tr *ngFor="let order of paginatedOrders">
-            <td>{{order.id}}</td>
+            <td>#{{order.id}}</td>
             <td>{{order.fullName}}</td>
+            <td>{{order.phoneNumber}}</td>
+            <td>{{order.email}}</td>
             <td>{{order.totalItems}}</td>
-            <td>{{formatCurrency(order.totalOrderAmount)}}</td>
             <td>{{formatCurrency(order.finalAmount)}}</td>
             <td>{{order.createdDate | date:'dd/MM/yyyy HH:mm'}}</td>
             <td>

@@ -105,7 +105,7 @@ export interface BrandReq {
     thumbnail: string;
     category: string;
     brand: string;
- 
+    quantity: number;
   }
 
 
@@ -161,6 +161,7 @@ export interface BrandReq {
     id: number;
     fullName: string;
     phoneNumber: string;
+    username: string;
     email: string;
     password: string;
     role: string;
@@ -243,3 +244,21 @@ export interface ProductReview {
   productId: number;
 }
 
+export interface LoginDto {
+  username: string;
+  password: string;
+}
+export interface User {
+  id: number;
+  username: string;
+  email: string;
+  fullName: string;
+  phoneNumber: string;
+}
+
+
+export interface AuthResponse {
+  accessToken: string;
+  refreshToken: string;
+  userId: number;
+}

@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { OrderService } from '../../services/order.service';
 import { CommonModule} from '@angular/common';
-import { OrderDetailResponse, OrderResponse } from '../../../type';
+import { OrderDetailResponse, OrderResponse, Voucher } from '../../../type';
 import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../services/product.service';
 import { ProductDetailResponse } from '../../../type';
@@ -11,6 +11,7 @@ import { forkJoin, throwError, TimeoutError } from 'rxjs';
 import { timeout, catchError, finalize } from 'rxjs/operators';
 import { debounceTime } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { VoucherService } from '../../services/voucher-service.service';
 declare var bootstrap: any;
 
 @Component({
@@ -34,7 +35,9 @@ export class OrderDetailComponent implements OnInit {
   errorMessage: string = '';
   loadingProductsTimeout: any;
   selectedProduct: ProductDetailResponse | null = null;
-
+  statusDates: { [key: string]: string } = {};
+  newAddQuantity: number = 1;
+  voucherOrder: Voucher | null = null;
   @ViewChild('confirmModal') confirmModal!: ElementRef;
   @ViewChild('updateModal') updateModal!: ElementRef;
   @ViewChild('cancelModal') cancelModal!: ElementRef;
@@ -49,7 +52,8 @@ export class OrderDetailComponent implements OnInit {
     private productService: ProductService,
     private pdfExportService: PdfExportService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private voucherService: VoucherService
   ) {
 
 
@@ -58,7 +62,7 @@ export class OrderDetailComponent implements OnInit {
   ngOnInit() {
     this.loadOrderData();
   }
-
+  
   private loadOrderData() {
     const orderId = this.route.snapshot.params['id'];
     if (!orderId) {
@@ -156,13 +160,17 @@ export class OrderDetailComponent implements OnInit {
   }
 
   isStatusCompleted(status: string): boolean {
-    if (this.order?.status == 'CANCELLED') {
+    if (!this.order) return false;
+    
+    // Nếu là đơn POS hoặc đã hủy, không có trạng thái completed
+    if (this.order.type === 'POS' || this.order.status === 'CANCELLED') {
       return false;
     }
     
     const statusOrder = ['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'SUCCESS'];
-    const currentIndex = statusOrder.indexOf(this.order?.status || '');
+    const currentIndex = statusOrder.indexOf(this.order.status);
     const statusIndex = statusOrder.indexOf(status);
+    
     return currentIndex > -1 && statusIndex < currentIndex;
   }
 
@@ -363,7 +371,7 @@ export class OrderDetailComponent implements OnInit {
 
   resetForm() {
     this.selectedProductId = 0;
-    this.newQuantity = 1;
+    this.newAddQuantity = 1;
     this.editingDetailId = null;
   }
 
@@ -378,69 +386,68 @@ export class OrderDetailComponent implements OnInit {
     this.newQuantity = 1;
   }
 
-  validateQuantity(quantity: number, productDetailId: number): boolean {
-    // Tìm sản phẩm trong availableProducts
-    const product = this.availableProducts.find(p => p.id == productDetailId);
-    if (!product) {
-      console.error('Không tìm thấy sản phẩm trong kho');
+  validateQuantity(newQuantity: number, productDetailId: number): boolean {
+    const productInStock = this.availableProducts.find(p => p.productDetailId == productDetailId);
+    if (!productInStock) {
+      this.snackBar.open('Không tìm thấy sản phẩm trong kho 1', 'Đóng', { duration: 3000 });
       return false;
     }
 
-    // Tìm sản phẩm trong orderDetails hiện tại
-    const existingOrderDetail = this.orderDetails.find(
-      od => od.productDetailId == productDetailId
-    );
-    console.log(productDetailId);
-    
-    console.log(this.orderDetails);
-    
-    // Log để debug
-    console.log('Product in stock:', product);
-    console.log('Existing order detail:', existingOrderDetail);
-    console.log('New quantity:', quantity);
-    
-    // Nếu sản phẩm chưa có trong đơn hàng
-    if (!existingOrderDetail) {
-      return quantity <= product.quantity;
+    const existingOrderDetail = this.orderDetails.find(detail => detail.productDetailId === productDetailId);
+    const totalQuantity = existingOrderDetail ? existingOrderDetail.quantity + newQuantity : newQuantity;
+
+    if (totalQuantity > productInStock.quantity) {
+      this.snackBar.open(`Số lượng vượt quá tồn kho (còn ${productInStock.quantity} sản phẩm)`, 'Đóng', { duration: 3000 });
+      return false;
     }
-    
-    // Nếu đang cập nhật số lượng sản phẩm đã có
-    if (this.editingDetailId == productDetailId) {
-      return quantity <= product.quantity;
-    }
-    
-    // Nếu thêm số lượng cho sản phẩm đã có trong đơn hàng
-    const totalQuantity = existingOrderDetail.quantity + quantity;
-    return totalQuantity <= product.quantity;
+
+    return true;
   }
 
   addOrderDetail() {
-    if (!this.selectedProductId || !this.order || this.newQuantity < 1) {
-      console.error('Invalid input data');
-      return;
-    }
-
-    // Log để debug
-    console.log('Adding product:', {
-      selectedProductId: this.selectedProductId,
-      newQuantity: this.newQuantity,
-      availableProducts: this.availableProducts
-    });
-
-    // Validate số lượng trước khi thêm
-    if (!this.validateQuantity(this.newQuantity, this.selectedProductId)) {
-      this.snackBar.open('Số lượng vượt quá số lượng trong kho! Vui lòng kiểm tra lại số lượng sản phẩm đã có trong đơn hàng.', 'Đóng', {
+    if (!this.selectedProductId || !this.order || this.newAddQuantity < 1) {
+      this.snackBar.open('Vui lòng chọn sản phẩm và nhập số lượng hợp lệ', 'Đóng', {
         duration: 3000,
       });
       return;
     }
 
+    // Kiểm tra sản phẩm trong kho
+    const productInStock = this.availableProducts.find(p => p.productDetailId == this.selectedProductId);
+    if (!productInStock) {
+      this.snackBar.open('Không tìm thấy sản phẩm trong kho 2', 'Đóng', { duration: 3000 });
+      return;
+    }
+
+    // Kiểm tra sản phẩm đã có trong đơn hàng chưa
+    const existingOrderDetail = this.orderDetails.find(detail => detail.productDetailId == this.selectedProductId);
+    if (existingOrderDetail) {
+      const totalQuantity = existingOrderDetail.quantity + this.newAddQuantity;
+      if (totalQuantity > productInStock.quantity) {
+        this.snackBar.open(
+          `Tổng số lượng (${totalQuantity}) vượt quá số trong kho (${productInStock.quantity}). Sản phẩm này đã có ${existingOrderDetail.quantity} trong đơn hàng.`, 
+          'Đóng', 
+          { duration: 3000 }
+        );
+        return;
+      }
+    } else {
+      // Sản phẩm chưa có trong đơn hàng
+      if (this.newAddQuantity > productInStock.quantity) {
+        this.snackBar.open(`Số lượng vượt quá số trong kho (${productInStock.quantity})`, 'Đóng', { duration: 3000 });
+        return;
+      }
+    }
+
     this.isLoading = true;
-    this.orderService.addOrderDetail(this.order.id, this.selectedProductId, this.newQuantity)
+    this.orderService.addOrderDetail(this.order.id, this.selectedProductId, this.newAddQuantity)
       .subscribe({
         next: () => {
           this.loadOrderDetails(this.order!.id);
           this.resetForm();
+          this.snackBar.open('Thêm sản phẩm thành công', 'Đóng', {
+            duration: 3000,
+          });
           this.isLoading = false;
         },
         error: (error) => {
@@ -454,20 +461,27 @@ export class OrderDetailComponent implements OnInit {
       });
   }
 
-  updateOrderDetail(detailId: number) {
-    if (!this.canEditOrder()) {
-      alert('Không thể cập nhật số lượng sản phẩm!');
+  async updateOrderDetail(detailId: number) {
+    if (!this.canEditOrder()) return;
+
+    const orderDetail = this.orderDetails.find(detail => detail.id === detailId);
+    if (!orderDetail || !this.order || this.newQuantity < 1) return;
+
+    const productInStock = this.availableProducts.find(p => p.productDetailId === orderDetail.productDetailId);
+    if (!productInStock || this.newQuantity > productInStock.quantity) {
+      this.snackBar.open(`Số lượng vượt quá số trong kho (${productInStock?.quantity || 0})`, 'Đóng', { duration: 3000 });
       return;
     }
 
-    if (!this.order || this.newQuantity < 1) {
-      console.error('Invalid input data');
-      return;
-    }
+    // Calculate new total
+    const currentAmount = orderDetail.price * orderDetail.quantity;
+    const newAmount = orderDetail.price * this.newQuantity;
+    const totalDifference = newAmount - currentAmount;
+    const newTotal = (this.order.totalOrderAmount || 0) + totalDifference;
 
-    // Validate số lượng trước khi cập nhật
-    if (!this.validateQuantity(this.newQuantity, detailId)) {
-      alert('Số lượng vượt quá số lượng trong kho!');
+    // Validate voucher with new total
+    const isVoucherValid = await this.validateVoucherAfterEdit(newTotal);
+    if (!isVoucherValid) {
       return;
     }
 
@@ -481,31 +495,47 @@ export class OrderDetailComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error updating quantity:', error);
-          if (error.error?.message) {
-            alert(error.error.message);
-          } else {
-            alert('Có lỗi xảy ra khi cập nhật số lượng');
-          }
           this.isLoading = false;
+          this.snackBar.open('Có lỗi xảy ra khi cập nhật số lượng', 'Đóng', { duration: 3000 });
         }
       });
   }
 
-  deleteOrderDetail(detailId: number) {
+  async deleteOrderDetail(detailId: number) {
     if (!this.canEditOrder()) {
-      alert('Không thể xóa sản phẩm khỏi đơn hàng!');
+      this.snackBar.open('Không thể xóa sản phẩm khỏi đơn hàng!', 'Đóng', { duration: 3000 });
       return;
     }
+
+    if (!this.canDeleteOrderDetail()) {
+      this.snackBar.open('Không thể xóa sản phẩm cuối cùng trong đơn hàng!', 'Đóng', { duration: 3000 });
+      return;
+    }
+
     if (!this.order || !confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) return;
+
+    // Calculate new total
+    const orderDetail = this.orderDetails.find(detail => detail.id === detailId);
+    if (!orderDetail) return;
+
+    const newTotal = this.order.totalOrderAmount - (orderDetail.price * orderDetail.quantity);
+    
+    // Validate voucher with new total
+    const isVoucherValid = await this.validateVoucherAfterEdit(newTotal);
+    if (!isVoucherValid) {
+      return;
+    }
 
     this.isLoading = true;
     this.orderService.deleteOrderDetail(this.order.id, detailId)
       .subscribe({
         next: () => {
           this.loadOrderDetails(this.order!.id);
+          this.snackBar.open('Xóa sản phẩm thành công', 'Đóng', { duration: 3000 });
         },
         error: (error) => {
           console.error('Error deleting product:', error);
+          this.snackBar.open('Có lỗi xảy ra khi xóa sản phẩm', 'Đóng', { duration: 3000 });
           this.isLoading = false;
         }
       });
@@ -578,7 +608,7 @@ export class OrderDetailComponent implements OnInit {
 
   // Cập nhật method khi chọn sản phẩm
   onProductSelect(productId: number) {
-    this.selectedProduct = this.availableProducts.find(p => p.id == productId) || null;
+    this.selectedProduct = this.availableProducts.find(p => p.productDetailId === productId) || null;
     if (this.selectedProduct) {
       // Reset số lượng khi chọn sản phẩm mới
       this.newQuantity = 1;
@@ -652,5 +682,65 @@ export class OrderDetailComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  // Thêm phương thức mới để load ngày của các trạng thái
+
+  // Thêm phương thức để lấy ngày của từng trạng thái
+  getStatusDate(status: string): string | null {
+    return this.statusDates[status] || null;
+  }
+
+  getAvailableQuantity(productDetailId: number): number {
+    const product = this.availableProducts.find(p => p.productDetailId === productDetailId);
+    return product?.quantity || 0;
+  }
+
+  private async validateVoucherAfterEdit(newTotal: number): Promise<boolean> {
+    if (!this.order?.voucherCode) return true;
+    
+    try {
+      // Get voucher details
+      const vouchers = await this.voucherService.getValidVoucher(newTotal).toPromise();
+      const isVoucherValid = vouchers?.some(v => v.code === this.order?.voucherCode);
+      
+      if (!isVoucherValid) {
+        const confirmRemove = await this.showVoucherWarningDialog();
+        if (confirmRemove) {
+          // Remove voucher from order
+          await this.removeVoucherFromOrder();
+          return true;
+        }
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error('Error validating voucher:', error);
+      return false;
+    }
+  }
+
+  private showVoucherWarningDialog(): Promise<boolean> {
+    return new Promise((resolve) => {
+      const result = confirm(
+        'Sau khi chỉnh sửa, đơn hàng không đủ điều kiện áp dụng voucher hiện tại. Bạn có muốn tiếp tục và xóa voucher không?'
+      );
+      resolve(result);
+    });
+  }
+
+  private async removeVoucherFromOrder(): Promise<void> {
+    if (!this.order) return;
+    
+    try {
+      const updatedOrder = await this.orderService.removeVoucher(this.order.id).toPromise();
+      if (updatedOrder) {
+        this.order = updatedOrder;
+        this.snackBar.open('Đã xóa voucher khỏi đơn hàng', 'Đóng', { duration: 3000 });
+      }
+    } catch (error) {
+      console.error('Error removing voucher:', error);
+      this.snackBar.open('Có lỗi xảy ra khi xóa voucher', 'Đóng', { duration: 3000 });
+    }
   }
 }

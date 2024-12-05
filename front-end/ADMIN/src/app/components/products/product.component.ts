@@ -20,6 +20,7 @@ import { BrandService } from '../../services/brand-service.service';
 import { CategoryService } from '../../services/category-service.service';
 import { ColorService } from '../../services/color.service';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-tables',
@@ -32,13 +33,13 @@ import { Router } from '@angular/router';
     MatTooltipModule,
     MatInputModule,
     MatFormFieldModule,
-    MatButton,MatSlideToggle
+    MatButton,MatSlideToggle,CommonModule
   ],
   templateUrl: './product.component.html',
   styleUrl: './product.component.scss',
 })
 export class ProductComponent {
-  displayedColumns: string[] = ['id', 'name', 'thumbnail', 'activate', 'category', 'brand', 'actions'];
+  displayedColumns: string[] = ['id', 'name', 'thumbnail', 'activate', 'category', 'brand', 'quantity', 'actions'];
   dataSource: MatTableDataSource<ProductResponse>;
   isLoading = false;
   categories: Category[] = [];

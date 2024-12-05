@@ -200,32 +200,58 @@
               <!-- Thông tin nhân viên -->
               <div class="mb-3">
                 <label class="form-label">Nhân viên bán hàng</label>
-                <input type="text" class="form-control" value="Nga đẹp trai " readonly>
+                <input type="text" class="form-control" [value]="currentUserName" readonly>
               </div>
 
               <!-- Chọn khách hàng -->
-              <div class="mb-3">
+              <div class="mb-3 customer-search-container">
                 <label class="form-label">Khách hàng</label>
                 <div class="d-flex gap-2">
-                  <div class="input-group">
-                    <select class="form-control" 
-                            [(ngModel)]="selectedCustomer" 
-                            (ngModelChange)="onCustomerSelected($event)">
-                      @for (customer of customers; track customer.id) {
-                        <option [ngValue]="customer" [selected]="customer.id == defaultCustomerId">
-                          {{customer.fullName}} - {{customer.phoneNumber}}
-                        </option>
-                      }
-                    </select>
+                  <div class="input-group position-relative">
+                    <input type="text" 
+                           class="form-control"
+                           [(ngModel)]="searchCustomerTerm"
+                           (ngModelChange)="searchCustomers()"
+                           (focus)="showCustomerDropdown=true"
+                           (click)="showCustomerDropdown=true"
+                           placeholder="Tìm kiếm theo tên hoặc số điện thoại...">
                     <button class="btn btn-outline-primary" 
                             type="button" 
                             (click)="openAddCustomerModal()">
                       <i class="fas fa-plus"></i> Thêm mới
                     </button>
+
+                    <!-- Dropdown danh sách khách hàng -->
+                    <div class="position-absolute top-100 start-0 w-100 mt-1" 
+                         style="z-index: 1000; max-height: 300px; overflow-y: auto;"
+                         *ngIf="showCustomerDropdown">
+                      <div class="list-group shadow">
+                        @if (filteredCustomers.length === 0) {
+                          <div class="list-group-item text-center text-muted">
+                            Không tìm thấy khách hàng
+                          </div>
+                        } @else {
+                          @for (customer of filteredCustomers; track customer.id) {
+                            <a class="list-group-item list-group-item-action"
+                               (click)="onCustomerSelected(customer)">
+                              <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                  <strong>{{customer.fullName}}</strong>
+                                  <small class="d-block text-muted">{{customer.phoneNumber}}</small>
+                                </div>
+                                @if (customer.email) {
+                                  <small class="text-muted">{{customer.email}}</small>
+                                }
+                              </div>
+                            </a>
+                          }
+                        }
+                      </div>
+                    </div>
                   </div>
                 </div>
                 
-                <!-- Hiển thị thông tin khch hàng đã chọn -->
+                <!-- Hiển thị thông tin khách hàng đã chọn -->
                 @if (selectedCustomer) {
                   <div class="mt-2 p-2 border rounded">
                     <div class="d-flex justify-content-between align-items-center">
@@ -236,6 +262,9 @@
                           <div class="text-muted">Email: {{selectedCustomer.email}}</div>
                         }
                       </div>
+                      <button class="btn btn-sm btn-outline-danger" (click)="clearSelectedCustomer()">
+                        <i class="fas fa-times"></i>
+                      </button>
                     </div>
                   </div>
                 }
@@ -243,12 +272,12 @@
 
               <!-- Chọn voucher -->
               <div class="mb-3">
-                <label class="form-label">Voucher</label>
+                <label class="form-label">Giảm giá</label>
                 <select 
                   class="form-control" 
                   [(ngModel)]="currentOrder.voucherCode"
                 >
-                  <option value="">Chọn voucher</option>
+                  <option value="">Chọn mã giảm giá</option>
                   @for (voucher of listVoucher; track voucher.code) {
                     <option [value]="voucher.code">
                       {{voucher.code}} - 
@@ -265,7 +294,7 @@
                 <label class="form-label">Phương thức thanh toán</label>
                 <select class="form-control" [(ngModel)]="currentOrder.paymentMethod">
                   <option value="CASH">Tiền mặt</option>
-                  <option value="CARD">Thẻ ngân hàng</option>
+                  <option value="CARD">Chuyển khoản</option>
                 </select>
               </div>
 

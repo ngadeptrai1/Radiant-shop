@@ -2,12 +2,9 @@ package com.backend.cosmetic.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -39,7 +36,6 @@ import com.backend.cosmetic.service.VoucherService;
 import com.backend.cosmetic.specification.OrderSpecification;
 import com.cloudinary.utils.StringUtils;
 
-import jakarta.annotation.PreDestroy;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 @Component
@@ -130,8 +126,9 @@ public class OrderServiceImpl implements OrderService {
                 throw new RuntimeException(e);
             }
         }
+        
         // Save final order
-        return orderMapper.toResponseDto( orderRepository.save(order));
+        return orderMapper.toResponseDto(orderRepository.save(order));
     }
 
     // Helper methods
@@ -199,30 +196,29 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private List<OrderDetail> processOrderDetails(Order order, List<OrderDetailDTO> detailDTOs) {
-        return detailDTOs.parallelStream()
-                .map(detail -> createOrderDetail(order, detail))
-                .collect(Collectors.toList());
+        List<OrderDetail> list = new LinkedList<>();
+
+        detailDTOs.forEach(detailDTO -> {
+            list.add(createOrderDetail(order, detailDTO));
+        });
+        return orderDetailRepository.saveAll(list);
     }
 
     private OrderDetail createOrderDetail(Order order, OrderDetailDTO detail) {
         ProductDetail productDetail = productDetailRepo.findById(detail.getProductDetailId())
                 .orElseThrow(() -> new DataNotFoundException("Product detail not found"));
-                
+
         // Validate stock
         if (productDetail.getQuantity() < detail.getQuantity()) {
             throw new DataInvalidException("Insufficient stock for product: " + productDetail.getId());
         }
-        
-        // Update stock
-        productDetail.setQuantity(productDetail.getQuantity() - detail.getQuantity());
-        productDetailRepo.save(productDetail);
         OrderDetail orderDetail = OrderDetail.builder()
                 .order(order)
                 .quantity(detail.getQuantity())
                 .productDetail(productDetail)
                 .price(productDetail.getSalePrice())
                 .build();
-        return orderDetailRepository.save(orderDetail);
+        return orderDetail;
     }
 
     private void calculateOrderTotals(Order order) {
@@ -306,13 +302,16 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderResponse> findAllByStatusAndCreatedDateBetween(
             String status, 
             LocalDateTime start, 
-            LocalDateTime end) {
+            LocalDateTime end,
+            String name,
+            String email,
+            String phone) {
         
         if (status != null && !isValidStatus(status)) {
             throw new DataInvalidException("Invalid order status: " + status);
         }
         
-        Specification<Order> spec = OrderSpecification.getOrderSpecification(status, start, end);
+        Specification<Order> spec = OrderSpecification.getOrderSpecification(status, start, end, name, email, phone);
         return orderMapper.toResponseDtoList(orderRepository.findAll(spec));
     }
 
@@ -529,5 +528,21 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toResponseDto(orderRepository.save(order));  
     }
 
+    @Override
+    public OrderResponse deleteVoucher(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new DataNotFoundException("Order not found"));
+        order.setVoucher(null);
+        order.setFinalAmount(order.getTotalOrderAmount()+order.getShippingCost());
+        order.setVoucherAmount(0);
+        return orderMapper.toResponseDto(orderRepository.save(order));
+    }
 
+    @Override
+    public OrderResponse addVoucher(Long orderId, String code) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new DataNotFoundException("Order not found"));
+        applyVoucherIfPresent(order, code);
+        return orderMapper.toResponseDto(orderRepository.save(order));
+    }
 }

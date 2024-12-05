@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { UserService } from '../../services/user.service';
 import { UserRequest, UserResponse } from '../../../type';
 import { MatTabsModule } from '@angular/material/tabs';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -70,43 +70,88 @@ export class UserComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
+    this.initializeDataSource(this.users);
+    if (this.dataSource) {
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
+    }
+  }
+
+  private initializeDataSource(data: UserResponse[]) {
+    this.dataSource = new MatTableDataSource(data);
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
-    
-    this.dataSource.filterPredicate = (data: UserResponse, filter: string) => {
-      const searchStr = filter.toLowerCase();
-      return data.fullName?.toLowerCase().includes(searchStr) ||
-             data.email?.toLowerCase().includes(searchStr) ||
-             data.phoneNumber?.includes(searchStr) ||
-             this.translateRole(data.roles[0]).toLowerCase().includes(searchStr);
-    };
 
-    this.dataSource.sortingDataAccessor = (item: UserResponse, property: string) => {
-      switch(property) {
-        case 'role':
-          return this.translateRole(item.roles[0]);
-        case 'fullName':
-          return item.fullName || '';
-        case 'email':
-          return item.email || '';
-        case 'phoneNumber':
-          return item.phoneNumber || '';
-        default:
-          return (item as any)[property];
-      }
-    };
+    if (this.paginator) {
+      this.paginator._intl.itemsPerPageLabel = "Số dòng trên trang";
+      this.paginator._intl.nextPageLabel = "Trang sau";
+      this.paginator._intl.previousPageLabel = "Trang trước";
+      this.paginator._intl.getRangeLabel = (page: number, pageSize: number, length: number) => {
+        if (length === 0 || pageSize === 0) {
+          return `0 / ${length}`;
+        }
+        length = Math.max(length, 0);
+        const startIndex = page * pageSize;
+        const endIndex = startIndex < length ? Math.min(startIndex + pageSize, length) : startIndex + pageSize;
+        return `${startIndex + 1} - ${endIndex} / ${length}`;
+      };
+    }
+  }
+
+  sortData(sort: any) {
+    this.dataSource.sort = this.sort;
   }
 
   loadUsers() {
     this.isLoading = true;
-    const loadFunction = this.activeTab === 'customer' 
+    const loadFunction = this.activeTab == 'customer' 
       ? this.userService.searchCustomer()
       : this.userService.searchStaff();
 
     loadFunction.subscribe({
       next: (users) => {
-        this.users = users;
-        this.dataSource.data = users;
+        const filteredUsers = this.activeTab === 'customer'
+          ? users.filter(user => user.roles.includes('CUSTOMER'))
+          : users.filter(user => user.roles.some(role => this.staffRoles.includes(role)));
+
+        this.dataSource = new MatTableDataSource<UserResponse>(filteredUsers);
+        
+        if (this.paginator) {
+          this.dataSource.paginator = this.paginator;
+          this.paginator.pageSize = 10;
+          this.paginator.pageIndex = 0;
+          
+          this.paginator._intl.itemsPerPageLabel = "Số dòng trên trang";
+          this.paginator._intl.nextPageLabel = "Trang sau";
+          this.paginator._intl.previousPageLabel = "Trang trước";
+          this.paginator._intl.firstPageLabel = "Trang đầu";
+          this.paginator._intl.lastPageLabel = "Trang cuối";
+          this.paginator._intl.getRangeLabel = (page: number, pageSize: number, length: number) => {
+            if (length === 0 || pageSize === 0) {
+              return `0 / ${length}`;
+            }
+            length = Math.max(length, 0);
+            const startIndex = page * pageSize;
+            const endIndex = startIndex < length ? Math.min(startIndex + pageSize, length) : startIndex + pageSize;
+            return `${startIndex + 1} - ${endIndex} / ${length}`;
+          };
+        }
+        
+        if (this.sort) {
+          this.dataSource.sort = this.sort;
+        }
+
+        this.dataSource.filterPredicate = (data: UserResponse, filter: string) => {
+          const searchStr = filter.toLowerCase();
+          return (
+            (data.phoneNumber?.toLowerCase().includes(searchStr) || '') ||
+            (data.email?.toLowerCase().includes(searchStr) || '') ||
+            (data.fullName?.toLowerCase().includes(searchStr) || '') ||
+            this.translateRole(data.roles[0]).toLowerCase().includes(searchStr)
+          );
+        };
+
+        this.table?.renderRows();
       },
       error: (error) => {
         console.error('Lỗi khi tải danh sách người dùng:', error);
@@ -119,6 +164,14 @@ export class UserComponent implements OnInit, AfterViewInit {
         this.isLoading = false;
       }
     });
+  }
+
+ 
+
+  ngDoCheck() {
+    if (this.dataSource && !this.dataSource.paginator && this.paginator) {
+      this.dataSource.paginator = this.paginator;
+    }
   }
 
   onRoleChange() {
@@ -159,6 +212,9 @@ export class UserComponent implements OnInit, AfterViewInit {
   }
 
   applyFilter(event: Event) {
+    if (!this.dataSource) {
+      return;
+    }
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
 

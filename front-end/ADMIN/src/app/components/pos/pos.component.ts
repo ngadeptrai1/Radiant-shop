@@ -17,6 +17,7 @@ import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { firstValueFrom } from 'rxjs';
 import { PdfExportService } from '../../services/pdf-export.service';
+import { AuthService } from '../../services/auth.service';
 
 // Thêm interface để kiểm tra trạng thái sản phẩm
 interface ProductDetailWithStatus {
@@ -50,6 +51,7 @@ export class POSComponent implements OnInit, OnDestroy {
   listVoucher: Voucher[] = [];
   searchCustomerTerm: string = '';
   filteredCustomers: UserResponse[] = [];
+  showCustomerDropdown = false;
   private searchSubject = new Subject<string>();
   showAddCustomerModal = false;
   customers: UserResponse[] = [];
@@ -59,6 +61,7 @@ export class POSComponent implements OnInit, OnDestroy {
   currentUserId: number = 11; // id cua khach le
   newCustomer: UserRequest = {
     id: 0,
+    username: '',
     password: '',
     fullName: '',
     phoneNumber: '',
@@ -86,6 +89,11 @@ export class POSComponent implements OnInit, OnDestroy {
   // Thêm biến để lưu trạng thái switch
   autoPrintInvoice: boolean = false;
 
+  // Thêm biến để lưu trữ tất cả khách hàng
+  allCustomers: UserResponse[] = [];
+
+  currentUserName: string = '';
+
   constructor(
     private orderService: OrderService,
     private productService: ProductService,
@@ -93,7 +101,8 @@ export class POSComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private userService: UserService,
-    private pdfExportService: PdfExportService
+    private pdfExportService: PdfExportService,
+    private authService: AuthService
   ) {
     this.loadCustomers();
     this.addNewEmptyOrder();
@@ -101,16 +110,26 @@ export class POSComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Load all required data
+    // Load existing data
     const loadData$ = forkJoin({
       productDetails: this.productService.getAllProductDetails(),
-      // Add other data loading observables here if needed
+      customers: this.userService.getUserByRole('CUSTOMER')
     });
 
     loadData$.subscribe({
       next: (data) => {
         this.productDetails = data.productDetails;
+        this.allCustomers = data.customers;
+        this.filteredCustomers = [...this.allCustomers]; // Khởi tạo danh sách lọc
         this.filterProducts();
+        
+        // Set default customer
+        const defaultCustomer = this.allCustomers.find(c => c.id === this.defaultCustomerId);
+        if (defaultCustomer) {
+          this.selectedCustomer = defaultCustomer;
+          this.updateOrderCustomerInfo(defaultCustomer);
+        }
+        
         this.isLoading = false;
       },
       error: (error) => {
@@ -118,6 +137,12 @@ export class POSComponent implements OnInit, OnDestroy {
         this.isLoading = false;
       }
     });
+
+    // Lấy thông tin người dùng hiện tại
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser) {
+      this.currentUserName = currentUser.fullName;
+    }
   }
   getValidVoucher(amount: number): void {
     if (amount <= 0) {
@@ -528,12 +553,31 @@ export class POSComponent implements OnInit, OnDestroy {
   }
 
   searchCustomers(): void {
-    this.searchSubject.next(this.searchCustomerTerm);
+    const searchTerm = this.searchCustomerTerm.toLowerCase().trim();
+    
+    // Nếu searchTerm rỗng, hiển thị tất cả khách hàng
+    if (!searchTerm) {
+      this.filteredCustomers = [...this.allCustomers];
+      return;
+    }
+
+    // Lọc khách hàng dựa trên tên hoặc số điện thoại
+    this.filteredCustomers = this.allCustomers.filter(customer => 
+      customer.fullName.toLowerCase().includes(searchTerm) || 
+      (customer.phoneNumber && customer.phoneNumber.includes(searchTerm)) ||
+      (customer.email && customer.email.toLowerCase().includes(searchTerm))
+    );
+
+    console.log('Search term:', searchTerm); // Debug
+    console.log('Filtered customers:', this.filteredCustomers); // Debug
   }
 
   onCustomerSelected(customer: UserResponse): void {
     this.selectedCustomer = customer;
     this.updateOrderCustomerInfo(customer);
+    this.searchCustomerTerm = ''; // Clear search term
+    this.filteredCustomers = []; // Clear results
+    this.showCustomerDropdown = false;
   }
 
   clearSelectedCustomer(): void {
@@ -552,6 +596,7 @@ export class POSComponent implements OnInit, OnDestroy {
       fullName: '',
       phoneNumber: '',
       email: '',
+      username: '',
       role: 'CUSTOMER'
     };
   }
@@ -562,8 +607,8 @@ export class POSComponent implements OnInit, OnDestroy {
 
   async createNewCustomer() {
     try {
+      this.isCreating = true;
       this.customerError = '';
-      const isCreating = true; // Biến loading riêng cho form thêm khách hàng
       
       // Check if customer already exists
       const existingCustomers = await firstValueFrom(
@@ -572,6 +617,7 @@ export class POSComponent implements OnInit, OnDestroy {
 
       if (existingCustomers.length > 0) {
         this.customerError = 'Khách hàng đã tồn tại trong hệ thống!';
+        this.isCreating = false;
         return;
       }
 
@@ -580,29 +626,35 @@ export class POSComponent implements OnInit, OnDestroy {
         this.userService.createWalkInUser(this.newCustomer)
       );
 
-      // Cập nhật lại danh sách khách hàng
-      await this.loadCustomers();
+      // Thêm khách hàng mới vào danh sách
+      this.allCustomers = [...this.allCustomers, createdCustomer];
+      this.filteredCustomers = [...this.allCustomers];
       
-      // Set as selected customer và cập nhật thông tin đơn hàng
+      // Tự động chọn khách hàng vừa tạo
       this.selectedCustomer = createdCustomer;
-      this.currentOrder.fullName = createdCustomer.fullName;
-      this.currentOrder.phoneNumber = createdCustomer.phoneNumber;
-      this.currentOrder.userId = createdCustomer.id;
+      this.updateOrderCustomerInfo(createdCustomer);
       
+      // Đóng modal và hiển thị thông báo thành công
       this.closeAddCustomerModal();
+      this.snackBar.open('Thêm khách hàng mới thành công!', 'Đóng', {
+        duration: 3000,
+        horizontalPosition: 'end',
+        verticalPosition: 'top',
+      });
       
-      // Show success message
-      this.successMessage = 'Thêm khách hàng mới thành công!';
-      setTimeout(() => this.successMessage = '', 3000);
     } catch (error) {
+      console.error('Lỗi khi thêm khách hàng:', error);
       this.customerError = 'Có lỗi xảy ra khi thêm khách hàng. Vui lòng thử lại!';
+    } finally {
+      this.isCreating = false;
     }
   }
 
   private loadCustomers(): void {
     this.userService.getUserByRole('CUSTOMER').subscribe({
       next: (customers) => {
-        this.customers = customers;
+        this.allCustomers = customers;
+        this.filteredCustomers = customers; // Ban đầu hiển thị tất cả
         // Set default customer
         const defaultCustomer = customers.find(c => c.id == this.defaultCustomerId);
         if (defaultCustomer) {
@@ -792,5 +844,12 @@ export class POSComponent implements OnInit, OnDestroy {
       product.id === id ? { ...product, quantity: remainingQuantity } : product
     );
     this.filterProducts();
+  }
+
+  @HostListener('document:click', ['$event'])
+  closeCustomerDropdown(event: any): void {
+    if (!event.target.closest('.customer-search-container')) {
+      this.showCustomerDropdown = false;
+    }
   }
 }

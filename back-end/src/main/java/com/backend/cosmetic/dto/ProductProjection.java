@@ -8,5 +8,5 @@ public interface ProductProjection {
     String getThumbnail();
     String getCategory();
     String getBrand();
-    
+    Integer getQuantity();
 }

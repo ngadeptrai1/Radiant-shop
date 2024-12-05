@@ -111,10 +111,12 @@ export class UserDialogComponent {
       fullName: [data.user?.fullName || '', [
         Validators.required,
         Validators.minLength(2),
-        Validators.maxLength(50)
+        Validators.maxLength(50),
+        Validators.pattern(/^[a-zA-ZÀ-ỹ\s]*$/)
       ]],
       email: [data.user?.email || '', [
-        Validators.email
+        Validators.email,
+        Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
       ]],
       phoneNumber: [data.user?.phoneNumber || '', [
         Validators.required,
@@ -129,7 +131,7 @@ export class UserDialogComponent {
       ] : []]
     });
 
-    // Chỉ disable email khi cập nhật nhân viên
+    // Disable email khi cập nhật nhân viên
     if (data.user && data.type === 'Staff') {
       this.userForm.get('email')?.disable();
     }
@@ -150,24 +152,30 @@ export class UserDialogComponent {
 
   getErrorMessage(controlName: string): string {
     const control = this.userForm.get(controlName);
-    if (control?.hasError('required')) {
+    if (!control) return '';
+
+    if (control.hasError('required')) {
       return 'Trường này là bắt buộc';
     }
-    if (control?.hasError('email')) {
+    if (control.hasError('email')) {
       return 'Email không đúng định dạng';
     }
-    if (control?.hasError('pattern')) {
-      if (controlName === 'phoneNumber') {
-        return 'Số điện thoại phải có 10 chữ số';
-      }
-      if (controlName === 'password') {
-        return 'Mật khẩu phải có ít nhất 6 ký tự, bao gồm chữ và số';
+    if (control.hasError('pattern')) {
+      switch (controlName) {
+        case 'phoneNumber':
+          return 'Số điện thoại phải có 10 chữ số';
+        case 'password':
+          return 'Mật khẩu phải có ít nhất 6 ký tự, bao gồm chữ và số';
+        case 'fullName':
+          return 'Họ tên chỉ được chứa chữ cái và dấu';
+        case 'email':
+          return 'Email không đúng định dạng';
       }
     }
-    if (control?.hasError('minlength')) {
+    if (control.hasError('minlength')) {
       return `Tối thiểu ${control.errors?.['minlength'].requiredLength} ký tự`;
     }
-    if (control?.hasError('maxlength')) {
+    if (control.hasError('maxlength')) {
       return `Tối đa ${control.errors?.['maxlength'].requiredLength} ký tự`;
     }
     return '';

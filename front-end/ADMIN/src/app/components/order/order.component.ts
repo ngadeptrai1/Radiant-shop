@@ -28,6 +28,7 @@ export class OrderComponent implements OnInit {
   orderStatistics: any = null;
   cancelReason: string = '';
   isLoading: boolean = false;
+  searchTimer: any;
   orderStatusCount: OrderStatusCount = {
     PENDING: 0,
     PROCESSING: 0,
@@ -36,6 +37,10 @@ export class OrderComponent implements OnInit {
     SHIPPED: 0,
     CANCELLED: 0
   };
+
+  phone: string = '';
+  name: string = '';
+  email: string = '';
 
   // Định nghĩa mảng trạng thái cho web orders
   webOrderStatuses = [
@@ -108,7 +113,7 @@ export class OrderComponent implements OnInit {
       status = this.selectedStatus || 'PENDING';
     }
     
-    this.orderService.getOrdersByStatusPaginated(status, this.startDate, this.endDate)
+    this.orderService.getOrdersByStatusPaginated(status, this.startDate, this.endDate, this.phone, this.name, this.email)
       .subscribe({
         next: (response) => {
           this.orders = response;
@@ -256,5 +261,16 @@ export class OrderComponent implements OnInit {
       style: 'currency', 
       currency: 'VND' 
     }).format(amount);
+  }
+
+  onSearch() {
+    this.loadOrders();
+  }
+
+  resetSearchFilter() {
+    this.name = '';
+    this.email = '';
+    this.phone = '';
+    this.loadOrders();
   }
 }

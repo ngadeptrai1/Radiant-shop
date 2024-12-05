@@ -39,7 +39,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT DISTINCT u FROM User u JOIN u.roles r WHERE r.name IN :roleNames")
     List<User> findByRoles(@Param("roleNames") List<RoleType> roleNames);
 
-    @Query("SELECT u FROM User u JOIN u.roles r WHERE r.name = 'STAFF' AND " +
+    @Query("SELECT u FROM User u JOIN u.roles r WHERE r.name = 'STAFF' or r.name='ADMIN' AND " +
            "(:username IS NULL OR u.username LIKE %:username%) AND " +
            "(:email IS NULL OR u.email LIKE %:email%) AND " +
            "(:phone IS NULL OR u.phoneNum LIKE %:phone%)")

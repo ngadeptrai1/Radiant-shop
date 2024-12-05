@@ -373,3 +373,32 @@
     color: #842029;
   }
 }
+
+.search-form {
+  .form-control {
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    padding: 0.5rem;
+    
+    &:focus {
+      border-color: #80bdff;
+      box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+  }
+  
+  .form-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+  }
+}
+
+.search-results {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin-top: 1rem;
+  
+  strong {
+    color: #2c3e50;
+  }
+}

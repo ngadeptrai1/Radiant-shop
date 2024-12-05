@@ -74,9 +74,10 @@ export class OrderDetailComponent implements OnInit {
     const statusOrder = {
       'PENDING': 0,
       'PROCESSING': 1,
-      'SHIPPING': 2,
+      'SHIPPED': 2,
       'DELIVERED': 3,
-      'SUCCESS': 4
+      'SUCCESS': 4,
+      'CANCELLED': 5
     };
     return statusOrder[status as keyof typeof statusOrder] ?? -1;
   }
@@ -94,14 +95,14 @@ export class OrderDetailComponent implements OnInit {
   }
 
   canShowQRCode(): boolean {
-    return this.order?.status === 'PENDING' && 
-           this.order?.paymentStatus === 'UNPAID' && 
-           this.order?.paymentMethod === 'CARD';
+    return this.order?.status == 'PENDING' && 
+           this.order?.paymentStatus == 'UNPAID' && 
+           this.order?.paymentMethod == 'CARD';
   }
 
   canCancel(): boolean {
-    return this.order?.status === 'PENDING' && 
-           this.order?.paymentStatus === 'UNPAID' && 
+    return this.order?.status == 'PENDING' && 
+           this.order?.paymentStatus == 'UNPAID' && 
            !this.isCancelling;
   }
 

@@ -4,10 +4,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -122,11 +124,20 @@ public class OrderController {
 
     @GetMapping("/status/{status}")
     public ResponseEntity<?> getOrdersByStatus(
-            @PathVariable String status, @RequestParam("startDate") Optional<LocalDateTime> startDate, @RequestParam("endDate") Optional<LocalDateTime> endDate) {
+            @PathVariable String status,
+             @RequestParam("startDate") Optional<LocalDateTime> startDate,
+            @RequestParam("endDate") Optional<LocalDateTime> endDate,
+            @RequestParam("name") Optional<String> name,
+            @RequestParam("email") Optional<String> email,
+            @RequestParam("phone") Optional<String> phone
+              ) {
         try {
             System.out.println(startDate);
             System.out.println(endDate);
-            return ResponseEntity.ok(orderService.findAllByStatusAndCreatedDateBetween(status, startDate.orElse(null), endDate.orElse(null)));
+            return ResponseEntity.ok(
+                orderService.findAllByStatusAndCreatedDateBetween(  status,
+                 startDate.orElse(null), endDate.orElse(null),
+                 name.orElse(null), email.orElse(null), phone.orElse(null)));
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -182,8 +193,9 @@ public class OrderController {
     }
 
     @GetMapping("/order-details/{id}")
-    public ResponseEntity<?> getOrderDetail(@PathVariable("id") Long orderId){
-        return ResponseEntity.ok(orderDetailRepository.findByOrderId(orderId));
+    @Async
+    public CompletableFuture<ResponseEntity<?>> getOrderDetail(@PathVariable("id") Long orderId){
+        return CompletableFuture.completedFuture(ResponseEntity.ok(orderDetailRepository.findByOrderId(orderId)));
     }
     
 
@@ -220,5 +232,13 @@ public class OrderController {
     @PutMapping("/{id}/confirm-payment")
     public ResponseEntity<?> confirmPayment(@PathVariable("id") Long orderId){
         return ResponseEntity.ok(orderService.confirmPayment(orderId));
+    }
+    @DeleteMapping("/{id}/voucher")
+    public ResponseEntity<?> deleteVoucher(@PathVariable("id") Long orderId){
+        return ResponseEntity.ok(orderService.deleteVoucher(orderId));
+    }
+    @PutMapping("/{id}/voucher")
+    public ResponseEntity<?> addVoucher(@PathVariable("id") Long orderId, @RequestParam String code){
+        return ResponseEntity.ok(orderService.addVoucher(orderId, code));
     }
 }

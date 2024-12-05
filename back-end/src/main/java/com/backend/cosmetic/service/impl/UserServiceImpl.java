@@ -156,7 +156,7 @@ public class UserServiceImpl implements UserService {
         User newStaff = User.builder()
             .fullName(staffDto.getFullName())
             .email(staffDto.getEmail())
-            .username(staffDto.getEmail()) // Use email as username
+            .username(staffDto.getUsername()) // Use email as username
             .phoneNum(staffDto.getPhoneNumber())
             .password(staffDto.getPassword())
             .provider("local")

@@ -1,54 +1,80 @@
-import { Component } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { RouterLink, RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { SlideBarComponent } from './components/slide-bar/slide-bar.component';
 import { HeaderComponent } from "./components/header/header.component";
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatTableModule } from '@angular/material/table';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatSortModule } from '@angular/material/sort';
-import { BrowserModule } from '@angular/platform-browser';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatChipsModule } from '@angular/material/chips';
 import { FooterComponent } from "./components/footer/footer.component";
-import { ReactiveFormsModule } from '@angular/forms';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import {MatDatepickerModule} from '@angular/material/datepicker';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+import { AuthService } from './services/auth.service';
+import { filter } from 'rxjs/operators';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, SlideBarComponent, HeaderComponent, MatPaginatorModule, FooterComponent],
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
-  providers:[
-    BrowserAnimationsModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatSortModule,
-    BrowserModule,
-    MatIconModule,
-    MatPaginatorModule,
-    MatChipsModule,
-    MatButtonModule,
-    MatTooltipModule,
-    ReactiveFormsModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatSlideToggleModule,
-    MatSnackBarModule,
-    MatDatepickerModule,
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    RouterLink,
+    SlideBarComponent,
+    HeaderComponent,
+    FooterComponent
   ],
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'admin-dashboard';
+  isAuthenticated = false;
+  isLoginPage = false;
+  isInitialized = false;
+
+  constructor(private authService: AuthService, private router: Router) {
+    // Chỉ theo dõi route changes sau khi đã khởi tạo xong
+    this.router.events.pipe(
+      filter(() => this.isInitialized)
+    ).subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.isLoginPage = this.checkIsLoginPage(event.url);
+        
+        // Chỉ redirect khi không phải trang login và chưa authenticated
+        if (!this.isLoginPage && !this.isAuthenticated) {
+          this.router.navigate(['/login']);
+        }
+      }
+    });
+  }
+
+  async ngOnInit() {
+    try {
+      // Đợi cho initializeAuthentication hoàn tất
+      await firstValueFrom(this.authService.initializeAuthentication());
+      this.isInitialized = true;
+
+      // Theo dõi thay đổi của currentUser
+      this.authService.currentUser$.subscribe(user => {
+        this.isAuthenticated = !!user;
+        
+        if (this.isInitialized) {
+          const currentUrl = this.router.url;
+          this.isLoginPage = this.checkIsLoginPage(currentUrl);
+          
+          if (!this.isAuthenticated && !this.isLoginPage) {
+            this.router.navigate(['/login']);
+          } else if (this.isAuthenticated && this.isLoginPage) {
+            this.router.navigate(['/']); // hoặc trang mặc định sau khi đăng nhập
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Failed to initialize authentication:', error);
+      this.isInitialized = true;
+      this.router.navigate(['/login']);
+    }
+  }
+
+  private checkIsLoginPage(url: string): boolean {
+    return url === '/login' || 
+           url === '/register' || 
+           url === '/forgot-password';
+  }
 }

@@ -81,11 +81,11 @@ public class WebConfig {
             @Override
             public void customize(CorsConfigurer<HttpSecurity> httpSecurityCorsConfigurer) {
                 CorsConfiguration corsConfiguration = new CorsConfiguration();
-                corsConfiguration.setAllowedOrigins(List.of("*"));
+                corsConfiguration.setAllowedOriginPatterns(List.of("*")); // Pattern thay cho "*"
                 corsConfiguration.setAllowedMethods(Arrays.asList("GET","POST","PATCH","DELETE","OPTIONS","PUT"));
                 corsConfiguration.setAllowedHeaders(Arrays.asList("authorization","content-type","x-auth-token"));
                 corsConfiguration.setExposedHeaders(List.of("x-auth-token"));
-                corsConfiguration.getAllowCredentials();
+                corsConfiguration.setAllowCredentials(true);
                 UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
                 source.registerCorsConfiguration("/**",corsConfiguration);
                 httpSecurityCorsConfigurer.configurationSource(source);

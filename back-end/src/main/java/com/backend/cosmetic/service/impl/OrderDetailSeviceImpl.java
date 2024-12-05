@@ -10,6 +10,7 @@ import com.backend.cosmetic.mapper.OrderDetailMapper;
 import com.backend.cosmetic.model.Order;
 import com.backend.cosmetic.model.OrderDetail;
 import com.backend.cosmetic.model.ProductDetail;
+import com.backend.cosmetic.model.Voucher;
 import com.backend.cosmetic.repository.OrderDetailRepository;
 import com.backend.cosmetic.repository.OrderRepository;
 import com.backend.cosmetic.repository.ProductDetailRepository;
@@ -41,9 +42,32 @@ public class OrderDetailSeviceImpl implements OrderDetailService {
         order.setTotalOrderAmount(totalOrderAmount);
         order.setTotalItems(totalItems);
         
-        // Tính finalAmount sau khi áp dụng voucher (nếu có)
-        long finalAmount = totalOrderAmount + order.getShippingCost() - order.getVoucherAmount();
-        order.setFinalAmount(finalAmount);
+        // Kiểm tra và cập nhật voucher
+        Voucher voucher = order.getVoucher();
+        if (voucher != null) {
+            // Kiểm tra điều kiện áp dụng voucher
+            if (totalOrderAmount < voucher.getMinOrderAmount()) {
+                // Nếu không đủ điều kiện, xóa voucher
+                order.setVoucher(null);
+                order.setVoucherAmount(0);
+                order.setFinalAmount(totalOrderAmount + order.getShippingCost());
+            } else {
+                // Tính lại số tiền giảm giá
+                long voucherAmount;
+                if ("PERCENT".equals(voucher.getType())) {
+                    voucherAmount = (totalOrderAmount * voucher.getValue()) / 100;
+                    if (voucher.getMaxDiscountAmount() != null) {
+                        voucherAmount = Math.min(voucherAmount, voucher.getMaxDiscountAmount());
+                    }
+                } else {
+                    voucherAmount = voucher.getValue();
+                }
+                order.setVoucherAmount(voucherAmount);
+                order.setFinalAmount(totalOrderAmount + order.getShippingCost() - voucherAmount);
+            }
+        } else {
+            order.setFinalAmount(totalOrderAmount + order.getShippingCost());
+        }
         
         orderRepository.save(order);
     }

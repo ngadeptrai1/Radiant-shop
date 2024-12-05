@@ -15,7 +15,10 @@ public class OrderSpecification {
     public static Specification<Order> getOrderSpecification(
             String status, 
             LocalDateTime startDate, 
-            LocalDateTime endDate) {
+            LocalDateTime endDate,
+            String name,
+            String email,
+            String phone) {
             
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -46,9 +49,27 @@ public class OrderSpecification {
                     endDate
                 ));
             }
+
+            // Add name condition if provided
+            if (name != null && !name.isEmpty()) {
+                predicates.add( criteriaBuilder.like(root.get("fullName"), "%" + name + "%"));
+            }
+
+            if (phone != null && !phone.isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("phoneNumber"), "%" + phone.toLowerCase() + "%"));
+            }
+
+            // email condition
+            if (email != null && !email.isEmpty()) {
+                predicates.add(criteriaBuilder.like(root.get("email"), "%" + email + "%"));
+            }
             // order by created date
             query.orderBy(criteriaBuilder.desc(root.get("createdDate")));
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+
+            // phone condition
+
+
         };
     }
 } 

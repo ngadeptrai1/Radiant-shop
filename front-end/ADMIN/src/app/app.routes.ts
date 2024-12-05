@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { AuthGuard } from './guards/auth.guard';
 import { LoginComponent } from './components/login/login.component';
 import { HomeComponent } from './components/home/home.component';
 import { RegisterComponent } from './components/register/register.component';
@@ -18,22 +19,22 @@ import { OrderDetailComponent } from './components/order-detail/order-detail.com
 import { ProductReviewComponent } from './components/product-review/product-review.component';
 import { UpdateProductComponent } from './components/update-product/update-product.component';
 export const routes: Routes = [
-  { path: '', component: HomeComponent },
+  { path: '', component: HomeComponent, canActivate: [AuthGuard] },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
-  { path: 'charts', component: ChartsComponent },
-  { path: 'products', component: ProductComponent },
-  { path:'category',component:CategoryComponent},
-  { path:'brands',component:BrandComponent},
-  { path:'vouchers',component:VoucherComponent},
-  { path:'colors',component:ColorComponent},
-  { path:'add-product',component:AddProductComponent},
-  { path:'pos',component:POSComponent},
-  { path:'user',component:UserComponent},
-  { path:'orders',component:OrderComponent},
-  { path:'orders/:id',component:OrderDetailComponent},
-  { path:'product-review',component:ProductReviewComponent},
-  { path:'update-product/:id',component:UpdateProductComponent},
-  { path: '**',component: NotFoundComponent }
+  { path: 'charts', component: ChartsComponent, canActivate: [AuthGuard] },
+  { path: 'products', component: ProductComponent, canActivate: [AuthGuard] },
+  { path: 'category', component: CategoryComponent, canActivate: [AuthGuard] },
+  { path: 'brands', component: BrandComponent, canActivate: [AuthGuard] },
+  { path: 'vouchers', component: VoucherComponent, canActivate: [AuthGuard] },
+  { path: 'colors', component: ColorComponent, canActivate: [AuthGuard] },
+  { path: 'add-product', component: AddProductComponent, canActivate: [AuthGuard] },
+  { path: 'pos', component: POSComponent, canActivate: [AuthGuard] },
+  { path: 'user', component: UserComponent, canActivate: [AuthGuard] },
+  { path: 'orders', component: OrderComponent, canActivate: [AuthGuard] },
+  { path: 'orders/:id', component: OrderDetailComponent, canActivate: [AuthGuard] },
+  { path: 'product-review', component: ProductReviewComponent, canActivate: [AuthGuard] },
+  { path: 'update-product/:id', component: UpdateProductComponent, canActivate: [AuthGuard] },
+  { path: '**', component: NotFoundComponent }
 ];

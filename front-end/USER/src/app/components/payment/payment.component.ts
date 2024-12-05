@@ -302,7 +302,11 @@ export class PaymentComponent implements OnInit, OnDestroy {
 
   private calculateSubTotal() {
     this.subTotal = this.cartItems.reduce((total, item) => {
-      return total + (item.productDetail.salePrice * item.quantity);
+      // Calculate price after discount percentage
+      const discountPercentage = item.productDetail.discount || 0;
+      const discountAmount = (item.productDetail.salePrice * discountPercentage) / 100;
+      const finalPrice = item.productDetail.salePrice - discountAmount;
+      return total + (finalPrice * item.quantity);
     }, 0);
     this.calculateTotal();
   }

@@ -226,9 +226,9 @@
                   </p>
                 </div>
                 <div class="item-price fw-bold">
-                  <div class="public-price">{{item.productDetail.salePrice | number}}đ</div>
+                  <div class="public-price">{{item.productDetail.salePrice - (item.productDetail.salePrice * (item.productDetail.discount || 0) / 100) | number}}đ</div>
                   <div class="total-price">
-                    {{item.productDetail.salePrice * item.quantity | number}}đ
+                    {{(item.productDetail.salePrice - (item.productDetail.salePrice * (item.productDetail.discount || 0) / 100)) * item.quantity | number}}đ
                   </div>
                 </div>
               </div>

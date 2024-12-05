@@ -80,8 +80,8 @@ export class OrderService {
     return this.apiService.get<OrderRequest[]>(`${this.endpoint}?startDate=${startDate}&endDate=${endDate}&customerId=${customerId}`);
   }
 
-  getOrdersByStatusPaginated(status: string, startDate: string, endDate: string): Observable<any> {
-    return this.apiService.get(`${this.endpoint}/status/${status}?startDate=${startDate}&endDate=${endDate}`);
+  getOrdersByStatusPaginated(status: string, startDate: string, endDate: string , phone: string,name: string,email: string): Observable<any> {
+    return this.apiService.get(`${this.endpoint}/status/${status}?startDate=${startDate}&endDate=${endDate}&phone=${phone}&name=${name}&email=${email}  `);
   }
 
   getOrdersByDateRange(startDate: string, endDate: string, page: number = 0, size: number = 5): Observable<any> {
@@ -112,9 +112,8 @@ export class OrderService {
     return this.apiService.put<OrderResponse>(`${this.endpoint}/${orderId}/confirm`, {});
   }
 
-  getOrderDetails(orderId: number): Observable<OrderDetailResponse[]> {
-    console.log('Fetching order details for order ID:', orderId);
-    return this.apiService.get<OrderDetailResponse[]>(`${this.endpoint}/order-details/${orderId}`);
+  getOrderDetails(orderId: number): Observable<any[]> {
+    return this.apiService.get<any[]>(`${this.endpoint}/order-details/${orderId}`);
   }
 
   getOrderStatusCount(): Observable<OrderStatusCount> {
@@ -140,5 +139,12 @@ export class OrderService {
 
   deleteOrderDetail(orderId: number, orderDetailId: number): Observable<void> {
     return this.apiService.delete<void>(`${this.endpoint}/details/${orderDetailId}`);
+  }
+
+  removeVoucher(orderId: number): Observable<OrderResponse> {
+    return this.apiService.delete<OrderResponse>(`${this.endpoint}/${orderId}/voucher`);
+  }
+  addVoucher(orderId: number, voucherCode: string): Observable<OrderResponse> {
+    return this.apiService.post<OrderResponse>(`${this.endpoint}/${orderId}/voucher?voucherCode=${voucherCode}`, {});
   }
 }

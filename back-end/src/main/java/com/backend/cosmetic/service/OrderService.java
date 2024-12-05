@@ -21,7 +21,7 @@ public interface OrderService {
     List<OrderResponse> findByUserId(Long id);
     OrderResponse changeStatus(Long id, String status);
     OrderResponse delete(Long id);
-    List<OrderResponse> findAllByStatusAndCreatedDateBetween(String status , LocalDateTime start, LocalDateTime end);
+    List<OrderResponse> findAllByStatusAndCreatedDateBetween(String status , LocalDateTime start, LocalDateTime end, String name, String email, String phone    );
     List<OrderResponse> findOrdersByDateRange(LocalDateTime startDate, LocalDateTime endDate);
     OrderResponse updatePaymentStatus(Long orderId, String paymentStatus);
     Map<String, Object> getOrderStatistics(LocalDateTime startDate, LocalDateTime endDate);
@@ -32,4 +32,6 @@ public interface OrderService {
     Map<String, Long> getOrderStatusStatistics();
     List<OrderResponse> getOrderByEmail(String email);
     OrderResponse confirmPayment(Long orderId);
+    OrderResponse addVoucher(Long orderId, String code);
+    OrderResponse deleteVoucher(Long orderId);
 }
