@@ -1,0 +1,20 @@
+.dropdown-item {
+  cursor: pointer;
+  
+  &:hover {
+    background-color: #f8f9fa;
+  }
+}
+
+.img-profile {
+  width: 32px;
+  height: 32px;
+}
+
+.dropdown-menu {
+  min-width: 12rem;
+}
+
+.nav-link {
+  padding: 0.5rem 1rem;
+}

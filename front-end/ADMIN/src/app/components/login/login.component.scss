@@ -71,3 +71,66 @@
     }
   }
 }
+
+.bg-login-image {
+  position: relative;
+  background: url('/assets/img/lobby.jpg');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.brand-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: 100%;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.login-logo {
+  width: 120px;
+  height: auto;
+  margin-bottom: 15px;
+}
+
+.brand-name {
+  color: white;
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  margin: 0;
+}
+
+.modal {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  border-radius: 10px;
+  border: none;
+}
+
+.modal-body {
+  padding: 2rem;
+  
+  i {
+    margin-bottom: 1rem;
+    
+    &.fa-check-circle {
+      color: #28a745;
+    }
+    
+    &.fa-times-circle {
+      color: #dc3545;
+    }
+  }
+  
+  p {
+    font-size: 1.1rem;
+    margin: 0;
+  }
+}

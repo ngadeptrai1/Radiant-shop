@@ -135,6 +135,8 @@ export class AuthService {
     this.cookieService.delete('REFRESH_TOKEN', '/');
     this.cookieService.delete('USER_ID', '/');
     this.currentUserSubject.next(null);
+    localStorage.clear();
+    sessionStorage.clear();
   }
 
   isAuthenticated(): boolean {

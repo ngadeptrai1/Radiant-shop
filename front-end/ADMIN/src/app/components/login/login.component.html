@@ -7,7 +7,12 @@
           <div class="card-body p-0">
             <!-- Nested Row within Card Body -->
             <div class="row">
-              <div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
+              <div class="col-lg-6 d-none d-lg-block bg-login-image">
+                <div class="brand-overlay">
+                  <img src="/assets/img/logo.png" alt="Radiant Shop Logo" class="login-logo">
+                  <h1 class="brand-name">Radiant Shop</h1>
+                </div>
+              </div>
               <div class="col-lg-6">
                 <div class="p-5">
                   <div class="text-center">
@@ -52,11 +57,6 @@
                       </div>
 
                       <button type="submit" [disabled]="loginForm.invalid">Đăng nhập</button>
-
-                      <div class="links">
-                        <a routerLink="/forgot-password">Quên mật khẩu?</a>
-                        <a routerLink="/register">Đăng ký tài khoản mới</a>
-                      </div>
                     </form>
                   </div>
                 </div>
@@ -77,4 +77,19 @@
 
   <!-- Custom scripts for all pages-->
   <script src="assets/js/sb-admin-2.min.js"></script>
+
+  <!-- Thêm modal vào cuối file, trước đóng thẻ body -->
+  <div class="modal" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body text-center">
+          <div [class]="modalClass">
+            <i [class]="modalIcon"></i>
+            <p class="mt-2">{{ modalMessage }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show" *ngIf="showModal"></div>
 </body>

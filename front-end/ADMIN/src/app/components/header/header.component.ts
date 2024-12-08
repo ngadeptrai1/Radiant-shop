@@ -3,17 +3,17 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { User } from '../../../type';
-import { LogoutModalComponent } from '../logout-modal/logout-modal.component';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, LogoutModalComponent],
+  imports: [CommonModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent implements OnInit {
   currentUser: User | null = null;
+  showLogoutModal = false;
 
   constructor(
     private authService: AuthService,
@@ -27,9 +27,7 @@ export class HeaderComponent implements OnInit {
   }
 
   logout() {
-    const modal = document.getElementById('logoutModal');
-    if (modal) {
-      (window as any).$('#logoutModal').modal('show');
-    }
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }
