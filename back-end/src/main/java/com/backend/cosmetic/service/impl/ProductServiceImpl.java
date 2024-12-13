@@ -2,6 +2,7 @@ package com.backend.cosmetic.service.impl;
 
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -83,38 +85,46 @@ public class ProductServiceImpl implements ProductService {
             }
         });
 
-        CompletableFuture<List<ProductImage>> imagesFuture = CompletableFuture.supplyAsync(() -> {
-            if (product.getProductImages() == null || product.getProductImages().isEmpty()) {
-                throw new DataNotFoundException("Images cannot be null or empty!");
-            }
+        List<ProductImage> listImages = new LinkedList<>();
 
-            return product.getProductImages().parallelStream()
-                    .map(image -> {
+        if( product.getProductImages() != null || !product.getProductImages().isEmpty()){
+            product.getProductImages().forEach(
+                    image -> {
                         ProductImage prImage = ProductImage.builder()
-                                .product(entityProduct)
                                 .url("")
-                                .build();
-                        try {
-                            fileService.uploadCoudary(image, prImage);
-                            return prImage;
-                        } catch (IOException e) {
-                            throw new CompletionException(e);
-                        }
-                    })
-                    .collect(Collectors.toList());
-        });
+                                .product(entityProduct).build();
+                        uploadFileImage(image , prImage , listImages);
+                    }
+            );
+        }
+        else{
+            throw new DataNotFoundException("Images can not be null or empty !");
+        }
+
+
+
+
 
 
             if (product.getProductDetails() != null && !product.getProductDetails().isEmpty()) {
                 productDetailService.save(product.getProductDetails(), entityProduct);
             }
         try {
+
+            listImages.forEach(image->{
+                while (image.getUrl().isBlank()){
+                    Thread.onSpinWait();
+                }
+            });
+
+            entityProduct.setProductImages(productImageService.saveAll(listImages));
             // Wait for all async operations to complete
+
             String thumbnailUrl = thumbnailFuture.join();
-            List<ProductImage> productImages = imagesFuture.join();
             entityProduct.setThumbnail(thumbnailUrl);
-            entityProduct.setProductImages(productImageService.saveAll(productImages));
-            
+            while (entityProduct.getThumbnail().isBlank()){
+                Thread.onSpinWait();
+            }
             return productMapper.toDTO(entityProduct);
         } catch (CompletionException e) {
             throw new RuntimeException("Error processing product data: " + e.getMessage(), e.getCause());
@@ -254,5 +264,16 @@ public class ProductServiceImpl implements ProductService {
    public List<ProductDetailResponse> getAllProductDetails(){
         return productDetailMapper.toResponseDtoList( productDetailRepository.findActiveProductDetailsWithStock());
 
+    }
+
+    @Async
+     void uploadFileImage(MultipartFile file, ProductImage productImage,List<ProductImage> list){
+        try {
+            String fileUrl =  fileService.uploadThumbnail(file);
+            productImage.setUrl(fileUrl);
+            list.add(productImage);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

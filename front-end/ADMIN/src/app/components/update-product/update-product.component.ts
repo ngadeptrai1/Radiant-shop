@@ -91,11 +91,13 @@ export class UpdateProductComponent implements OnInit {
   }
 
   private initializeForm(product: ProductResponse, details: ProductDetailResponse[]) {
+  
+    
     this.form.patchValue({
       id: product.id,
       name: product.name,
       description: product.description,
-      activate: product.activate,
+      activate: product!.activate,
       categoryId: this.getCategoryId(product.category),
       brandId: this.getBrandId(product.brand)
     });
@@ -120,13 +122,15 @@ export class UpdateProductComponent implements OnInit {
   }
 
   addProductDetail(detail?: ProductDetailResponse) {
+    console.log(detail);
+    
     const productDetailForm = this.fb.group({
       id: [detail?.id],
       salePrice: [detail?.salePrice, [Validators.required, Validators.min(0)]],
       discount: [detail?.discount ?? 0, [Validators.required, Validators.min(0), Validators.max(100)]],
       quantity: [detail?.quantity, [Validators.required, Validators.min(0)]],
       colorId: [this.getColorId(detail?.color), [Validators.required]],
-      active: [detail?.active ?? true]
+      active: [detail?.active]
     });
 
     this.setupColorValidation(productDetailForm);

@@ -103,7 +103,7 @@ private final RateLimiter rateLimiter = RateLimiter.create(2.0);
         }
     }
 
-    @Cacheable(value = "product", key = "#id")
+
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable Long id){
         return ResponseEntity.status(HttpStatus.OK)

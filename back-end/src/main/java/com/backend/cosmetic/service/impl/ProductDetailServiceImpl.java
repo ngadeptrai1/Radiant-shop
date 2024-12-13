@@ -29,69 +29,81 @@ public class ProductDetailServiceImpl implements ProductDetailService {
     private final ColorRepository colorRepository;
 
     @Override
-    @Async
     public List<ProductDetailResponse> save(List<ProductDetailDTO> productDetailDTOs, Product product) {
-        List<ProductDetail> productDetails = productDetailDTOs.stream().map(productDetailDTO -> {
-            Color color = colorRepository.findById(productDetailDTO.getColorId()).orElseThrow(() -> {
-                return new DataNotFoundException("Color with id " + productDetailDTO.getColorId() + " Not found ");
-            });
-            ProductDetail productDetail = ProductDetail.builder()
-                    .product(product)
-                    .color(color)
-                    .quantity(productDetailDTO.getQuantity())
-                    .discount(productDetailDTO.getDiscount())
-                    .salePrice(productDetailDTO.getSalePrice())
-                    .build();
-            productDetail.setActive(productDetailDTO.isActive());
-            return productDetail;
+       try {
+           List<ProductDetail> productDetails = productDetailDTOs.stream().map(productDetailDTO -> {
+               Color color = colorRepository.findById(productDetailDTO.getColorId()).orElseThrow(() -> {
+                   return new DataNotFoundException("Color with id " + productDetailDTO.getColorId() + " Not found ");
+               });
+               ProductDetail productDetail = ProductDetail.builder()
+                       .product(product)
+                       .color(color)
+                       .quantity(productDetailDTO.getQuantity())
+                       .discount(productDetailDTO.getDiscount())
+                       .salePrice(productDetailDTO.getSalePrice())
+                       .build();
+               productDetail.setActive(productDetailDTO.isActive());
+               return productDetail;
 
-        }).toList();
+           }).toList();
 
-        List<ProductDetail> savedDetails = productDetailRepository.saveAll(productDetails);
-        product.setProductDetails(savedDetails);
-        return savedDetails.stream().map(ProductDetailResponse::fromProductDetail).toList();
+           List<ProductDetail> savedDetails = productDetailRepository.saveAll(productDetails);
+           product.setProductDetails(savedDetails);
+           return savedDetails.stream().map(ProductDetailResponse::fromProductDetail).toList();
+       }catch(Exception e) {
+           e.printStackTrace();
+       }
+       return null;
     }
 
     @Override
+    @Transactional
     public List<ProductDetailResponse> update(List<ProductDetailDTO> productDetailDTOs, Product product) {
-        List<ProductDetail> productDetails = productDetailDTOs.stream().map(productDetailDTO -> {
-            // Validate color exists
-            Color color = colorRepository.findById(productDetailDTO.getColorId()).orElseThrow(() -> {
-                return new DataNotFoundException("Color with id " + productDetailDTO.getColorId() + " Not found ");
-            });
+       try {
+           List<ProductDetail> productDetails = productDetailDTOs.stream().map(productDetailDTO -> {
+               System.out.println(productDetailDTO);
+               // Validate color exists
+               Color color = colorRepository.findById(productDetailDTO.getColorId()).orElseThrow(() -> {
+                   return new DataNotFoundException("Color with id " + productDetailDTO.getColorId() + " Not found ");
+               });
 
-            ProductDetail productDetail;
-            if (productDetailDTO.getId() != null) {
-                // Update existing product detail
-                productDetail = productDetailRepository.findById(productDetailDTO.getId()).orElseThrow(() -> {
-                    return new DataNotFoundException("Product detail with id " + productDetailDTO.getId() + " Not found ");
-                });
-                productDetail.setActive(productDetailDTO.isActive());
-                productDetail.setColor(color);
-                productDetail.setQuantity(productDetailDTO.getQuantity());
-                productDetail.setDiscount(productDetailDTO.getDiscount());
-                productDetail.setSalePrice(productDetailDTO.getSalePrice());
-            } else {
-                // Create new product detail
-                productDetail = ProductDetail.builder()
-                        .product(product)
-                        .color(color)
-                        .quantity(productDetailDTO.getQuantity())
-                        .discount(productDetailDTO.getDiscount())
-                        .salePrice(productDetailDTO.getSalePrice())
-                        .build();
-                productDetail.setActive(productDetailDTO.isActive());
-            }
-            return productDetail;
-        }).toList();
+               ProductDetail productDetail;
+               if (productDetailDTO.getId() != null) {
+                   // Update existing product detail
+                   productDetail = productDetailRepository.findById(productDetailDTO.getId()).orElseThrow(() -> {
+                       return new DataNotFoundException("Product detail with id " + productDetailDTO.getId() + " Not found ");
+                   });
+                   productDetail.setActive(productDetailDTO.isActive());
+                   productDetail.setColor(color);
+                   productDetail.setQuantity(productDetailDTO.getQuantity());
+                   productDetail.setDiscount(productDetailDTO.getDiscount());
+                   productDetail.setSalePrice(productDetailDTO.getSalePrice());
+               } else {
+                   // Create new product detail
+                   productDetail = ProductDetail.builder()
+                           .product(product)
+                           .color(color)
+                           .quantity(productDetailDTO.getQuantity())
+                           .discount(productDetailDTO.getDiscount())
+                           .salePrice(productDetailDTO.getSalePrice())
 
-        // Save all product details and update product
-        List<ProductDetail> savedDetails = productDetailRepository.saveAll(productDetails);
-        product.setProductDetails(savedDetails);
-        
-        return savedDetails.stream()
-                .map(ProductDetailResponse::fromProductDetail)
-                .toList();
+                           .build();
+                   productDetail.setActive(productDetailDTO.isActive());
+               }
+               return productDetail;
+           }).toList();
+
+           // Save all product details and update product
+           List<ProductDetail> savedDetails = productDetailRepository.saveAll(productDetails);
+           product.setProductDetails(savedDetails);
+
+           return savedDetails.stream()
+                   .map(ProductDetailResponse::fromProductDetail)
+                   .toList();
+       }catch (Exception e) {
+           e.printStackTrace();
+       }
+        return null;
     }
 
     @Override

@@ -11,7 +11,7 @@ import com.backend.cosmetic.response.ProductDetailResponse;
 
 @Service
 public interface ProductDetailService {
-   List<ProductDetailResponse> save(List<ProductDetailDTO> productDetailDTO, Product product  );
+   List<ProductDetailResponse> save(List<ProductDetailDTO> productDetailDTO, Product product );
     List<ProductDetailResponse> update(List<ProductDetailDTO> productDetailDTO, Product product);
     ProductDetailResponse delete(Long id);
     ProductDetailResponse findById(Long id);

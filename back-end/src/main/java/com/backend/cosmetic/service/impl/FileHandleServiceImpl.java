@@ -21,22 +21,16 @@ public class FileHandleServiceImpl implements FileHandleService {
 
     private final Cloudinary cloudinary;
 
-//    @Override
-//    public String storeFile(MultipartFile thumbnail ) throws IOException {
-//        String newFileName = (String) uploadCoudary(thumbnail).get("url");
-//        return newFileName;
-//    }
-
 
     @Override
-    @Async
     public void uploadCoudary(MultipartFile file , ProductImage image) throws IOException {
         try {
             Map data =  cloudinary.uploader().upload(file.getBytes(), Map.of());
             String newFileName = (String) data.get("url");
            image.setUrl(newFileName);
-        }catch (IOException ex){
-            throw new IOException("Failed to upload file");
+        }catch (Exception ex){
+
+            throw new IOException("Failed to upload file "+ ex.getMessage());
         }
 
     }

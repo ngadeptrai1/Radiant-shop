@@ -47,7 +47,7 @@ List<ProductDetail> findActiveProductDetailsWithStock();
            pd.quantity AS quantity,
            c.name AS color,
            p.name AS productName,
-           p.active AS active,
+           pd.active AS active,
            p.thumbnail AS thumbnail,
            pd.id as productDetailId
        FROM
