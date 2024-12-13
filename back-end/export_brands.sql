@@ -1,6 +1,8 @@
 -- Script generated for table: brands
--- Generated on: Tue Nov 19 22:46:17 ICT 2024
+-- Generated on: Wed Dec 11 22:14:05 ICT 2024
 
+INSERT INTO brands (id, active, created_date, updated_date, name, thumbnail) VALUES (1, 'false', '2024-11-05 14:42:03', '2024-11-13 10:54:28', 'data test 123', 'http://res.cloudinary.com/dvyx6ldqz/image/upload/v1731469188/bwh3cqq7ackqztnb1e8w.png');
+INSERT INTO brands (id, active, created_date, updated_date, name, thumbnail) VALUES (2, 'false', '2024-11-05 14:51:55', '2024-11-13 10:49:04', 'son romad', 'http://res.cloudinary.com/dvyx6ldqz/image/upload/v1730793115/dgriznnb44agjkjk6nta.png');
 INSERT INTO brands (id, active, created_date, updated_date, name, thumbnail) VALUES (3, 'true', '2024-11-05 15:34:00', '2024-11-05 15:34:00', '16Brand', 'http://res.cloudinary.com/dvyx6ldqz/image/upload/v1730795640/smff1qg6pormvg9prgff.jpg');
 INSERT INTO brands (id, active, created_date, updated_date, name, thumbnail) VALUES (4, 'true', '2024-11-05 15:36:02', '2024-11-05 15:36:02', '3CE-Brand', 'http://res.cloudinary.com/dvyx6ldqz/image/upload/v1730795761/qt9cn99pocs6echdyhn2.png');
 INSERT INTO brands (id, active, created_date, updated_date, name, thumbnail) VALUES (5, 'true', '2024-11-05 15:38:53', '2024-11-05 15:38:53', '3W-Clinic', 'http://res.cloudinary.com/dvyx6ldqz/image/upload/v1730795932/t4eyegbkwwt9qhar05rl.png');
@@ -52,7 +54,6 @@ INSERT INTO brands (id, active, created_date, updated_date, name, thumbnail) VAL
 INSERT INTO brands (id, active, created_date, updated_date, name, thumbnail) VALUES (51, 'true', '2024-11-06 14:27:19', '2024-11-06 14:27:19', 'Black Rouge', 'http://res.cloudinary.com/dvyx6ldqz/image/upload/v1730878039/vwpnwdauodtr8quw2mk0.jpg');
 INSERT INTO brands (id, active, created_date, updated_date, name, thumbnail) VALUES (52, 'true', '2024-11-06 14:28:48', '2024-11-06 14:28:48', 'Black Mores', 'http://res.cloudinary.com/dvyx6ldqz/image/upload/v1730878128/xxjtudqmwxhgxhdnxrqf.webp');
 INSERT INTO brands (id, active, created_date, updated_date, name, thumbnail) VALUES (53, 'true', '2024-11-06 14:30:01', '2024-11-06 14:30:01', 'Bnbg Brand', 'http://res.cloudinary.com/dvyx6ldqz/image/upload/v1730878201/tsmfshvqfq1mdyou39u4.png');
-INSERT INTO brands (id, active, created_date, updated_date, name, thumbnail) VALUES (2, 'false', '2024-11-05 14:51:55', '2024-11-13 10:49:04', 'son romad', 'http://res.cloudinary.com/dvyx6ldqz/image/upload/v1730793115/dgriznnb44agjkjk6nta.png');
 INSERT INTO brands (id, active, created_date, updated_date, name, thumbnail) VALUES (54, 'true', '2024-11-06 14:30:34', '2024-11-06 14:30:34', 'Bobbi Brown', 'http://res.cloudinary.com/dvyx6ldqz/image/upload/v1730878233/ro51opzspwpheekvqwvu.png');
 INSERT INTO brands (id, active, created_date, updated_date, name, thumbnail) VALUES (55, 'true', '2024-11-06 14:31:14', '2024-11-06 14:31:14', 'Bông Bach Tuyết', 'http://res.cloudinary.com/dvyx6ldqz/image/upload/v1730878273/itke9dbatyn8rvefhdkz.jpg');
 INSERT INTO brands (id, active, created_date, updated_date, name, thumbnail) VALUES (56, 'true', '2024-11-06 14:32:37', '2024-11-06 14:32:37', 'Bourjois', 'http://res.cloudinary.com/dvyx6ldqz/image/upload/v1730878356/qdsqejadmaih9vea56fm.png');
@@ -433,4 +434,3 @@ INSERT INTO brands (id, active, created_date, updated_date, name, thumbnail) VAL
 INSERT INTO brands (id, active, created_date, updated_date, name, thumbnail) VALUES (431, 'true', '2024-11-07 12:51:19', '2024-11-07 12:51:19', 'Sungboon', 'http://res.cloudinary.com/dvyx6ldqz/image/upload/v1730958680/qxcf3qz43pgiosngl1lg.jpg');
 INSERT INTO brands (id, active, created_date, updated_date, name, thumbnail) VALUES (432, 'true', '2024-11-07 12:51:44', '2024-11-07 12:51:44', 'Suddenly', 'http://res.cloudinary.com/dvyx6ldqz/image/upload/v1730958704/feevhgrusdibvoqqhujg.jpg');
 INSERT INTO brands (id, active, created_date, updated_date, name, thumbnail) VALUES (433, 'true', '2024-11-13 00:02:42', '2024-11-13 00:02:42', 'Local Brand', 'http://res.cloudinary.com/dvyx6ldqz/image/upload/v1731430960/h66uyhiktjiorkbtj26o.jpg');
-INSERT INTO brands (id, active, created_date, updated_date, name, thumbnail) VALUES (1, 'false', '2024-11-05 14:42:03', '2024-11-13 10:54:28', 'data test 123', 'http://res.cloudinary.com/dvyx6ldqz/image/upload/v1731469188/bwh3cqq7ackqztnb1e8w.png');

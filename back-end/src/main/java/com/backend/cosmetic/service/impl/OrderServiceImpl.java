@@ -119,11 +119,13 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(OrderStatus.SUCCESS);
         order.setPaymentStatus(orderDTO.getPaymentStatus());
         
-        if(order.getEmail() != null){
-            try {
-                emailService.createElectronicInvoiceEmailContent(order, order.getEmail());
-            } catch (MessagingException e) {
-                throw new RuntimeException(e);
+        if(order.getUser()!= null){
+            if (!order.getUser().getEmail().isEmpty()){
+                try {
+                    emailService.createElectronicInvoiceEmailContent(order, order.getEmail());
+                } catch (MessagingException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         
@@ -274,6 +276,9 @@ public class OrderServiceImpl implements OrderService {
 
         if(order.getEmail() != null){
             try {
+                if(status.equalsIgnoreCase(OrderStatus.SUCCESS)) {
+                    emailService.createElectronicInvoiceEmailContent(order, order.getEmail());
+                }
                 emailService.sendOrderStatusUpdateEmail(order, status, order.getEmail());
             } catch (MessagingException e) {
                 throw new RuntimeException(e);

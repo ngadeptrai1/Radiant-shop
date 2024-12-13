@@ -25,7 +25,11 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
-       dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+        jdbc:
+          lob:
+            non_contextual_creation: true
       jdbc:
         batch_size: 50
         fetch_size: 50

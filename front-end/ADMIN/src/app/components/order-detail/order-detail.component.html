@@ -108,26 +108,28 @@
   <div class="card mb-4">
     <div class="card-body">
       <div class="d-flex gap-2 flex-wrap">
-        <!-- Nút xác nhận thanh toán cho đơn hàng card -->
+        <!-- Payment confirmation button -->
         <button *ngIf="canConfirmPayment()" 
                 class="btn btn-warning" 
                 (click)="openModal('confirmPayment')">
-          <i class="fas fa-credit-card me-2"></i>Xác nhận thanh toán
+          <i class="fas fa-credit-card me-2"></i>
+          {{order.paymentMethod == 'CARD' ? 'Xác nhận thanh toán online' : 'Xác nhận đã thu tiền'}}
         </button>
 
+        <!-- Status update button -->
+        <button *ngIf="canUpdateStatus() && order.status !== 'PENDING'" 
+                [class]="'btn ' + getNextStatusButtonClass()"
+                (click)="openModal('update')"
+                [disabled]="order.status == 'DELIVERED' && order.paymentMethod == 'CASH' && order.paymentStatus == 'UNPAID'">
+          <i class="fas" [class]="getNextStatusIcon() + ' me-2'"></i>
+          {{getNextStatusLabel()}}
+        </button>
+        
         <!-- Nút xác nhận đơn -->
         <button *ngIf="canConfirm()" 
                 class="btn btn-primary" 
                 (click)="openModal('confirm')">
           <i class="fas fa-check me-2"></i>Xác nhận đơn
-        </button>
-
-        <!-- Nút chuyển trạng thái tiếp theo -->
-        <button *ngIf="canUpdateStatus() && order.status !== 'PENDING'" 
-                [class]="'btn ' + getNextStatusButtonClass()"
-                (click)="openModal('update')">
-          <i class="fas" [class]="getNextStatusIcon() + ' me-2'"></i>
-          {{getNextStatusLabel()}}
         </button>
 
         <!-- Nút hủy đơn -->
@@ -143,6 +145,13 @@
                 (click)="exportToPDF()">
           <i class="fas fa-file-pdf me-2"></i>Xuất hóa đơn
         </button>
+      </div>
+
+      <!-- Add warning message when payment confirmation is required -->
+      <div *ngIf="order.status === 'DELIVERED' && order.paymentMethod === 'CASH' && order.paymentStatus === 'UNPAID'" 
+           class="alert alert-warning mt-3 mb-0">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        Vui lòng xác nhận đã thu tiền trước khi chuyển trạng thái thành công
       </div>
     </div>
   </div>
@@ -479,7 +488,7 @@
 </div>
 
 <!-- Add this section for voucher code input and actions -->
-<div class="card mb-4">
+<div class="card mb-4" *ngIf="order?.status == 'PENDING' && order?.paymentStatus == 'UNPAID'">
   <div class="card-body">
     <h5 class="card-title">
       <i class="fas fa-tag me-2"></i>Mã giảm giá

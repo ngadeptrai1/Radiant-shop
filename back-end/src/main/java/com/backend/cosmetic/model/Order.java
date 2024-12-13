@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties   ({"hibernateLazyInitializer", "handler"})
 public class Order extends BaseModel {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_seq")
+   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_seq")
     @SequenceGenerator(name = "order_seq", sequenceName = "order_sequence", initialValue = 1000123112, allocationSize = 1)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)

@@ -35,7 +35,7 @@
   </li>
 
   <!-- Heading -->
-  <div class="sidebar-heading">Interface</div>
+  <div class="sidebar-heading">Chức năng</div>
 <!-- User -->
 <li class="nav-item">
   <a class="nav-link collapsed"
@@ -132,7 +132,7 @@
     aria-controls="collapseOrder"
   >
     <i class="fa fa-money-bill"></i>
-    <span>Hóa đơn</span>
+    <span>Hóa đơn & đơn hàng</span>
   </a>
   <div
     id="collapseOrder"
@@ -141,7 +141,11 @@
     data-parent="#accordionSidebar"
   >
     <div class="bg-gradient-light py-2 collapse-inner rounded">
-      <a class="collapse-item text-capitalize text-dark" [routerLink]="['orders']">Quản lí hóa đơn</a>
+      <a class="collapse-item text-capitalize text-dark" [routerLink]="['orders']">Quản lí đơn hàng</a>
+    </div>
+
+    <div class="bg-gradient-light py-2 collapse-inner rounded">
+      <a class="collapse-item text-capitalize text-dark" [routerLink]="['invoices']">Hóa đơn</a>
     </div>
   </div>
 </li>

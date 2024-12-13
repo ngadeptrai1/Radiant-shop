@@ -27,7 +27,7 @@ public class ExportService {
             writer.write("-- Generated on: " + new Date() + "\n\n");
 
             // Tạo câu query để lấy dữ liệu
-            String query = "SELECT * FROM " + tableName;
+            String query = "SELECT * FROM " + tableName + " order by id";
 
             // Sử dụng RowMapper để xử lý từng dòng
             List<Map<String, Object>> results = jdbcTemplate.queryForList(query);

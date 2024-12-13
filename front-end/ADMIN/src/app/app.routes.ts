@@ -18,6 +18,7 @@ import { OrderComponent } from './components/order/order.component';
 import { OrderDetailComponent } from './components/order-detail/order-detail.component';
 import { ProductReviewComponent } from './components/product-review/product-review.component';
 import { UpdateProductComponent } from './components/update-product/update-product.component';
+import { InvoicesComponent } from './components/invoices/invoices.component';
 export const routes: Routes = [
   { path: '', component: HomeComponent, canActivate: [AuthGuard] },
   { path: 'login', component: LoginComponent },
@@ -36,5 +37,6 @@ export const routes: Routes = [
   { path: 'orders/:id', component: OrderDetailComponent, canActivate: [AuthGuard] },
   { path: 'product-review', component: ProductReviewComponent, canActivate: [AuthGuard] },
   { path: 'update-product/:id', component: UpdateProductComponent, canActivate: [AuthGuard] },
+  { path: 'invoices', component: InvoicesComponent, canActivate: [AuthGuard] },
   { path: '**', component: NotFoundComponent }
 ];

@@ -78,7 +78,14 @@ public class EmailService {
             content.append("<html><body>");
             content.append("<h2>Cập nhật trạng thái đơn hàng #").append(order.getId()).append("</h2>");
             content.append("<p>Đơn hàng của bạn đã được cập nhật trạng thái mới:</p>");
-            content.append("<p><strong>Trạng thái mới: </strong>").append(newStatus).append("</p>");
+            if(newStatus.equals(OrderStatus.PROCESSING)){
+                content.append("<p><strong>Trạng thái mới: </strong>Đơn hàng đang được xử lý</p>");
+            }else if(newStatus.equals(OrderStatus.SHIPPED)){
+                content.append("<p><strong>Trạng thái mới: </strong>Đơn hàng đang được vận chuyển</p>");
+            }else if(newStatus.equals(OrderStatus.DELIVERED)){
+                content.append("<p><strong>Trạng thái mới: </strong>Đơn hàng đã được giao thành công</p>");
+            }
+
             content.append("</body></html>"); 
         }
         
@@ -95,6 +102,8 @@ public class EmailService {
             case OrderStatus.PROCESSING -> helper.setSubject("Đơn hàng #" + order.getId() + " đã được xác nhận");
             case OrderStatus.SUCCESS -> helper.setSubject("Đơn hàng #" + order.getId() + " đã giao thành công");
             case OrderStatus.CANCELLED -> helper.setSubject("Đơn hàng #" + order.getId() + " đã bị hủy");
+            case OrderStatus.SHIPPED -> helper.setSubject("Đơn hàng #" + order.getId() + " đã được vận chuyển");
+            case OrderStatus.DELIVERED -> helper.setSubject("Đơn hàng #" + order.getId() + " đã được giao thành công");
             default -> {
             }
         }

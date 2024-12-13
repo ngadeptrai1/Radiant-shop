@@ -14,10 +14,10 @@ import { RouterLink } from '@angular/router';
 })
 export class OrderComponent implements OnInit {
   orders: OrderResponse[] = [];
-  selectedType: string = 'POS';
-  selectedStatus: string = 'SUCCESS';
+  selectedType: string = 'WEB';
+  selectedStatus: string = 'PENDING';
   
-  orderTypes = ['POS', 'WEB'];
+  orderTypes = ['WEB'];
   orderStatuses = ['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'SUCCESS'];
 
   currentPage = 0;
@@ -55,10 +55,9 @@ export class OrderComponent implements OnInit {
   constructor(private orderService: OrderService) {}
 
   ngOnInit() {
+    this.selectedType = 'WEB';
     this.loadOrders();
     this.loadOrderStatusCount();
-    
-    // Theo dõi sự thay đổi của startDate và endDate
     this.watchDateChanges();
   }
 
@@ -105,18 +104,12 @@ export class OrderComponent implements OnInit {
     if (!this.selectedType) return;
     
     this.isLoading = true;
-    let status = '';
-
-    if (this.selectedType === 'POS') {
-      status = 'SUCCESS';
-    } else {
-      status = this.selectedStatus || 'PENDING';
-    }
+    const status = this.selectedStatus || 'PENDING';
     
     this.orderService.getOrdersByStatusPaginated(status, this.startDate, this.endDate, this.phone, this.name, this.email)
       .subscribe({
         next: (response) => {
-          this.orders = response;
+          this.orders = response.filter(order => order.type === 'WEB');
           this.totalPages = Math.ceil(this.filteredOrders.length / this.pageSize);
           this.currentPage = 0;
         },

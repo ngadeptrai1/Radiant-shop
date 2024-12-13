@@ -196,7 +196,13 @@ export class OrderDetailComponent implements OnInit {
 
   canUpdateStatus(): boolean {
     if (!this.order) return false;
-    return this.order.type == 'WEB' && 
+    
+    // If order is DELIVERED and payment is CASH, require payment confirmation
+    if (this.order.status === 'DELIVERED' && this.order.paymentMethod === 'CASH') {
+      return this.order.paymentStatus === 'PAID';
+    }
+    
+    return this.order.type === 'WEB' && 
            !['CANCELLED', 'SUCCESS'].includes(this.order.status);
   }
 
@@ -587,9 +593,19 @@ export class OrderDetailComponent implements OnInit {
   }
 
   canConfirmPayment(): boolean {
-    return this.order?.paymentMethod == 'CARD' && 
-           this.order.paymentStatus == 'UNPAID' &&
-           this.order.status == 'PENDING';
+    if (!this.order) return false;
+    
+    // For CARD payment method
+    if (this.order.paymentMethod === 'CARD') {
+      return this.order.status === 'PENDING' && this.order.paymentStatus === 'UNPAID';
+    }
+    
+    // For CASH payment method
+    if (this.order.paymentMethod === 'CASH') {
+      return this.order.status === 'DELIVERED' && this.order.paymentStatus === 'UNPAID';
+    }
+    
+    return false;
   }
 
   confirmPayment() {
