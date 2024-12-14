@@ -23,7 +23,9 @@ export class OrderService {
   getOrdersByUserId(userId: number): Observable<OrderResponse[]> {
     return this.apiService.get<OrderResponse[]>(`${this.BASE_URL}/user/${userId}`);
   }
-
+  getOrdersByEmail(email: string): Observable<OrderResponse[]> {
+    return this.apiService.get<OrderResponse[]>(`${this.BASE_URL}/email?email=${email}`);
+  }
   getOrderDetailById(orderId: number): Observable<OrderDetailResponse[]> {
     return this.apiService.get<OrderDetailResponse[]>(`${this.BASE_URL}/order-details/${orderId}`);
   }

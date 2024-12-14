@@ -17,6 +17,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>,
                                       JpaSpecificationExecutor<Order> {
 
     List<Order> findAllByUserIdOrderByCreatedDateDesc(Long id);
+    List<Order> findAllByEmailOrderByIdDesc(String email);
 
     List<Order> findAllByCreatedDateBetween(LocalDateTime startDate, LocalDateTime endDate);
     

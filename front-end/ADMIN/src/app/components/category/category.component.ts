@@ -172,7 +172,7 @@ export class CategoryComponent implements OnInit,AfterViewInit {
   deleteCategory(category: Category) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
-      data: { title: 'Xác nhận xóa', message: `Bạn có chắc chắn muốn xóa danh mục "${category.name}"?` }
+      data: { title: 'Xác nhận ngưng hoạt động', message: `Bạn có chắc chắn muốn ngưng hoạt động danh mục "${category.name}"?` }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -190,7 +190,7 @@ export class CategoryComponent implements OnInit,AfterViewInit {
           },
           error: (error) => {
             console.error('Error deleting category:', error);
-            this.showSnackBar('Lỗi khi xóa danh mục');
+            this.showSnackBar('Lỗi khi ngưng hoạt động danh mục');
             this.isLoading = false;
           }
         });

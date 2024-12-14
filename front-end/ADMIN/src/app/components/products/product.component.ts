@@ -47,7 +47,7 @@ export class ProductComponent {
   colors: Color[] = [];
   product: ProductResponse[] = [];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-
+  @ViewChild(MatSort) sort!: MatSort;
   constructor(
     private productService: ProductService,
     private dialog: MatDialog,
@@ -68,7 +68,10 @@ export class ProductComponent {
   }
 
   ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
+    if (this.dataSource) {
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
+    }
   }
 
   loadProducts() {
@@ -77,6 +80,8 @@ export class ProductComponent {
       next: (products) => {
         this.product = products;
         this.dataSource.data = this.product;
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
         this.isLoading = false;
       },
       error: (error) => {
@@ -170,5 +175,9 @@ export class ProductComponent {
       horizontalPosition: 'right',
       verticalPosition: 'top'
     });
+  }
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 }

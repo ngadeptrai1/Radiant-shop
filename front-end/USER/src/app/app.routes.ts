@@ -14,6 +14,7 @@ import { MyOrderComponent } from './components/my-order/my-order.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { OrderDetailComponent } from './components/order-detail/order-detail.component';
 import { WishListComponent } from './components/wish-list/wish-list.component';
+import { OrderEmailComponent } from './components/order-email/order-email.component';
 export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
@@ -28,5 +29,6 @@ export const routes: Routes = [
   { path: 'my-orders', component: MyOrderComponent},
   {path:'wishlist',component:WishListComponent},
   { path:'order-detail/:id', component: OrderDetailComponent},
+  {path:'order-lookup' , component:OrderEmailComponent},
   { path: '**', component: NotFoundComponent}
 ];

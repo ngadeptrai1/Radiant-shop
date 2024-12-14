@@ -162,7 +162,7 @@ export class BrandComponent implements OnInit, AfterViewInit   {
   deleteBrand(brand: Brand) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
-      data: { title: 'Xác nhận xóa', message: `Bạn có chắc chắn muốn xóa thương hiệu "${brand.name}"?` }
+      data: { title: 'Xác nhận ngưng hoạt động', message: `Bạn có chắc chắn muốn ngưng hoạt động thương hiệu "${brand.name}"?` }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -171,7 +171,7 @@ export class BrandComponent implements OnInit, AfterViewInit   {
         this.brandService.deleteBrand(brand.id).subscribe({
           next: () => {
             this.dataSource.data = this.dataSource.data.filter(b => b.id !== brand.id);
-            this.showSnackBar('Xóa thương hiệu thành công');
+            this.showSnackBar('Ngưng hoạt động thương hiệu thành công');
             this.isLoading = false;
           },
           error: (error) => {

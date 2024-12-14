@@ -146,7 +146,7 @@
             <i class="bi bi-telephone"></i>
             <div class="hotline">
               <p>Đặt hàng nhanh!</p>
-              <a href="#" title="Số hotline">0123456789</a>
+              <a href="#" title="Số hotline">0862092083</a>
             </div>
           </div>
         </div>
@@ -174,17 +174,24 @@
               <a href="#">XU HƯỚNG LÀM ĐẸP</a>
             </li>
 
-          <li class="nav-item dropdown order">
-            <a href="#" class="dropdown-toggle">TRA CỨU ĐƠN HÀNG</a>
-            <div class="dropdown-menu order-lookup">
-              <form>
-                <input type="text" placeholder="Nhập email hoặc mã đơn hàng" class="form-control"/>
-                <button class="btn btn-danger mt-2 fw-bold" type="submit">
-                  Kiểm tra đơn hàng
-                </button>
-              </form>
-            </div>
-          </li>
+            <li class="nav-item dropdown order">
+              <a href="#" class="dropdown-toggle">TRA CỨU ĐƠN HÀNG</a>
+              <div class="dropdown-menu order-lookup">
+                <form (ngSubmit)="submitForm()">
+                  <input
+                    type="text"
+                    placeholder="Nhập email của bạn"
+                    class="form-control"
+                    [(ngModel)]="email"
+                    name="email"
+                    required
+                  />
+                  <button class="btn btn-danger mt-2 fw-bold" type="submit">
+                    Kiểm tra đơn hàng
+                  </button>
+                </form>
+              </div>
+            </li>
         </ul>
       </div>
     </div>

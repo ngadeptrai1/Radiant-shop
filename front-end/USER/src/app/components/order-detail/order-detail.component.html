@@ -163,7 +163,8 @@
     </div>
 
     <!-- Actions -->
-    <div class="order-actions">
+     @if(userId!= null && userId == order.userId){
+       <div class="order-actions">
       <button *ngIf="canCancel()" 
               class="btn-cancel" 
               (click)="cancelOrder()"
@@ -172,5 +173,8 @@
         {{ isCancelling ? 'Đang hủy đơn hàng...' : 'Hủy đơn hàng' }}
       </button>
     </div>
+     }
+   
+
   </div>
 </div>

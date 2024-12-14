@@ -8,6 +8,7 @@ import { Category, ProductDetail } from '../../../type';
 import { LoadingComponent } from '../shared/loading/loading.component';
 import { NestedCategoryComponent } from "../nested-category/nested-category.component";
 import { CartService } from '../../services/cart.service';
+import { FormsModule } from '@angular/forms';
 
 interface CartItem {
   productDetail: ProductDetail;
@@ -20,7 +21,7 @@ interface CartItem {
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterModule, RouterLink, LoadingComponent, NestedCategoryComponent],
+  imports: [CommonModule, RouterModule, RouterLink, LoadingComponent, NestedCategoryComponent,FormsModule],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css'],
 })
@@ -35,7 +36,7 @@ export class HeaderComponent implements OnInit {
   cartItemCount: number = 0;
   cartItems: CartItem[] = [];
   isCartDropdownVisible: boolean = false;
-
+  email: string = ''; // Biến lưu trữ email
   constructor(
     private authService: AuthService,
     private categoryService: CategoryService,
@@ -173,5 +174,11 @@ export class HeaderComponent implements OnInit {
 
   isValidCartItem(item: CartItem): boolean {
     return !!(item?.productDetail?.product);
+  }
+  submitForm() {
+    if (this.email) {
+      // Chuyển hướng sang trang tra cứu với query params
+      this.router.navigate(['/order-lookup'], { queryParams: { email: this.email } });
+    }
   }
 }

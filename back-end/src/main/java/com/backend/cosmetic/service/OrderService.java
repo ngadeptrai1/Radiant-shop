@@ -34,4 +34,5 @@ public interface OrderService {
     OrderResponse confirmPayment(Long orderId);
     OrderResponse addVoucher(Long orderId, String code);
     OrderResponse deleteVoucher(Long orderId);
+    List<OrderResponse> findByEmail(String email);
 }

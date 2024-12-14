@@ -8,8 +8,8 @@
  <div class="mat-elevation-z8">
     <div class="filters-container">
       <mat-form-field>
-        <mat-label>Filter</mat-label>
-        <input matInput (keyup)="applyFilter($event)" placeholder="Search..." #input>
+        <mat-label>Tìm kiếm</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Nước hoa ..." #input>
       </mat-form-field>
     </div>
     @if(isLoading){
@@ -52,10 +52,10 @@
       <ng-container matColumnDef="actions">
         <mat-header-cell *matHeaderCellDef> Thao tác </mat-header-cell>
         <mat-cell *matCellDef="let category">
-          <button mat-icon-button color="primary" (click)="openDialog(category)" matTooltip="Sửa">
+          <button mat-icon-button color="primary" (click)="openDialog(category)" matTooltip="Cập nhật">
             <mat-icon>edit</mat-icon>
           </button>
-          <button mat-icon-button color="warn" (click)="deleteCategory(category)" matTooltip="Xóa">
+          <button mat-icon-button color="warn" (click)="deleteCategory(category)" matTooltip="Ngưng hoạt động">
             <mat-icon>delete</mat-icon>
           </button>
         </mat-cell>
@@ -65,7 +65,7 @@
       <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
     </mat-table>
   
-    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of categories"></mat-paginator>
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of categories" showFirstLastButtons></mat-paginator>
   </div>
 </div>
 

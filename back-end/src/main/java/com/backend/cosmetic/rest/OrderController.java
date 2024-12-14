@@ -109,6 +109,14 @@ public class OrderController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    @GetMapping("/email")
+    public ResponseEntity<?> findOrdersByEmail(@RequestParam("email") String id){
+        try {
+            return  ResponseEntity.status(HttpStatus.OK).body(orderService.findByEmail(id));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> findOrderById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(orderService.findById(id));

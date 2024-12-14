@@ -1,0 +1,79 @@
+<div class="orders-container">
+  <h2>Tìm kiếm đơn hàng bằng email: {{ email }} </h2>
+
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Đang tải đơn hàng...</p>
+  </div>
+
+  <div *ngIf="!loading && orders.length === 0" class="no-orders">
+    <p>Bạn chưa có đơn hàng nào.</p>
+  </div>
+
+  <div *ngIf="!loading && orders.length > 0" class="orders-list">
+    <div *ngFor="let order of orders" class="order-card">
+      <div class="order-header">
+        <div class="order-id">
+          <span>Mã đơn hàng: #{{order.id}}</span>
+        </div>
+        <div class="order-date">
+          Ngày đặt: {{order.createdDate | date:'dd/MM/yyyy HH:mm'}}
+        </div>
+      </div>
+
+      <div class="order-info">
+        <div class="info-group">
+          <div class="label">Người nhận:</div>
+          <div class="value">{{order.fullName}}</div>
+        </div>
+        <div class="info-group">
+          <div class="label">Số điện thoại:</div>
+          <div class="value">{{order.phoneNumber}}</div>
+        </div>
+        <div class="info-group">
+          <div class="label">Địa chỉ:</div>
+          <div class="value">{{order.address}}</div>
+        </div>
+        <div class="info-group">
+          <div class="label">Tổng số sản phẩm:</div>
+          <div class="value">{{order.totalItems}}</div>
+        </div>
+        <div class="info-group">
+          <div class="label">Tổng tiền:</div>
+          <div class="value">{{order.totalOrderAmount | number}} ₫</div>
+        </div>
+        <div class="info-group">
+          <div class="label">Phí vận chuyển:</div>
+          <div class="value">{{order.shippingCost | number}} ₫</div>
+        </div>
+        <div class="info-group" *ngIf="order.voucherAmount">
+          <div class="label">Giảm giá:</div>
+          <div class="value">-{{order.voucherAmount | number}} ₫</div>
+        </div>
+        <div class="info-group">
+          <div class="label">Tổng thanh toán:</div>
+          <div class="value final-price">{{order.finalAmount | number}} ₫</div>
+        </div>
+        <div class="info-group cancel-reason" *ngIf="order.status === 'CANCELLED' && order.reason">
+          <div class="label">Lý do hủy:</div>
+          <div class="value reason-text">{{order.reason}}</div>
+        </div>
+      </div>
+
+      <div class="order-footer">
+        <div class="status-payment-group">
+          <span [class]="'status-badge ' + getStatusClass(order.status)">
+            {{ getStatusClass(order.status) }}
+          </span>
+          <span *ngIf="order.status !== 'CANCELLED'" 
+                [class]="'payment-badge ' + (order.paymentStatus === 'PAID' ? 'paid' : 'unpaid')">
+            {{ order.paymentStatus === 'PAID' ? 'Đã thanh toán' : 'Chưa thanh toán' }}
+          </span>
+        </div>
+        <a [routerLink]="['/order-detail', order.id]" class="view-detail-btn">
+          Xem chi tiết
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

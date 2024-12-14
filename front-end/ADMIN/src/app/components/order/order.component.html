@@ -186,14 +186,7 @@
                 <i class="fas fa-info-circle"></i>
               </a>
               
-              <ng-container *ngIf="order.status != 'SUCCESS'">
-                <button class="btn btn-sm btn-danger me-2" 
-                        *ngIf="order.status != 'CANCELLED'"
-                        (click)="cancelOrder(order.id)"
-                        title="Hủy đơn">
-                  <i class="fas fa-ban"></i>
-                </button>
-              </ng-container>
+            
             </td>
             <td>
               <span class="status-badge" [ngClass]="order.status.toLowerCase()">

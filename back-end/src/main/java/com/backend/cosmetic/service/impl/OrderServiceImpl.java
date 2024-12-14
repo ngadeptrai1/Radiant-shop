@@ -267,7 +267,10 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderResponse> findByUserId(Long id) {
         return orderMapper.toResponseDtoList(orderRepository.findAllByUserIdOrderByCreatedDateDesc(id));
     }
-
+    @Override
+    public List<OrderResponse> findByEmail(String email) {
+        return orderMapper.toResponseDtoList(orderRepository.findAllByEmailOrderByIdDesc(email));
+    }
     @Override
     public OrderResponse changeStatus(Long id, String status) {
         Order order = orderRepository.findById(id)

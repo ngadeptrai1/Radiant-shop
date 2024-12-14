@@ -59,10 +59,10 @@
           <ng-container matColumnDef="actions">
             <mat-header-cell *matHeaderCellDef> Thao tác </mat-header-cell>
             <mat-cell *matCellDef="let brand">
-              <button mat-icon-button color="primary" (click)="openDialog(brand)" matTooltip="Sửa">
+              <button mat-icon-button color="primary" (click)="openDialog(brand)" matTooltip="Cập nhật">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button mat-icon-button color="warn" (click)="deleteBrand(brand)" matTooltip="Xóa">
+              <button mat-icon-button color="warn" (click)="deleteBrand(brand)" matTooltip="Ngưng hoạt động">
                 <mat-icon>delete</mat-icon>
               </button>
             </mat-cell>
@@ -80,7 +80,8 @@
         </mat-table>
       
         <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" 
-                       aria-label="Select page of brands">
+                       aria-label="Select page of brands"
+                       showFirstLastButtons>
         </mat-paginator>
       </div>
 </div>

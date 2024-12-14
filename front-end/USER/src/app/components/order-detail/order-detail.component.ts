@@ -1,12 +1,14 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { OrderDetailResponse, OrderResponse } from '../../../type';
+import { OrderDetailResponse, OrderResponse, User } from '../../../type';
 import { OrderService } from '../../services/order.service';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CancelOrderDialogComponent } from '../../shared/cancel-order-dialog/cancel-order-dialog.component';
 import { QrPaymentModalComponent } from '../../shared/qr-payment-modal/qr-payment-modal.component';
+import { AuthService } from '../../services/auth.service';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-order-detail',
@@ -32,13 +34,17 @@ export class OrderDetailComponent implements OnInit {
   snackBar = inject(MatSnackBar);
   dialog = inject(MatDialog);
   isCancelling = false;
+   userId!: number|null;
   constructor(
     private route: ActivatedRoute,
-    private orderService: OrderService
+    private orderService: OrderService,
+    private authService:AuthService,
+    private cookieService:CookieService
   ) {}
 
   ngOnInit(): void {
     this.orderId = Number(this.route.snapshot.paramMap.get('id'));
+    this.userId = Number(this.cookieService.get('USER_ID'));
     this.loadOrderData();
   }
 

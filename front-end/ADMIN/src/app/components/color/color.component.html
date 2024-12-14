@@ -11,7 +11,10 @@
       <mat-spinner diameter="40"></mat-spinner>
     </div>}
     
-  
+    <mat-form-field>
+      <mat-label>Tìm kiếm</mat-label>
+      <input matInput (keyup)="applyFilter($event)" placeholder="Tên màu , mã màu ,..." #input>
+    </mat-form-field>
     <mat-table [dataSource]="dataSource" class="color-table">
       <ng-container matColumnDef="id">
         <mat-header-cell *matHeaderCellDef> ID </mat-header-cell>
