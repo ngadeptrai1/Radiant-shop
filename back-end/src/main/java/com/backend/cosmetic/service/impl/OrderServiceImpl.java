@@ -120,12 +120,15 @@ public class OrderServiceImpl implements OrderService {
         order.setPaymentStatus(orderDTO.getPaymentStatus());
         
         if(order.getUser()!= null){
-            if (!order.getUser().getEmail().isEmpty()){
-                try {
-                    emailService.createElectronicInvoiceEmailContent(order, order.getEmail());
-                } catch (MessagingException e) {
-                    throw new RuntimeException(e);
+            if (!(order.getUser().getEmail() == null || (order.getUser().getEmail().isBlank() ))){
+                if((15 > order.getUser().getEmail().length())){
+                    try {
+                        emailService.createElectronicInvoiceEmailContent(order, order.getUser().getEmail());
+                    } catch (MessagingException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
+
             }
         }
         
@@ -156,14 +159,14 @@ public class OrderServiceImpl implements OrderService {
         if (orderDTO.getOrderDetails() == null || orderDTO.getOrderDetails().isEmpty()) {
             throw new DataInvalidException("Order must have at least one product");
         }
-        
-        if (StringUtils.isBlank(orderDTO.getFullName())) {
-            throw new DataInvalidException("Full name is required");
-        }
-        
-        if (StringUtils.isBlank(orderDTO.getPhoneNumber())) {
-            throw new DataInvalidException("Phone number is required");
-        }
+
+//        if (StringUtils.isBlank(orderDTO.getFullName())) {
+//            throw new DataInvalidException("Full name is required");
+//        }
+//
+//        if (StringUtils.isBlank(orderDTO.getPhoneNumber())) {
+//            throw new DataInvalidException("Phone number is required");
+//        }
     }
 
     private Order buildInitialOrder(OrderDTO orderDTO) {
