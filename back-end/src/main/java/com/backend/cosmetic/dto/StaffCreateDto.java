@@ -25,4 +25,6 @@ public class StaffCreateDto {
     private String password;
 
     private String role;
+
+    private boolean enabled;
 } 

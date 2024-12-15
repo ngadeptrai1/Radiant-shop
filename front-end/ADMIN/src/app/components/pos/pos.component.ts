@@ -66,8 +66,8 @@ export class POSComponent implements OnInit, OnDestroy {
     fullName: '',
     phoneNumber: '',
     email: '',
-    role: 'CUSTOMER'
-
+    role: 'CUSTOMER',
+    enabled:true
   };
   customerError: string = '';
 
@@ -597,7 +597,8 @@ export class POSComponent implements OnInit, OnDestroy {
       phoneNumber: '',
       email: '',
       username: '',
-      role: 'CUSTOMER'
+      role: 'CUSTOMER',
+      enabled:true
     };
   }
 

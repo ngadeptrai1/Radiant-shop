@@ -165,6 +165,7 @@ export interface BrandReq {
     email: string;
     password: string;
     role: string;
+    enabled:boolean;
   }
 
   export interface OrderResponse {

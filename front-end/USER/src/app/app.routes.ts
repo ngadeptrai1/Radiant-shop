@@ -15,6 +15,7 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
 import { OrderDetailComponent } from './components/order-detail/order-detail.component';
 import { WishListComponent } from './components/wish-list/wish-list.component';
 import { OrderEmailComponent } from './components/order-email/order-email.component';
+import { authGuard } from './guards/auth.guard';
 export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
@@ -25,8 +26,8 @@ export const routes: Routes = [
   { path: 'payment', component: PaymentComponent },
   { path: 'product-list', component: ProductListComponent },
   { path: 'thank-you', component: ThankYouComponent },
-  { path: 'my-account', component: MyAccountComponent },
-  { path: 'my-orders', component: MyOrderComponent},
+  { path: 'my-account', component: MyAccountComponent ,canActivate: [authGuard]},
+  { path: 'my-orders', component: MyOrderComponent ,canActivate: [authGuard]},
   {path:'wishlist',component:WishListComponent},
   { path:'order-detail/:id', component: OrderDetailComponent},
   {path:'order-lookup' , component:OrderEmailComponent},

@@ -20,6 +20,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-user',
@@ -38,7 +39,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
     MatPaginatorModule,
     MatSortModule,
     MatTooltipModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatSlideToggle
   ],
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss'
@@ -51,7 +53,7 @@ export class UserComponent implements OnInit, AfterViewInit {
   users: UserResponse[] = [];
   selectedRole: string = 'CUSTOMER';
   roles = ['CUSTOMER', 'STAFF', 'ADMIN'];
-  displayedColumns: string[] = ['id', 'fullName', 'email', 'phoneNumber', 'role', 'actions'];
+  displayedColumns: string[] = ['id', 'fullName', 'email', 'phoneNumber', 'role', 'enabled','actions'];
   isLoading = false;
   activeTab: 'customer' | 'staff' = 'customer';
   staffRoles = ['STAFF', 'ADMIN'];
@@ -249,7 +251,7 @@ export class UserComponent implements OnInit, AfterViewInit {
       next: () => {
         this.loadUsers();
         this.snackBar.open(
-          `Thêm ${this.activeTab === 'customer' ? 'khách hàng' : 'nhân viên'} thành công`, 
+          `Thêm ${this.activeTab == 'customer' ? 'khách hàng' : 'nhân viên'} thành công`, 
           'Đóng', 
           { duration: 3000 }
         );

@@ -44,7 +44,7 @@ export class OrderDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.orderId = Number(this.route.snapshot.paramMap.get('id'));
-    this.userId = Number(this.cookieService.get('USER_ID'));
+    this.userId = Number(this.cookieService.get('USER_ID1'));
     this.loadOrderData();
   }
 

@@ -27,7 +27,7 @@ public class User extends BaseModel implements UserDetails {
     @Column(unique = false, nullable = true, length = 100)
     private String email;
 
-    @Column(unique = true, nullable = true, length = 100)
+    @Column(unique = true, nullable = true, length = 100,name = "username")
     private String username;
 
     @Column(unique = false, nullable = true, length = 255)
@@ -66,7 +66,7 @@ public class User extends BaseModel implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return username;
     }
 
     @Override

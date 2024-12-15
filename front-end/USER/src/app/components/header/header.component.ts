@@ -62,7 +62,7 @@ export class HeaderComponent implements OnInit {
       this.cartItems = items;
     });
 
-    console.log(this.cookieService.get('ACCESS_TOKEN'));
+    console.log(this.cookieService.get('ACCESS_TOKEN1'));
     
   }
 

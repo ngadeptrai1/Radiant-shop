@@ -8,6 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { UserResponse, UserRequest } from '../../../../type';
 import { MatProgressSpinnerModule, MatSpinner } from '@angular/material/progress-spinner';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-user-dialog',
@@ -21,7 +22,8 @@ import { MatProgressSpinnerModule, MatSpinner } from '@angular/material/progress
     MatSelectModule,
     MatButtonModule,
     MatProgressSpinnerModule,
-    MatSpinner
+    MatSpinner,
+    MatSlideToggle
   ],
   template: `
     <h2 mat-dialog-title>{{data.user ? 'Sửa' : 'Thêm'}} {{translateType(data.type)}}</h2>
@@ -35,8 +37,7 @@ import { MatProgressSpinnerModule, MatSpinner } from '@angular/material/progress
 
         <mat-form-field appearance="outline">
           <mat-label>Email</mat-label>
-          <input matInput formControlName="email" type="email">
-          <mat-hint>Không bắt buộc</mat-hint>
+          <input matInput formControlName="email" type="email" required>
           <mat-error>{{getErrorMessage('email')}}</mat-error>
         </mat-form-field>
 
@@ -47,7 +48,13 @@ import { MatProgressSpinnerModule, MatSpinner } from '@angular/material/progress
           <mat-error>{{getErrorMessage('phoneNumber')}}</mat-error>
         </mat-form-field>
 
-        @if (data.type === 'Staff') {
+        @if (data.type == 'Staff') {
+               <mat-form-field appearance="outline">
+            <mat-label>Tên đăng nhập</mat-label>
+            <input matInput formControlName="username" required>
+            <mat-error>{{getErrorMessage('username')}}</mat-error>
+          </mat-form-field>
+            
           <mat-form-field appearance="outline">
             <mat-label>Vai trò</mat-label>
             <mat-select formControlName="role" required>
@@ -58,6 +65,7 @@ import { MatProgressSpinnerModule, MatSpinner } from '@angular/material/progress
             <mat-error>{{getErrorMessage('role')}}</mat-error>
           </mat-form-field>
 
+         
           @if (!data.user) {
             <mat-form-field appearance="outline">
               <mat-label>Mật khẩu</mat-label>
@@ -68,7 +76,9 @@ import { MatProgressSpinnerModule, MatSpinner } from '@angular/material/progress
           }
         }
       </div>
-
+      <mat-slide-toggle formControlName="enabled" class="full-width">
+        Kích hoạt
+      </mat-slide-toggle>
       <div mat-dialog-actions align="end">
         <button mat-button type="button" [disabled]="isLoading" (click)="onCancel()">Hủy</button>
         <button mat-raised-button color="primary" type="submit" 
@@ -105,30 +115,39 @@ export class UserDialogComponent {
       roles: string[]
     }
   ) {
-    const isNewStaff = data.type === 'Staff' && !data.user;
+    const isNewStaff = data.type == 'Staff' && !data.user;
+    console.log(data);
     
     this.userForm = this.fb.group({
-      fullName: [data.user?.fullName || '', [
+      username: [data.user?.username || '', data.type == 'Staff' ? [
         Validators.required,
-        Validators.minLength(2),
-        Validators.maxLength(50),
-        Validators.pattern(/^[a-zA-ZÀ-ỹ\s]*$/)
+        Validators.minLength(4),
+        Validators.maxLength(20),
+        Validators.pattern(/^[a-zA-Z0-9_]+$/) // Allows alphanumeric and underscore
+      ] : []],
+      fullName: [data.user?.fullName || '', [ 
+        Validators.required, 
+        Validators.minLength(2), 
+        Validators.maxLength(50), 
+        Validators.pattern(/^[a-zA-ZÀ-ỹ\s]*$/) 
       ]],
-      email: [data.user?.email || '', [
-        Validators.email,
-        Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+      email: [data.user?.email || '', [ 
+        Validators.email, 
+        Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/) 
       ]],
-      phoneNumber: [data.user?.phoneNumber || '', [
-        Validators.required,
-        Validators.pattern(/^[0-9]{10}$/)
+      phoneNumber: [data.user?.phoneNumber || '', [ 
+        Validators.required, 
+        Validators.pattern(/^[0-9]{10}$/) 
       ]],
-      role: [data.user?.roles[0] || (data.type === 'Customer' ? 'CUSTOMER' : 'STAFF'), 
-        data.type === 'Staff' ? Validators.required : null],
-      password: ['', isNewStaff ? [
-        Validators.required,
-        Validators.minLength(6),
-        Validators.pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/)
-      ] : []]
+      role: [data.user?.roles[0] || (data.type == 'Customer' ? 'CUSTOMER' : 'STAFF'), 
+        data.type == 'Staff' ? Validators.required : null
+      ],
+      password: ['', isNewStaff ? [ 
+        Validators.required, 
+        Validators.minLength(6), 
+        Validators.pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/) 
+      ] : []],
+      enabled: [data.user?.enabled ?? true]
     });
 
     // Disable email khi cập nhật nhân viên
@@ -168,6 +187,8 @@ export class UserDialogComponent {
           return 'Mật khẩu phải có ít nhất 6 ký tự, bao gồm chữ và số';
         case 'fullName':
           return 'Họ tên chỉ được chứa chữ cái và dấu';
+        case 'username':
+          return 'Tên đăng nhập không hợp lệ';
         case 'email':
           return 'Email không đúng định dạng';
       }
@@ -186,7 +207,7 @@ export class UserDialogComponent {
       const formValue = this.userForm.getRawValue();
       const userData = {
         ...formValue,
-        role: formValue.role || (this.data.type === 'Customer' ? 'CUSTOMER' : 'STAFF')
+        role: formValue.role || (this.data.type == 'Customer' ? 'CUSTOMER' : 'STAFF')
       };
       this.submitForm.emit(userData);
     }

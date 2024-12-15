@@ -37,7 +37,7 @@ export class OrderEmailComponent implements OnInit {
       this.route.queryParams.subscribe(params => {
         this.email = params['email'] || '';
       });
-      const userId = Number(this.cookieService.get('USER_ID'));
+      const userId = Number(this.cookieService.get('USER_ID1'));
       console.log(userId);
       if (this.email) {
         this.orderService.getOrdersByEmail(this.email).subscribe({

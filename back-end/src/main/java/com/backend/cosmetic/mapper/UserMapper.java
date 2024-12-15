@@ -15,6 +15,7 @@ import com.backend.cosmetic.model.User;
 public interface UserMapper {
 
     default UserResponseDto toResponseDto(User user) {
+
         UserResponseDto response = new UserResponseDto();
         response.setId(user.getId());
         response.setUsername(user.getUsername());
@@ -29,6 +30,7 @@ public interface UserMapper {
                 .collect(Collectors.toSet()));
         response.setCreatedAt(user.getCreatedDate());
         response.setUpdatedAt(user.getUpdatedDate());
+
         return response;
     }
 

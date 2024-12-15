@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
         user.setFullName(updateDto.getFullName());
         user.setPhoneNum(updateDto.getPhoneNumber());
         user.setEmail(updateDto.getEmail());
-        
+        user.setEnabled(updateDto.isEnabled());
         User updatedUser = userRepository.save(user);
         return userMapper.toResponseDto(updatedUser);
     }
@@ -156,7 +156,7 @@ public class UserServiceImpl implements UserService {
         User newStaff = User.builder()
             .fullName(staffDto.getFullName())
             .email(staffDto.getEmail())
-            .username(staffDto.getUsername()) // Use email as username
+            .username(staffDto.getUsername())
             .phoneNum(staffDto.getPhoneNumber())
             .password(staffDto.getPassword())
             .provider("local")
@@ -170,6 +170,7 @@ public class UserServiceImpl implements UserService {
                 RoleType roleType = RoleType.valueOf(staffDto.getRole().toUpperCase());
                 switch (roleType) {
                     case ADMIN:
+
                         newStaff.getRoles().add(roleService.getAdminRole());
                         break;
                     case STAFF:
@@ -194,17 +195,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto updateStaff(Long id, StaffCreateDto staffDto) {
         User staff = userRepository.findById(id)
-            .orElseThrow(() -> new DataNotFoundException("Staff not found"));
-        
-        // Verify user is actually a staff member
-        if (!staff.getRoles().stream().anyMatch(role -> role.getName() == RoleType.STAFF)) {
-            throw new IllegalArgumentException("User is not a staff member");
-        }
-        
+                .orElseThrow(() -> new DataNotFoundException("Staff not found"));
+        ;
+
         // Update fields
         staff.setFullName(staffDto.getFullName());
         staff.setPhoneNum(staffDto.getPhoneNumber());
-        
+
         // Only update email if it changed and isn't already taken
         if (!staff.getEmail().equals(staffDto.getEmail())) {
             if (userRepository.existsByEmail(staffDto.getEmail())) {
@@ -212,11 +209,18 @@ public class UserServiceImpl implements UserService {
             }
             staff.setEmail(staffDto.getEmail());
             staff.setUsername(staffDto.getEmail());
+
         }
+        staff.setEnabled(staffDto.isEnabled());
         // Xử lý role
         if (staffDto.getRole() != null && !staffDto.getRole().isEmpty()) {
             try {
                 RoleType roleType = RoleType.valueOf(staffDto.getRole().toUpperCase());
+
+                // Xóa tất cả các role hiện tại
+                staff.getRoles().clear();
+
+                // Thêm role mới
                 switch (roleType) {
                     case ADMIN:
                         staff.getRoles().add(roleService.getAdminRole());
@@ -229,12 +233,15 @@ public class UserServiceImpl implements UserService {
                 }
             } catch (IllegalArgumentException e) {
                 // Nếu role không hợp lệ, mặc định là STAFF
+                staff.getRoles().clear();
                 staff.getRoles().add(roleService.getStaffRole());
             }
         } else {
             // Nếu không có role được chỉ định, mặc định là STAFF
-                staff.getRoles().add(roleService.getStaffRole());
+            staff.getRoles().clear();
+            staff.getRoles().add(roleService.getStaffRole());
         }
+
         User updatedStaff = userRepository.save(staff);
         return userMapper.toResponseDto(updatedStaff);
     }
@@ -244,12 +251,8 @@ public class UserServiceImpl implements UserService {
         User staff = userRepository.findById(id)
             .orElseThrow(() -> new DataNotFoundException("Staff not found"));
         
-        // Verify user is actually a staff member
-        if (!staff.getRoles().stream().anyMatch(role -> role.getName() == RoleType.STAFF)) {
-            throw new IllegalArgumentException("User is not a staff member");
-        }
-        
-        userRepository.delete(staff);
+       staff.setEnabled(false);
+       userRepository.save(staff);
     }
 
     @Override

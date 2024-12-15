@@ -16,7 +16,7 @@ import { inject } from '@angular/core';
 export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
   const cookieService = inject(CookieService);
   const router = inject(Router);
-  const token = cookieService.get('accessToken');
+  const token = cookieService.get('ACCESS_TOKEN1');
 
   if (token) {
     req = req.clone({
@@ -30,9 +30,9 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401) {
         // Token expired or invalid
-        cookieService.delete('accessToken');
-        cookieService.delete('refreshToken');
-        cookieService.delete('userId');
+        cookieService.delete('ACCESS_TOKEN1');
+        cookieService.delete('REFRESH_TOKEN1');
+        cookieService.delete('USER_ID1');
         router.navigate(['/login']);
       }
       return throwError(() => error);

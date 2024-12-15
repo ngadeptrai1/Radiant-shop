@@ -63,9 +63,9 @@ export class LoginComponent {
   }
 
   private showErrorModal(error: any) {
-    this.modalMessage = error.status === 401 
-      ? 'Tên đăng nhập hoặc mật khẩu không chính xác'
-      : 'Đã có lỗi xảy ra. Vui lòng thử lại sau.';
+    this.modalMessage = error.status == 401 
+      ? 'Tên đăng nhập hoặc mật khẩu không chính xác hoặc tài khoản không có quyền đăng nhập'
+      : 'Tên đăng nhập hoặc mật khẩu không chính xác hoặc tài khoản không có quyền đăng nhập';
     this.modalClass = 'text-danger';
     this.modalIcon = 'fas fa-times-circle fa-3x';
     this.showModal = true;
@@ -73,7 +73,7 @@ export class LoginComponent {
     // Tự động ẩn modal lỗi sau 2 giây
     setTimeout(() => {
       this.hideModal();
-    }, 2000);
+    }, 1000);
   }
 
   private hideModal() {

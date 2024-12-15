@@ -29,7 +29,7 @@ export class MyOrderComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const userId = Number(this.cookieService.get('USER_ID'));
+    const userId = Number(this.cookieService.get('USER_ID1'));
     console.log(userId);
     if (userId) {
       this.orderService.getOrdersByUserId(userId).subscribe({
