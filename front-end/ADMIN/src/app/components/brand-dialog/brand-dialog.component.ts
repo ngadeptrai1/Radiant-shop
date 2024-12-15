@@ -54,12 +54,13 @@ export class BrandDialogComponent {
         if (key == 'thumbnail' && this.form.get('thumbnail')?.value instanceof File) {
           formData.append(key, this.form.get('thumbnail')?.value);
         } else {
-          console.log('not');
-          formData.append('thumbnail',this.file);
+          
           formData.append(key, formValue[key]);
+          formData.delete('thumbnail');
+          formData.append('thumbnail',this.file);
         }
       });
-
+      
       this.dialogRef.close(formData);
     }
   }

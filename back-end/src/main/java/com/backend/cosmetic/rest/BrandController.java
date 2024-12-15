@@ -51,10 +51,12 @@ public class BrandController {
 
         if(result.hasErrors()){
             List<String> errs = result.getFieldErrors().stream().map(FieldError:: getDefaultMessage).toList();
-            String mess = errs.isEmpty() ? "" : errs.get(0);;
+            String mess = errs.isEmpty() ? "" : errs.get(0);
+            System.out.println(mess);
             throw new DataInvalidException( mess);
         }
         try {
+            System.out.println(brand.toString());
             return ResponseEntity.status(HttpStatus.CREATED).body(brandService.save(brand));
         } catch (IOException e) {
             throw new RuntimeException(e);

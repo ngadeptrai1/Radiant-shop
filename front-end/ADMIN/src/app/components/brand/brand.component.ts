@@ -122,6 +122,7 @@ export class BrandComponent implements OnInit, AfterViewInit   {
 
   createBrand(brand: FormData) {
     this.isLoading = true;
+    brand.delete('id');
     this.brandService.createBrand(brand).subscribe({
       next: (newBrand) => {
         this.dataSource.data = [...this.dataSource.data, newBrand];

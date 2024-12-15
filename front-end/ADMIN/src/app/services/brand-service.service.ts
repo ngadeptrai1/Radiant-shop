@@ -21,6 +21,7 @@ export class BrandService {
   }
 
   createBrand(brand: FormData): Observable<Brand> {
+    
     return this.apiService.post<Brand>(this.endpoint, brand);
   }
 
