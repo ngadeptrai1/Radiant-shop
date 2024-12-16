@@ -112,7 +112,8 @@ export class MyAccountComponent implements OnInit {
   }
 
   onAddressSubmit() {
-    if (this.addressForm.valid) {
+    console.log('1');
+    
       const addressData = {
         ...this.addressForm.value,
         email: this.addressForm.get('email')?.value
@@ -127,7 +128,7 @@ export class MyAccountComponent implements OnInit {
         },
         error: (error) => console.error('Error adding address:', error)
       });
-    }
+    
   }
 
   deleteAddress(id: number) {

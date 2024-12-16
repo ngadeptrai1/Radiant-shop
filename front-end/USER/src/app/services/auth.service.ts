@@ -95,6 +95,7 @@ export class AuthService {
     const userId = this.cookieService.get('USER_ID1');
     return this.apiService.get<User>(`${this.endpoint}/users/${userId}`);
   }
+  
   changePassword(newPassword: string): Observable<void> {
     if (!this.cookieService.check('USER_ID1')) {
       return throwError(() => new Error('User ID not found'));

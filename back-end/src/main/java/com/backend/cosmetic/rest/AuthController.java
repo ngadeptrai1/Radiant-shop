@@ -93,6 +93,7 @@ public class AuthController {
                     loginDto.getPassword()
                 )
             );
+            System.out.println("2"+auth.getAuthorities());
             return ResponseEntity.ok(tokenGenerator.createToken(auth));
         } catch (UsernameNotFoundException usernameNotFoundException) {
            throw new UsernameNotFoundException("Username or password incorrect");
@@ -100,6 +101,28 @@ public class AuthController {
              throw new BadCredentialsException("Username or password incorrect");
         } catch (DisabledException Exception) {
              throw new DisabledException("Your account not active , please check your email to active accunt");
+        }
+    }
+    @PostMapping("/admin/login")
+    public ResponseEntity<?> loginAdmin(@Valid @RequestBody LoginDto loginDto) {
+        try {
+            Authentication auth = authenticationProvider.authenticate(
+                    UsernamePasswordAuthenticationToken.unauthenticated(
+                            loginDto.getUsername(),
+                            loginDto.getPassword()
+                    )
+            );
+            if(! auth.getAuthorities().toString().equalsIgnoreCase("ROLE_ADMIN")) {
+               throw new BadCredentialsException(" Username or password incorrect");
+            }
+
+            return ResponseEntity.ok(tokenGenerator.createToken(auth));
+        } catch (UsernameNotFoundException usernameNotFoundException) {
+            throw new UsernameNotFoundException("Username or password incorrect");
+        } catch (BadCredentialsException badCredentialsException) {
+            throw new BadCredentialsException("Username or password incorrect");
+        } catch (DisabledException Exception) {
+            throw new DisabledException("Your account not active , please check your email to active accunt");
         }
     }
 

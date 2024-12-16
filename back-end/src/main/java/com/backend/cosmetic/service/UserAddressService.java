@@ -29,7 +29,7 @@ public class UserAddressService {
             .provinceName(addressDTO.getProvinceName())
             .districtId(addressDTO.getDistrictId())
             .districtName(addressDTO.getDistrictName())
-            .fullname(addressDTO.getFullname())
+            .fullname(addressDTO.getFullName())
             .wardCode(addressDTO.getWardCode())
             .wardName(addressDTO.getWardName())
             .address(addressDTO.getAddress())
@@ -55,7 +55,7 @@ public class UserAddressService {
         address.setDistrictId(addressDTO.getDistrictId());
         address.setDistrictName(addressDTO.getDistrictName());
         address.setWardCode(addressDTO.getWardCode());
-        address.setFullname(addressDTO.getFullname());
+        address.setFullname(addressDTO.getFullName());
         address.setWardName(addressDTO.getWardName());
         address.setAddress(addressDTO.getAddress());
         address.setPhoneNumber(addressDTO.getPhoneNumber());

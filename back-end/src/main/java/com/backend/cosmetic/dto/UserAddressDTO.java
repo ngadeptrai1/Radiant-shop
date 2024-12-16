@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserAddressDTO {
     private long id;
-    private String fullname;
+    private String fullName;
     private Integer provinceId;
     private String provinceName;
     private Integer districtId;

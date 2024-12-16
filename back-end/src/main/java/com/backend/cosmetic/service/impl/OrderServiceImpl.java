@@ -427,13 +427,19 @@ public class OrderServiceImpl implements OrderService {
         }
 
         order = orderRepository.save(order);
-
+        orderRepository.flush();
         try {
-            emailService.sendOrderStatusUpdateEmail(order, order.getStatus(), order.getEmail());
+            if(order.getStatus().equals(OrderStatus.SUCCESS)) {
+                emailService.createElectronicInvoiceEmailContent(order,order.getEmail());
+            }else{
+                emailService.sendOrderStatusUpdateEmail(order, order.getStatus(), order.getEmail());
+            }
+
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
-        return orderMapper.toResponseDto(orderRepository.save(order));
+
+        return orderMapper.toResponseDto(order);
     }
 
     @Override

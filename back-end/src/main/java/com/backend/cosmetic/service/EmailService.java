@@ -26,7 +26,6 @@ public class EmailService {
 
     @Async
     public void createOrderConfirmationEmailContent(Order order) {
-        NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
         StringBuilder content = new StringBuilder();
         content.append("<html><body>");
         content.append("<h2>Xác nhận đơn hàng #").append(order.getId()).append("</h2>");
@@ -100,7 +99,6 @@ public class EmailService {
         helper.setTo(recipientEmail);
         switch (newStatus) {
             case OrderStatus.PROCESSING -> helper.setSubject("Đơn hàng #" + order.getId() + " đã được xác nhận");
-            case OrderStatus.SUCCESS -> helper.setSubject("Đơn hàng #" + order.getId() + " đã giao thành công");
             case OrderStatus.CANCELLED -> helper.setSubject("Đơn hàng #" + order.getId() + " đã bị hủy");
             case OrderStatus.SHIPPED -> helper.setSubject("Đơn hàng #" + order.getId() + " đã được vận chuyển");
             case OrderStatus.DELIVERED -> helper.setSubject("Đơn hàng #" + order.getId() + " đã được giao thành công");
@@ -149,14 +147,13 @@ public class EmailService {
                "<body>" +
                "    <div class='invoice'>" +
                "        <div class='invoice-header'>" +
-               "            <h1>HÓA ĐƠN ĐIỆN TỬ</h1>" +
+               "            <h1>HÓA ĐƠN ĐIỆN TỬ RADIANT-SHOP</h1>" +
                "            <p>Số hóa đơn: " + order.getId() + "</p>" +
                "            <p>Ngày: " + order.getCreatedDate() + "</p>" +
                "        </div>" +
                "        <div class='invoice-details'>" +
                "            <h2>Thông Tin Khách Hàng</h2>" +
-               "            <p>Tên: " + order.getUser().getFullName() + "</p>" +
-               "            <p>Email: " + order.getUser().getEmail() + "</p>" +
+               "            <p>Tên: " +  (order.getUser() != null && order.getUser().getFullName() != null ? order.getUser().getFullName() : "Trống") + "</p>" +
                "            <p>Địa chỉ: " + order.getAddress() + "</p>" +
                "        </div>" +
                "        <div class='invoice-items'>" +
@@ -176,7 +173,8 @@ public class EmailService {
                "            </table>" +
                "        </div>" +
                "        <div class='invoice-summary'>" +
-               "            <p class='total'>Tổng Cộng: " + order.getFinalAmount() + " VND</p>" +
+               "            <p class='total'>Phí vận chuyển: " + order.getShippingCost() + " VND</p>" +
+                "            <p class='total'>Tổng Cộng: " +( order.getTotalOrderAmount()+order.getShippingCost() )+ " VND</p>" +
                "            <p class='total'>Giảm giá: " + order.getVoucherAmount()+ " VND</p>" +
                "            <p class='total'>Tổng Thanh Toán: " + order.getFinalAmount() + " VND</p>" +
                "        </div>" +
@@ -192,7 +190,7 @@ public class EmailService {
         StringBuilder itemsHtml = new StringBuilder();
         for (OrderDetail item : items) {
             itemsHtml.append("<tr>")
-                     .append("<td>").append(item.getProductDetail().getProduct().getName()).append("</td>")
+                     .append("<td>").append(item.getProductDetail().getProduct().getName() +" - " + item.getProductDetail().getColor().getName()).append("</td>")
                      .append("<td>").append(item.getQuantity()).append("</td>")
                      .append("<td>").append(item.getPrice()).append(" VND</td>")
                      .append("<td>").append(item.getPrice() * item.getQuantity()).append(" VND</td>")
