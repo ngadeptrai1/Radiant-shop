@@ -39,7 +39,7 @@ public class ProductReviewDTO {
     @Nullable
     private LocalDateTime reviewDate = LocalDateTime.now();
 
-    private boolean active = true;
+    private boolean active = false;
 
     @NotNull(message = "Product ID cannot be null")
     private Long productId;

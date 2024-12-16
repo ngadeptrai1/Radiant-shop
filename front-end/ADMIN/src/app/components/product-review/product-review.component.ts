@@ -53,11 +53,11 @@ export class ProductReviewComponent implements OnInit {
   approveReview(id: number): void {
     this.productReviewService.approveProductReview(id.toString()).subscribe({
       next: () => {
-        this.showMessage('Review approved successfully');
+        this.showMessage('Đã duyệt đánh giá');
         this.loadReviews();
       },
       error: () => {
-        this.showMessage('Error approving review');
+        this.showMessage('Đã duyệt đánh giá');
       }
     });
   }
@@ -65,24 +65,24 @@ export class ProductReviewComponent implements OnInit {
   rejectReview(id: number): void {
     this.productReviewService.rejectProductReview(id.toString()).subscribe({
       next: () => {
-        this.showMessage('Review rejected successfully');
+        this.showMessage('Đã từ chối đánh giá');
         this.loadReviews();
       },
       error: () => {
-        this.showMessage('Error rejecting review');
+        this.showMessage('Đã từ chối đánh giá');
       }
     });
   }
 
   deleteReview(id: number): void {
-    if (confirm('Are you sure you want to delete this review?')) {
+    if (confirm('Bạn có chắc muốn xóa đánh giá này ?')) {
       this.productReviewService.deleteProductReview(id.toString()).subscribe({
         next: () => {
-          this.showMessage('Review deleted successfully');
+          this.showMessage('Đã xóa đánh giá');
           this.loadReviews();
         },
         error: () => {
-          this.showMessage('Error deleting review');
+          this.showMessage('Đã xóa đánh giá');
         }
       });
     }

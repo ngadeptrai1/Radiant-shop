@@ -88,7 +88,7 @@ export class AuthService {
   }
 
   login(loginDto: LoginDto): Observable<AuthResponse> {
-    return this.apiService.post<AuthResponse>(`${this.endpoint}/login`, loginDto).pipe(
+    return this.apiService.post<AuthResponse>(`${this.endpoint}/admin/login`, loginDto).pipe(
       tap(response => {
         this.cookieService.set('ACCESS_TOKEN', response.accessToken);
         this.cookieService.set('REFRESH_TOKEN', response.refreshToken);

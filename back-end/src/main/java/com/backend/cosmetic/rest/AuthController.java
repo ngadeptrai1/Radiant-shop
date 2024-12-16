@@ -112,8 +112,14 @@ public class AuthController {
                             loginDto.getPassword()
                     )
             );
-            if(! auth.getAuthorities().toString().equalsIgnoreCase("ROLE_ADMIN")) {
-               throw new BadCredentialsException(" Username or password incorrect");
+            boolean hasValidRole = auth.getAuthorities().stream()
+                    .anyMatch(authority ->
+                            authority.getAuthority().equals("ROLE_ADMIN") ||
+                                    authority.getAuthority().equals("ROLE_STAFF")
+                    );
+
+            if (!hasValidRole) {
+                throw new BadCredentialsException("Username or password incorrect");
             }
 
             return ResponseEntity.ok(tokenGenerator.createToken(auth));

@@ -34,7 +34,7 @@ public class ProductReviewServiceImpl implements ProductReviewService {
             .fullName(reviewDTO.getFullName()).rating(reviewDTO.getRating())
             .reviewText(reviewDTO.getReviewText())
             .reivewDate(reviewDTO.getReviewDate())
-            .active(true)
+            .active(false)
             .product(product)
             .build();
 
