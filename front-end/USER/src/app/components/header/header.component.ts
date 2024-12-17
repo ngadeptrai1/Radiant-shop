@@ -37,6 +37,7 @@ export class HeaderComponent implements OnInit {
   cartItems: CartItem[] = [];
   isCartDropdownVisible: boolean = false;
   email: string = ''; // Biến lưu trữ email
+  name: string = '';
   constructor(
     private authService: AuthService,
     private categoryService: CategoryService,
@@ -179,6 +180,14 @@ export class HeaderComponent implements OnInit {
     if (this.email) {
       // Chuyển hướng sang trang tra cứu với query params
       this.router.navigate(['/order-lookup'], { queryParams: { email: this.email } });
+    }
+  }
+  submitFormpProduct() {
+    console.log(this.name);
+    
+    if (this.name) {
+      // Chuyển hướng sang trang tra cứu với query params
+      this.router.navigate(['/product-list'], { queryParams: { name: this.name } });
     }
   }
 }

@@ -37,8 +37,7 @@ export class MyAccountComponent implements OnInit {
   ) {
     this.profileForm = this.fb.group({
       fullName: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      username: ['', Validators.required]
+      email: ['', [Validators.required, Validators.email]]
     });
 
     this.addressForm = this.fb.group({

@@ -15,28 +15,28 @@ export class WishlistService {
   constructor(private apiService: ApiService, private authService: AuthService, private cookieService: CookieService) { }
 
   addToWishlist(productId: number): Observable<WishlistItem> {
-    if (!this.cookieService.check('USER_ID')) {
+    if (!this.cookieService.check('USER_ID1')) {
       return throwError(() => new Error('Vui lòng đăng nhập để sử dụng tính năng này'));
     }
-    const userId = this.cookieService.get('USER_ID');
+    const userId = this.cookieService.get('USER_ID1');
     return this.apiService.post<WishlistItem>(`${this.endpoint}/${userId}/${productId}`, {}).pipe(
       catchError(error => throwError(() => error))
     );
   }
   deleteFromWishlist(productId: number): Observable<void> {
-    if (!this.cookieService.check('USER_ID')) {
+    if (!this.cookieService.check('USER_ID1')) {
       return throwError(() => new Error('Vui lòng đăng nhập để sử dụng tính năng này'));
     }
-    const userId = this.cookieService.get('USER_ID');
+    const userId = this.cookieService.get('USER_ID1');
     return this.apiService.delete<void>(`${this.endpoint}/${userId}/${productId}`).pipe(
       catchError(error => throwError(() => error))
     );
   }
   isInWishlist(productId: number): Observable<boolean> {
-    if (!this.cookieService.check('USER_ID')) {
+    if (!this.cookieService.check('USER_ID1')) {
       return of(false);
     }
-    const userId = this.cookieService.get('USER_ID');
+    const userId = this.cookieService.get('USER_ID1');
     return this.apiService.get<boolean>(`${this.endpoint}/${userId}/${productId}`);
   }
   getProducts(userId:string) :Observable<Product[]>{

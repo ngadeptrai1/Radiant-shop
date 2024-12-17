@@ -74,11 +74,13 @@
 
         <div class="col-lg-5 col-md-5 d-none d-md-block search-box">
           <div class="header_search">
-            <form class="d-flex search-form" role="search">
+            <form class="d-flex search-form" (ngSubmit)="submitFormpProduct()" >
               <input
                 class="form-control me-2"
-                type="search"
-                placeholder="Tìm kiếm..."
+                type="text"
+                [(ngModel)]="name"
+                name="name"
+                placeholder="Tìm kiếm sản phẩm theo tên"
                 aria-label="Search"
               />
               <button class="btn search-icon" type="submit">
@@ -171,7 +173,7 @@
             <a routerLink="/product-list">DANH SÁCH SẢN PHẨM</a>
           </li>
           <li class="nav-item">
-              <a href="#">XU HƯỚNG LÀM ĐẸP</a>
+              <a routerLink="/checkout">GIỎ HÀNG</a>
           </li>
 
             <li class="nav-item dropdown order">

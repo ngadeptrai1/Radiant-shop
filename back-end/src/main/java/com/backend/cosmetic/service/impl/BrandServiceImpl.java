@@ -72,7 +72,7 @@ public class BrandServiceImpl implements BrandService {
 
     @Override
     public List<BrandResponse> findAll() {
-        List<Brand> categories = brandRepository.findAll();
+        List<Brand> categories = brandRepository.findAllByOrderByIdDesc();
         return categories.stream()
                 .map(BrandResponse::fromBrand)
                 .collect(Collectors.toList());}

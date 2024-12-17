@@ -85,6 +85,7 @@ export class ProductListComponent implements OnInit {
       sortBy: ['name'],
       direction: ['ASC']
     });
+    this.ngOnInit();
   }
 
   ngOnInit(): void {
@@ -99,6 +100,10 @@ export class ProductListComponent implements OnInit {
       if (params['brand']) {
         formValues.brands = [params['brand']];
         this.paramBrands = Number(params['brand']);
+      }
+      if (params['name']) {
+        formValues.name = [params['name']];
+        this.name = params['name'];
       }
       
       this.filterForm.patchValue(formValues);

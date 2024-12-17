@@ -34,7 +34,7 @@ Page<Product> findProductsByCategoryAndSubcategories(@Param("categoryId") Intege
            "       p.description, p.active as  activate , p.thumbnail, c.name as Category, b.name as Brand , sum(pd.quantity) as quantity from Products p\n" +
            "join Categories c on c.id = p.category_id\n" +
            "join Brands b on b.id = p.brand_id   join Product_Details pd on pd.product_id = p.id\n" +
-           "group by p.id, p.name, p.description, p.active, p.thumbnail, c.name, b.name ")
+           "group by p.id, p.name, p.description, p.active, p.thumbnail, c.name, b.name  order by id desc")
    List<ProductProjection> findAllProjected();
 
 @Query("SELECT c.name as categoryName, " +

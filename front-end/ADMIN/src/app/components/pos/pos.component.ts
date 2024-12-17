@@ -249,7 +249,7 @@ export class POSComponent implements OnInit, OnDestroy {
     this.currentOrder.paymentStatus = 'PAID';
     this.orderService.createOrder(this.currentOrder).subscribe({
       next: (response) => {
-        this.snackBar.open('Tạo đơn hàng thành công!', 'Đóng', {
+        this.snackBar.open('Tạo hóa đơn thành công!', 'Đóng', {
           duration: 3000,
           horizontalPosition: 'end',
           verticalPosition: 'top',
