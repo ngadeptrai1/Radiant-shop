@@ -73,7 +73,14 @@ public class EmailService {
             content.append("<h2>Đơn hàng #").append(order.getId()).append(" đã bị hủy</h2>");
             content.append("<p>Lý do: ").append(order.getReason()).append("</p>");
             content.append("</body></html>");
-        }else{
+        }
+        else if(newStatus.equals(OrderStatus.REFUNDED)){
+            content.append("<html><body>");
+            content.append("<h2>Đơn hàng #").append(order.getId()).append(" đã được hoàn tiền</h2>");
+            content.append("<p>Lý do: ").append(order.getReason()).append("</p>");
+            content.append("</body></html>");
+        }
+        else{
             content.append("<html><body>");
             content.append("<h2>Cập nhật trạng thái đơn hàng #").append(order.getId()).append("</h2>");
             content.append("<p>Đơn hàng của bạn đã được cập nhật trạng thái mới:</p>");
@@ -83,11 +90,14 @@ public class EmailService {
                 content.append("<p><strong>Trạng thái mới: </strong>Đơn hàng đang được vận chuyển</p>");
             }else if(newStatus.equals(OrderStatus.DELIVERED)){
                 content.append("<p><strong>Trạng thái mới: </strong>Đơn hàng đã được giao thành công</p>");
+            }else if(newStatus.equals(OrderStatus.DELIVERY_FAILED)){
+                content.append("<p><strong>Trạng thái mới: </strong>Đơn hàng đã giao thất bại</p>");
             }
 
             content.append("</body></html>"); 
         }
         
+
         return content.toString();
     }
     @Async
@@ -102,6 +112,8 @@ public class EmailService {
             case OrderStatus.CANCELLED -> helper.setSubject("Đơn hàng #" + order.getId() + " đã bị hủy");
             case OrderStatus.SHIPPED -> helper.setSubject("Đơn hàng #" + order.getId() + " đã được vận chuyển");
             case OrderStatus.DELIVERED -> helper.setSubject("Đơn hàng #" + order.getId() + " đã được giao thành công");
+            case OrderStatus.DELIVERY_FAILED -> helper.setSubject("Đơn hàng #" + order.getId() + " đã giao thất bại");
+            case OrderStatus.REFUNDED -> helper.setSubject("Đơn hàng #" + order.getId() + " đã được hoàn tiền");
             default -> {
             }
         }
@@ -222,7 +234,10 @@ public class EmailService {
     }
 
 
-
+@Async
+public void sendRefundOrderEmail(Order order, String recipientEmail) throws MessagingException {
+    sendMail(recipientEmail, "Đơn hàng #" + order.getId() + " đã được hoàn tiền", createOrderStatusUpdateEmailContent(order, OrderStatus.REFUNDED));
+}
 
 
 

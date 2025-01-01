@@ -147,4 +147,12 @@ export class OrderService {
   addVoucher(orderId: number, voucherCode: string): Observable<OrderResponse> {
     return this.apiService.put<OrderResponse>(`${this.endpoint}/${orderId}/voucher?code=${voucherCode}`, {});
   }
+
+  markDeliveryFailed(orderId: number, reason: string): Observable<OrderResponse> {
+    return this.apiService.put<OrderResponse>(`${this.endpoint}/${orderId}/delivery-failed?reason=${reason}`, {});
+  }
+
+  refundPayment(orderId: number): Observable<OrderResponse> {
+    return this.apiService.put<OrderResponse>(`${this.endpoint}/${orderId}/refund`, {});
+  }
 }

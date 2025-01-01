@@ -337,7 +337,9 @@ public class OrderServiceImpl implements OrderService {
             status.equalsIgnoreCase(OrderStatus.SUCCESS) ||
             status.equalsIgnoreCase(OrderStatus.UNPAID) ||
             status.equalsIgnoreCase(OrderStatus.PAID) ||
-            status.equalsIgnoreCase(OrderStatus.PAYMENT_FAILED)
+            status.equalsIgnoreCase(OrderStatus.PAYMENT_FAILED) ||
+            status.equalsIgnoreCase(OrderStatus.DELIVERY_FAILED) ||
+            status.equalsIgnoreCase(OrderStatus.REFUNDED)
         );
     }
 
@@ -560,6 +562,65 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new DataNotFoundException("Order not found"));
         applyVoucherIfPresent(order, code);
+        return orderMapper.toResponseDto(orderRepository.save(order));
+    }
+
+    @Override
+    @Transactional
+    public OrderResponse markDeliveryFailed(Long orderId, String reason) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new DataNotFoundException("Order not found"));
+
+        // Chỉ cho phép cập nhật trạng thái SHIPPED thành DELIVERY_FAILED
+        if (!OrderStatus.SHIPPED.equals(order.getStatus())) {
+            throw new DataInvalidException("Only shipped orders can be marked as delivery failed");
+        }
+
+        order.setStatus(OrderStatus.DELIVERY_FAILED);
+        order.setReason(reason);
+
+        // Hoàn lại số lượng sản phẩm vào kho
+        for (OrderDetail detail : order.getOrderDetails()) {
+            ProductDetail productDetail = detail.getProductDetail();
+            productDetail.setQuantity(productDetail.getQuantity() + detail.getQuantity());
+            productDetailRepo.save(productDetail);
+        }
+
+        // Gửi email thông báo
+        if (order.getEmail() != null) {
+            try {
+                emailService.sendOrderStatusUpdateEmail(order, OrderStatus.DELIVERY_FAILED, order.getEmail());
+            } catch (MessagingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return orderMapper.toResponseDto(orderRepository.save(order));
+    }
+
+    @Override
+    @Transactional
+    public OrderResponse refundOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new DataNotFoundException("Order not found"));
+
+        // Chỉ cho phép hoàn tiền cho đơn hàng giao không thành công và đã thanh toán
+        if (!OrderStatus.DELIVERY_FAILED.equals(order.getStatus()) || 
+            !OrderStatus.PAID.equals(order.getPaymentStatus())) {
+            throw new DataInvalidException("Only paid and delivery failed orders can be refunded");
+        }
+
+        
+        order.setPaymentStatus(OrderStatus.REFUNDED);
+
+        // Gửi email thông báo hoàn tiền
+        if (order.getEmail() != null) {
+            try {
+                emailService.sendRefundOrderEmail(order, order.getEmail());
+            } catch (MessagingException e) {
+                throw new RuntimeException(e);
+            }
+        }
         return orderMapper.toResponseDto(orderRepository.save(order));
     }
 }

@@ -77,6 +77,21 @@
             <span class="timeline-status">Giao hàng thành công</span>
           </div>
         </div>
+
+        <div class="timeline-line" [class.active]="getTimelineStatus(order.status) >= 5"></div>
+        
+        <div class="timeline-item" [class.active]="getTimelineStatus(order.status) >= 5">
+          <div class="timeline-icon failed">
+            <i class="bi bi-x-circle"></i>
+          </div>
+          <div class="timeline-content">
+            <span class="timeline-title">Giao hàng không thành công</span>
+            <span class="timeline-status">Đơn hàng giao không thành công</span>
+            <span class="timeline-reason" *ngIf="order.reason">
+              Lý do: {{order.reason}}
+            </span>
+          </div>
+        </div>
       </div>
 
       <!-- Timeline for cancelled order -->
@@ -112,8 +127,8 @@
           {{ order.paymentMethod === 'CASH' ? 'Thanh toán khi nhận hàng' : 'Thanh toán qua tài khoản ngân hàng' }}
         </p>
         <p><strong>Trạng thái:</strong> 
-          <span [class]="'payment-badge ' + (order.paymentStatus === 'PAID' ? 'paid' : 'unpaid')">
-            {{ order.paymentStatus === 'PAID' ? 'Đã thanh toán' : 'Chưa thanh toán' }}
+          <span [class]="'payment-badge ' + getPaymentStatusClass()">
+            {{ getPaymentStatusText() }}
           </span>
           <button *ngIf="canShowQRCode()" 
                   class="btn-qr-payment" 

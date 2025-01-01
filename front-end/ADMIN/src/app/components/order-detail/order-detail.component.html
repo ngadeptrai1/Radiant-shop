@@ -145,6 +145,22 @@
                 (click)="exportToPDF()">
           <i class="fas fa-file-pdf me-2"></i>Xuất hóa đơn
         </button>
+
+        <!-- Thêm button vào phần actions -->
+        <button *ngIf="canMarkDeliveryFailed()" 
+                class="btn btn-danger me-2" 
+                (click)="openModal('deliveryFailed')">
+          <i class="fas fa-times-circle me-2"></i>
+          Giao hàng không thành công
+        </button>
+
+        <!-- Thêm button hoàn tiền -->
+        <button *ngIf="canRefundPayment()" 
+                class="btn btn-warning me-2" 
+                (click)="openModal('refund')">
+          <i class="fas fa-undo me-2"></i>
+          Hoàn tiền
+        </button>
       </div>
 
       <!-- Add warning message when payment confirmation is required -->
@@ -520,6 +536,57 @@
         <i class="fas" [class.fa-spinner]="isLoading" [class.fa-spin]="isLoading" [class.fa-check]="!isLoading"></i>
         {{isLoading ? 'Đang áp dụng...' : 'Áp dụng'}}
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- Thêm modal giao hàng không thành công -->
+<div class="modal fade" id="deliveryFailedModal" tabindex="-1" #deliveryFailedModal>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Đánh dấu giao hàng không thành công</h5>
+        <button type="button" class="btn-close" (click)="closeModal('deliveryFailed')"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Lý do không giao được:</label>
+          <textarea class="form-control" [(ngModel)]="deliveryFailedReason" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal('deliveryFailed')">Đóng</button>
+        <button type="button" class="btn btn-danger" 
+                [disabled]="!deliveryFailedReason || deliveryFailedReason.trim() == ''"
+                (click)="handleDeliveryFailed()">
+          Xác nhận
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Thêm modal xác nhận hoàn tiền -->
+<div class="modal fade" id="refundModal" tabindex="-1" #refundModal>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Xác nhận hoàn tiền</h5>
+        <button type="button" class="btn-close" (click)="closeModal('refund')"></button>
+      </div>
+      <div class="modal-body">
+        <p>Bạn có chắc chắn muốn hoàn tiền cho đơn hàng #{{order?.id}} không?</p>
+        <div class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          Lưu ý: Hành động này không thể hoàn tác
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal('refund')">Đóng</button>
+        <button type="button" class="btn btn-warning" (click)="handleRefundPayment()">
+          <i class="fas fa-undo me-2"></i>Xác nhận hoàn tiền
+        </button>
+      </div>
     </div>
   </div>
 </div>

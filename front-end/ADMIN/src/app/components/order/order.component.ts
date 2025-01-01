@@ -47,9 +47,10 @@ export class OrderComponent implements OnInit {
     { value: 'PENDING', label: 'Chờ xác nhận', icon: 'fas fa-clock' },
     { value: 'PROCESSING', label: 'Đang xử lý', icon: 'fas fa-cog fa-spin' },
     { value: 'SHIPPED', label: 'Đang giao hàng', icon: 'fas fa-truck' },
+    { value: 'DELIVERED', label: 'Đã giao hàng', icon: 'fas fa-box' },
     { value: 'SUCCESS', label: 'Thành công', icon: 'fas fa-check-circle' },
-    { value: 'DELIVERED', label: 'Đã giao hàng', icon: 'fas fa-user-check' },
-    { value: 'CANCELLED', label: 'Đã hủy', icon: 'fas fa-ban' }
+    { value: 'CANCELLED', label: 'Đã hủy', icon: 'fas fa-ban' },
+    { value: 'DELIVERY_FAILED', label: 'Giao hàng thất bại', icon: 'fas fa-times-circle' }
   ];
 
   constructor(private orderService: OrderService) {}

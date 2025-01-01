@@ -42,10 +42,13 @@ export class OrderDetailComponent implements OnInit {
   @ViewChild('updateModal') updateModal!: ElementRef;
   @ViewChild('cancelModal') cancelModal!: ElementRef;
   @ViewChild('confirmPaymentModal') confirmPaymentModal!: ElementRef;
+  @ViewChild('deliveryFailedModal') deliveryFailedModal: ElementRef;
+  @ViewChild('refundModal') refundModal: ElementRef;
   
   cancelReason: string = '';
   private modalInstances: { [key: string]: any } = {};
   newVoucherCode: string = '';
+  deliveryFailedReason: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -56,8 +59,14 @@ export class OrderDetailComponent implements OnInit {
     private snackBar: MatSnackBar,
     private voucherService: VoucherService
   ) {
-
-
+    this.modalInstances = {
+      confirm: null,
+      update: null,
+      cancel: null,
+      confirmPayment: null,
+      deliveryFailed: null,
+      refund: null
+    };
   }
 
   ngOnInit() {
@@ -298,7 +307,7 @@ export class OrderDetailComponent implements OnInit {
     return methods[method] || method;
   }
 
-  openModal(type: 'confirm' | 'update' | 'cancel' | 'confirmPayment') {
+  openModal(type: 'confirm' | 'update' | 'cancel' | 'confirmPayment' | 'deliveryFailed' | 'refund') {
     const modalElement = this.getModalElement(type);
     if (modalElement) {
       this.modalInstances[type] = new bootstrap.Modal(modalElement);
@@ -306,7 +315,7 @@ export class OrderDetailComponent implements OnInit {
     }
   }
 
-  closeModal(type: 'confirm' | 'update' | 'cancel' | 'confirmPayment') {
+  closeModal(type: 'confirm' | 'update' | 'cancel' | 'confirmPayment' | 'deliveryFailed' | 'refund') {
     if (this.modalInstances[type]) {
       this.modalInstances[type].hide();
       if (type == 'cancel') {
@@ -325,6 +334,10 @@ export class OrderDetailComponent implements OnInit {
         return this.cancelModal?.nativeElement;
       case 'confirmPayment':
         return this.confirmPaymentModal?.nativeElement;
+      case 'deliveryFailed':
+        return this.deliveryFailedModal?.nativeElement;
+      case 'refund':
+        return this.refundModal?.nativeElement;
       default:
         return null;
     }
@@ -799,5 +812,68 @@ export class OrderDetailComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  // Kiểm tra có thể đánh dấu giao hàng không thành công
+  canMarkDeliveryFailed(): boolean {
+    return this.order?.status === 'SHIPPED';
+  }
+
+  // Kiểm tra có thể hoàn tiền
+  canRefundPayment(): boolean {
+    return this.order?.status === 'CANCELLED' && 
+           this.order?.paymentStatus === 'PAID' &&
+           this.order?.paymentMethod === 'CARD';
+  }
+
+  // Xử lý giao hàng không thành công
+  handleDeliveryFailed() {
+    if (!this.order || !this.deliveryFailedReason.trim()) return;
+
+    this.isLoading = true;
+    this.orderService.markDeliveryFailed(this.order.id, this.deliveryFailedReason)
+      .subscribe({
+        next: (response) => {
+          this.order = response;
+          this.closeModal('deliveryFailed');
+          this.deliveryFailedReason = '';
+          this.snackBar.open('Đã cập nhật trạng thái giao hàng không thành công', 'Đóng', {
+            duration: 3000,
+          });
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error('Error marking delivery failed:', error);
+          this.snackBar.open('Có lỗi xảy ra khi cập nhật trạng thái', 'Đóng', {
+            duration: 3000,
+          });
+          this.isLoading = false;
+        }
+      });
+  }
+
+  // Xử lý hoàn tiền
+  handleRefundPayment() {
+    if (!this.order) return;
+
+    this.isLoading = true;
+    this.orderService.refundPayment(this.order.id)
+      .subscribe({
+        next: (response) => {
+          this.order = response;
+          this.closeModal('refund');
+          this.snackBar.open('Đã hoàn tiền thành công', 'Đóng', {
+            duration: 3000,
+          });
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error('Error refunding payment:', error);
+          this.snackBar.open('Có lỗi xảy ra khi hoàn tiền', 'Đóng', {
+            duration: 3000,
+          });
+          this.isLoading = false;
+        }
+      });
   }
 }
