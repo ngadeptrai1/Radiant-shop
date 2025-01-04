@@ -197,3 +197,18 @@ h2 {
   background: #f8d7da; 
   color: #721c24; 
 }
+
+.status-delivery_failed {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.status-shipped {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.refunded {
+  background: #efebe9;
+  color: #4e342e;
+}

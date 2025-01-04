@@ -48,6 +48,9 @@
 
 .timeline.cancelled {
   justify-content: center;
+  padding: 20px;
+  background: #fff3f3;
+  border-radius: 8px;
 }
 
 .timeline-item {
@@ -91,6 +94,10 @@
   color: #dc3545;
 }
 
+.timeline-icon.failed i {
+  color: #dc3545;
+}
+
 .timeline-content {
   text-align: center;
 }
@@ -114,7 +121,7 @@
 }
 
 .timeline-reason {
-  font-size: 0.85em;
+  font-size: 0.9em;
   color: #dc3545;
   display: block;
   margin-top: 5px;
@@ -246,6 +253,13 @@
   padding: 4px 8px;
   border-radius: 4px;
 }
+.status-refunded {
+  background: #f8d7da;
+  color: #c4dc38;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
 
 /* Action buttons */
 .order-actions {
@@ -327,7 +341,7 @@
 }
 
 .payment-badge.refunded {
-  background-color: #e2e3e5;
+  background-color: #c3e337;
   color: #383d41;
 }
 
@@ -351,4 +365,16 @@
   justify-content: flex-end;
   gap: 10px;
   margin-top: 20px;
+}
+
+.timeline-item.active .timeline-icon.failed {
+  background-color: #fff;
+  border-color: #dc3545;
+}
+
+.timeline-content .timeline-reason {
+  color: #dc3545;
+  font-size: 0.9em;
+  margin-top: 5px;
+  font-style: italic;
 }

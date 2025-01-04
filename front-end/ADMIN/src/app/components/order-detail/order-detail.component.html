@@ -15,7 +15,7 @@
 
   <div class="order-timeline">
     <!-- Timeline cho đơn hàng POS -->
-    <div *ngIf="order.type === 'POS'" class="timeline-item active">
+    <div *ngIf="order.type == 'POS'" class="timeline-item active">
       <div class="timeline-icon">
         <i class="fas fa-check-circle"></i>
       </div>
@@ -26,7 +26,7 @@
     </div>
 
     <!-- Timeline cho đơn hàng bị hủy -->
-    <div *ngIf="order.status === 'CANCELLED'" class="timeline-item active">
+    <div *ngIf="order.status == 'CANCELLED'" class="timeline-item active">
       <div class="timeline-icon">
         <i class="fas fa-ban"></i>
       </div>
@@ -36,9 +36,18 @@
       </div>
     </div>
 
+    <div *ngIf="order.status == 'DELIVERY_FAILED'" class="timeline-item active">
+      <div class="timeline-icon">
+        <i class="fas fa-ban"></i>
+      </div>
+      <div class="timeline-content">
+        <h4>Không thành công</h4>
+        <div class="timeline-date">{{getStatusDate('CANCELLED') | date:'dd/MM/yyyy HH:mm'}}</div>
+      </div>
+    </div>
     <!-- Timeline cho đơn hàng web bình thường -->
-    <ng-container *ngIf="order.type === 'WEB' && order.status !== 'CANCELLED'">
-      <div class="timeline-item" [ngClass]="{'completed': isStatusCompleted('PENDING'), 'active': order.status === 'PENDING'}">
+    <ng-container *ngIf="order.type == 'WEB' && order.status !== 'CANCELLED'&& order.status !== 'DELIVERY_FAILED' ">
+      <div class="timeline-item" [ngClass]="{'completed': isStatusCompleted('PENDING'), 'active': order.status == 'PENDING'}">
         <div class="timeline-icon">
           <i class="fas fa-clock"></i>
         </div>
@@ -49,7 +58,7 @@
         <div class="timeline-line"></div>
       </div>
 
-      <div class="timeline-item" [ngClass]="{'completed': isStatusCompleted('PROCESSING'), 'active': order.status === 'PROCESSING'}">
+      <div class="timeline-item" [ngClass]="{'completed': isStatusCompleted('PROCESSING'), 'active': order.status == 'PROCESSING'}">
         <div class="timeline-icon">
           <i class="fas fa-cog"></i>
         </div>
@@ -60,7 +69,7 @@
         <div class="timeline-line"></div>
       </div>
 
-      <div class="timeline-item" [ngClass]="{'completed': isStatusCompleted('SHIPPED'), 'active': order.status === 'SHIPPED'}">
+      <div class="timeline-item" [ngClass]="{'completed': isStatusCompleted('SHIPPED'), 'active': order.status == 'SHIPPED'}">
         <div class="timeline-icon">
           <i class="fas fa-truck"></i>
         </div>
@@ -71,7 +80,7 @@
         <div class="timeline-line"></div>
       </div>
 
-      <div class="timeline-item" [ngClass]="{'completed': isStatusCompleted('DELIVERED'), 'active': order.status === 'DELIVERED'}">
+      <div class="timeline-item" [ngClass]="{'completed': isStatusCompleted('DELIVERED'), 'active': order.status == 'DELIVERED'}">
         <div class="timeline-icon">
           <i class="fas fa-box"></i>
         </div>
@@ -82,7 +91,7 @@
         <div class="timeline-line"></div>
       </div>
 
-      <div class="timeline-item" [ngClass]="{'completed': isStatusCompleted('SUCCESS'), 'active': order.status === 'SUCCESS'}">
+      <div class="timeline-item" [ngClass]="{'completed': isStatusCompleted('SUCCESS'), 'active': order.status == 'SUCCESS'}">
         <div class="timeline-icon">
           <i class="fas fa-check-circle"></i>
         </div>
@@ -103,34 +112,42 @@
       <p class="mb-0">{{order.reason || 'Không có lý do'}}</p>
     </div>
   </div>
-
+  <div class="card mb-4" *ngIf="order?.status == 'DELIVERY_FAILED'">
+    <div class="card-body">
+      <h5 class="card-title text-danger">
+        <i class="fas fa-ban me-2"></i>Lý do không thành công
+      </h5>
+      <p class="mb-0">{{order.reason || 'Không có lý do'}}</p>
+    </div>
+  </div>
   <!-- Sửa phần actions button -->
   <div class="card mb-4">
     <div class="card-body">
       <div class="d-flex gap-2 flex-wrap">
         <!-- Payment confirmation button -->
         <button *ngIf="canConfirmPayment()" 
-                class="btn btn-warning" 
+                class="btn btn-warning me-2" 
                 (click)="openModal('confirmPayment')">
           <i class="fas fa-credit-card me-2"></i>
-          {{order.paymentMethod == 'CARD' ? 'Xác nhận thanh toán online' : 'Xác nhận đã thu tiền'}}
-        </button>
-
-        <!-- Status update button -->
-        <button *ngIf="canUpdateStatus() && order.status !== 'PENDING'" 
-                [class]="'btn ' + getNextStatusButtonClass()"
-                (click)="openModal('update')"
-                [disabled]="order.status == 'DELIVERED' && order.paymentMethod == 'CASH' && order.paymentStatus == 'UNPAID'">
-          <i class="fas" [class]="getNextStatusIcon() + ' me-2'"></i>
-          {{getNextStatusLabel()}}
+          {{order.paymentMethod == 'CARD' ? 'Xác nhận thanh toán' : 'Xác nhận đã thu tiền'}}
         </button>
         
-        <!-- Nút xác nhận đơn -->
-        <button *ngIf="canConfirm()" 
-                class="btn btn-primary" 
-                (click)="openModal('confirm')">
-          <i class="fas fa-check me-2"></i>Xác nhận đơn
+        <!-- Status update button -->
+         @if (!(order.paymentStatus == 'UNPAID' && order.paymentMethod == 'CARD') ) {
+        <button *ngIf="canUpdateStatus()" 
+                class="btn btn-primary me-2" 
+                (click)="openModal('update')">
+          <i class="fas fa-arrow-right me-2"></i>
+          {{getNextStatusLabel()}}
         </button>
+      }
+        <!-- Nút xác nhận đơn -->
+        <!-- <button *ngIf="canConfirmOrder()" 
+                class="btn btn-primary me-2" 
+                (click)="openModal('confirm')">
+          <i class="fas fa-check me-2"></i>
+          Xác nhận đơn hàng
+        </button> -->
 
         <!-- Nút hủy đơn -->
         <button *ngIf="canCancel()" 
@@ -163,11 +180,30 @@
         </button>
       </div>
 
-      <!-- Add warning message when payment confirmation is required -->
-      <div *ngIf="order.status === 'DELIVERED' && order.paymentMethod === 'CASH' && order.paymentStatus === 'UNPAID'" 
-           class="alert alert-warning mt-3 mb-0">
-        <i class="fas fa-exclamation-triangle me-2"></i>
-        Vui lòng xác nhận đã thu tiền trước khi chuyển trạng thái thành công
+   
+
+      <!-- Thêm hiển thị trạng thái hoàn tiền khi đơn hàng giao không thành công -->
+<div *ngIf="order?.status == 'DELIVERY_FAILED'" class="alert" 
+[ngClass]="{'alert-warning': order.paymentStatus !== 'REFUNDED', 
+            'alert-success': order.paymentStatus == 'REFUNDED'}">
+<i class="fas" [ngClass]="{'fa-exclamation-triangle': order.paymentStatus !== 'REFUNDED',
+                       'fa-check-circle': order.paymentStatus == 'REFUNDED'}"></i>
+{{order.paymentStatus == 'REFUNDED' ? 'Đã hoàn tiền thành công' : 'Đơn hàng giao không thành công'}}
+</div>
+
+        <!-- Thêm thông báo khi đơn hàng online chưa thanh toán -->
+        <div *ngIf="order?.paymentMethod == 'CARD' && order?.status == 'PENDING' && order?.paymentStatus == 'UNPAID'" 
+             class="alert alert-warning mt-3">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          Đơn hàng đang chờ thanh toán online. Vui lòng đợi khách hàng thanh toán trước khi xác nhận.
+        </div>
+
+        <!-- Thông báo cho đơn hàng tiền mặt đã giao nhưng chưa thanh toán -->
+        <div *ngIf="order?.paymentMethod == 'CASH' && order?.status == 'DELIVERED' && order?.paymentStatus == 'UNPAID'" 
+             class="alert alert-warning mt-3">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          Vui lòng xác nhận thanh toán trước khi hoàn thành đơn hàng.
+        </div>
       </div>
     </div>
   </div>
@@ -182,9 +218,9 @@
             <i class="fas fa-user me-2"></i>Thông tin khách hàng
           </h5>
           <div class="mt-3">
-            <p><strong>Họ tên:</strong> {{order.fullName}}</p>
-            <p><strong>SĐT:</strong> {{order.phoneNumber}}</p>
-            <p><strong>Email:</strong> {{order.email || 'Không có'}}</p>
+            <p><strong>Họ tên:</strong> {{order?.fullName}}</p>
+            <p><strong>SĐT:</strong> {{order?.phoneNumber}}</p>
+            <p><strong>Email:</strong> {{order?.email || 'Không có'}}</p>
           </div>
         </div>
       </div>
@@ -198,8 +234,8 @@
             <i class="fas fa-shipping-fast me-2"></i>Thông tin giao hàng
           </h5>
           <div class="mt-3">
-            <p><strong>Địa chỉ:</strong> {{order.address || 'Mua tại cửa hàng'}}</p>
-            <p><strong>Ghi chú:</strong> {{order.note || 'Không có'}}</p>
+            <p><strong>Địa chỉ:</strong> {{order?.address || 'Mua tại cửa hàng'}}</p>
+            <p><strong>Ghi chú:</strong> {{order?.note || 'Không có'}}</p>
           </div>
         </div>
       </div>
@@ -213,11 +249,20 @@
             <i class="fas fa-credit-card me-2"></i>Thông tin thanh toán
           </h5>
           <div class="mt-3">
-            <p><strong>Phương thức:</strong> {{getPaymentMethodLabel(order.paymentMethod)}}</p>
+            <p><strong>Phương thức:</strong> {{getPaymentMethodLabel( order?.paymentMethod + '' )}}</p>
             <p><strong>Trạng thái:</strong> 
-              <span [class.text-success]="order.paymentStatus == 'PAID'"
-                    [class.text-danger]="order.paymentStatus == 'UNPAID'">
-                {{order.paymentStatus == 'PAID' ? 'Đã thanh toán' : 'Chưa thanh toán'}}
+              <span [class.text-success]="order?.paymentStatus == 'PAID'"
+                    [class.text-danger]="order?.paymentStatus == 'UNPAID'"
+                    [class.text-warning]="order?.paymentStatus == 'REFUNDED'">
+                    @if (order?.paymentStatus == 'PAID' ) {
+                       Đã thanh toán
+                    }
+                    @if (order?.paymentStatus == 'UNPAID' ) {
+                      Chưa thanh toán
+                   }
+                   @if (order?.paymentStatus == 'REFUNDED' ) {
+                    Đã hoàn tiền
+                 }
               </span>
             </p>
           </div>
@@ -308,26 +353,26 @@
           <div class="border-top pt-3">
             <div class="d-flex justify-content-between mb-2">
               <span>Tạm tính:</span>
-              <span>{{formatCurrency(order.totalOrderAmount || 0)}}</span>
+              <span>{{formatCurrency(order?.totalOrderAmount || 0)}}</span>
             </div>
             <div class="d-flex justify-content-between mb-2">
               <span>Phí vận chuyển:</span>
-              <span>{{formatCurrency(order.shippingCost || 0)}}</span>
+              <span>{{formatCurrency(order?.shippingCost || 0)}}</span>
             </div>
             <div class="d-flex justify-content-between mb-2">
               <span>Giảm giá:</span>
-              <span>{{formatCurrency(order.voucherAmount || 0)}}</span>
+              <span>{{formatCurrency(order?.voucherAmount || 0)}}</span>
             </div>
             <div class="d-flex justify-content-between fw-bold border-top pt-2">
               <span>Tổng cộng:</span>
-              <span class="text-primary">{{formatCurrency(order.finalAmount || 0)}}</span>
+              <span class="text-primary">{{formatCurrency(order?.finalAmount || 0)}}</span>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+
 
 <!-- Thay thế phần hiển thị lỗi cũ -->
 <div *ngIf="!isLoading && !order" class="alert alert-danger m-4">
@@ -590,3 +635,5 @@
     </div>
   </div>
 </div>
+
+

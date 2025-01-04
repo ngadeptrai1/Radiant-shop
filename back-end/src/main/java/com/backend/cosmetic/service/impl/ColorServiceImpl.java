@@ -58,7 +58,7 @@ return ColorResponse.fromColor(colorRepository.save(color));
 
     @Override
     public List<ColorResponse> findAll() {
-        List<Color> color = colorRepository.findAll();
+        List<Color> color = colorRepository.findAllByOrderByIdDesc();
         return color.stream()
                 .map(ColorResponse::fromColor)
                 .collect(Collectors.toList());

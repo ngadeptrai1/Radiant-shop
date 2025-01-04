@@ -39,7 +39,9 @@ export class VoucherDialogComponent {
   ) {
     this.dialogTitle = data.voucher ? 'Cập nhật voucher' : 'Thêm voucher mới';
     this.selectedStartDate = data.voucher?.startDate;
-    
+    if(data.voucher){
+      this.currentDate =  data.voucher?.startDate;
+    }
     this.form = this.fb.group({
       id: [data.voucher?.id],
       code: [

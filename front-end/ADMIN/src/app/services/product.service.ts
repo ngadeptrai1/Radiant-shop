@@ -14,9 +14,9 @@ export class ProductService {
 
 
     getProducts(): Observable<ProductResponse[]> {
-      
+
     return this.apiService.get<ProductResponse[]>(this.endpoint+'/get-all');
-  
+
   }
 
   createProduct(product: FormData, productDetails: ProductDetail[]): Observable<ProductResponse> {
@@ -41,19 +41,15 @@ export class ProductService {
   updateProduct(product: ProductRequest, id: number): Observable<ProductResponse> {
     return this.apiService.put<ProductResponse>(`${this.endpoint}/${id}`, product);
   }
-
   deleteProduct(id: number): Observable<ProductResponse> {
     return this.apiService.delete<ProductResponse>(`${this.endpoint}/${id}`);
   }
-
   searchByName(name: string): Observable<ProductResponse[]> {
     return this.apiService.get<ProductResponse[]>(`${this.endpoint}/search`,{params: {name: name}});
   }
-
   getAllProductDetails(): Observable<ProductDetailResponse[]> {
     return this.apiService.get<ProductDetailResponse[]>(`${this.endpoint}/product-details/get-all`);
   }
-
   plusQuantity(productDetailId: number): Observable<number> {
     return this.apiService.put<number>(`${this.endpoint}/product-detail/plus/${productDetailId}`,{});
   }

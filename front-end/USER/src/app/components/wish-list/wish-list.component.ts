@@ -29,8 +29,8 @@ export class WishListComponent implements OnInit {
 
   ngOnInit() {
     if (!this.authService.isAuthenticated()) {
-      this.router.navigate(['/login'], { 
-        queryParams: { returnUrl: '/wishlist' } 
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: '/wishlist' }
       });
       return;
     }
@@ -39,7 +39,7 @@ export class WishListComponent implements OnInit {
 
   loadWishlist() {
     this.loading = true;
-    const userId = this.cookieService.get('USER_ID');
+    const userId = this.cookieService.get('USER_ID1');
     if (!userId) {
       this.error = 'Không tìm thấy thông tin người dùng';
       this.loading = false;

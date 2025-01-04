@@ -131,7 +131,7 @@ export interface OrderResponse {
   phoneNumber: string
   email: any
   address: any
-  status: 'PENDING'|'SHIPPED' | 'DELIVERED' | 'CANCELLED'|'PROCESSING'|'SUCCESS'|'DELIVERY-FAILED' |string;
+  status: 'PENDING'|'SHIPPED' | 'DELIVERED' | 'CANCELLED'|'PROCESSING'|'SUCCESS'|'DELIVERY_FAILED' |string;
   paymentStatus: string|'REFUNDED';
   paymentMethod: string;
   totalOrderAmount: number;
@@ -140,7 +140,8 @@ export interface OrderResponse {
   finalAmount: number;
   totalItems: number;
   type: string
-  createdDate: string
+  createdDate: string;
+  updatedDate:string;
   note: string
   userId: number
   voucherCode: any

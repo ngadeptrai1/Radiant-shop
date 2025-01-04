@@ -58,9 +58,22 @@ export class OrderEmailComponent implements OnInit {
       switch (status) {
         case 'PENDING': return 'Chờ xác nhận';
         case 'CONFIRMED': return 'Đã xác nhận';
+        case 'PROCESSING': return 'Đang xử lý';
+        case 'SHIPPED': return 'Đang giao hàng';
         case 'DELIVERED': return 'Đã giao';
+        case 'SUCCESS': return 'Thành công';
         case 'CANCELLED': return 'Đã hủy';
-        default: return '';
+        case 'DELIVERY_FAILED': return 'Giao hàng thất bại';
+        default: return status;
+      }
+    }
+
+    getPaymentStatusText(status: string): string {
+      switch (status) {
+        case 'PAID': return 'Đã thanh toán';
+        case 'UNPAID': return 'Chưa thanh toán';
+        case 'REFUNDED': return 'Đã hoàn tiền';
+        default: return status;
       }
     }
 }

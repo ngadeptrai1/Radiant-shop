@@ -39,6 +39,7 @@ import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 
 import java.util.Arrays;
 import java.util.List;
@@ -67,12 +68,14 @@ public class WebConfig {
 
                 .authorizeRequests(authorized -> authorized
                         .anyRequest().permitAll())
+
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(customOAuth2SuccessHandler())
                 )
                 .oauth2ResourceServer((oauth2) ->
                         oauth2.jwt((jwt) -> jwt.jwtAuthenticationConverter(jwtToUserConverter))
                 )
+
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling((exceptions) -> exceptions
                         .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
@@ -146,7 +149,6 @@ CustomOAuth2SuccessHandler customOAuth2SuccessHandler(){
         provider.setUserDetailsService(userDetailsManager);
         return provider;
     }
-
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         converters.add(new MappingJackson2HttpMessageConverter());
     }

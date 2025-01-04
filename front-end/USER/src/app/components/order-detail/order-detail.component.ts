@@ -83,7 +83,7 @@ export class OrderDetailComponent implements OnInit {
       'SHIPPED': 2,
       'DELIVERED': 3,
       'SUCCESS': 4,
-      'DELIVERY-FAILED': 5,
+      'DELIVERY-FAILED': 4,
       'CANCELLED': -1
     };
     return statusOrder[status as keyof typeof statusOrder] ?? -1;

@@ -54,20 +54,23 @@
           <div class="label">Tổng thanh toán:</div>
           <div class="value final-price">{{order.finalAmount | number}} ₫</div>
         </div>
-        <div class="info-group cancel-reason" *ngIf="order.status === 'CANCELLED' && order.reason">
+        <div class="info-group cancel-reason" *ngIf="order.status == 'CANCELLED' && order.reason">
           <div class="label">Lý do hủy:</div>
+          <div class="value reason-text">{{order.reason}}</div>
+        </div>
+        <div class="info-group cancel-reason" *ngIf="order.status == 'DELIVERY_FAILED' && order.reason">
+          <div class="label">Lý do :</div>
           <div class="value reason-text">{{order.reason}}</div>
         </div>
       </div>
 
       <div class="order-footer">
         <div class="status-payment-group">
-          <span [class]="'status-badge ' + getStatusClass(order.status)">
+          <span [class]="'status-badge status-' + order.status.toLowerCase()">
             {{ getStatusClass(order.status) }}
           </span>
-          <span *ngIf="order.status !== 'CANCELLED'" 
-                [class]="'payment-badge ' + (order.paymentStatus === 'PAID' ? 'paid' : 'unpaid')">
-            {{ order.paymentStatus === 'PAID' ? 'Đã thanh toán' : 'Chưa thanh toán' }}
+          <span [class]="'payment-badge ' + order.paymentStatus.toLowerCase()">
+            {{ getPaymentStatusText(order.paymentStatus) }}
           </span>
         </div>
         <a [routerLink]="['/order-detail', order.id]" class="view-detail-btn">

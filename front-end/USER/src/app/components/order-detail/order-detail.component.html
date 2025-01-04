@@ -16,8 +16,38 @@
 
     <!-- Timeline section -->
     <div class="timeline-section">
-      <!-- Timeline for normal order status -->
-      <div class="timeline" *ngIf="order.status !== 'CANCELLED'">
+      <!-- Timeline cho đơn hàng đã hủy -->
+      <div class="timeline cancelled" *ngIf="order.status === 'CANCELLED'">
+        <div class="timeline-item active">
+          <div class="timeline-icon cancelled">
+            <i class="bi bi-x-circle"></i>
+          </div>
+          <div class="timeline-content">
+            <span class="timeline-title">Đơn hàng đã hủy</span>
+            <span class="timeline-date">{{order.createdDate | date:'dd/MM/yyyy HH:mm'}}</span>
+            <span class="timeline-reason" *ngIf="order.reason">
+              Lý do: {{order.reason}}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="timeline cancelled" *ngIf="order.status == 'DELIVERY_FAILED'">
+        <div class="timeline-item active">
+          <div class="timeline-icon cancelled">
+            <i class="bi bi-x-circle"></i>
+          </div>
+          <div class="timeline-content">
+            <span class="timeline-title">Đơn hàng giao không thành công</span>
+            <span class="timeline-date">{{order.updatedDate| date:'dd/MM/yyyy HH:mm'}}</span>
+            <span class="timeline-reason" *ngIf="order.reason">
+              Lý do: {{order.reason}}
+            </span>
+          </div>
+        </div>
+      </div>
+      <!-- Timeline cho các trạng thái khác -->
+      <div class="timeline" *ngIf="order.status !== 'CANCELLED' && order.status !== 'DELIVERY_FAILED' ">
+        <!-- Pending -->
         <div class="timeline-item" [class.active]="getTimelineStatus(order.status) >= 0">
           <div class="timeline-icon">
             <i class="bi bi-box-seam"></i>
@@ -32,78 +62,40 @@
         
         <div class="timeline-line" [class.active]="getTimelineStatus(order.status) >= 1"></div>
         
+        <!-- Processing -->
         <div class="timeline-item" [class.active]="getTimelineStatus(order.status) >= 1">
           <div class="timeline-icon">
             <i class="bi bi-gear"></i>
           </div>
           <div class="timeline-content">
             <span class="timeline-title">Đang xử lý</span>
-            <span class="timeline-status">Đơn hàng đang được xử lý</span>
           </div>
         </div>
         
         <div class="timeline-line" [class.active]="getTimelineStatus(order.status) >= 2"></div>
         
+        <!-- Shipping -->
         <div class="timeline-item" [class.active]="getTimelineStatus(order.status) >= 2">
           <div class="timeline-icon">
             <i class="bi bi-truck"></i>
           </div>
           <div class="timeline-content">
             <span class="timeline-title">Đang giao hàng</span>
-            <span class="timeline-status">Đơn hàng đang được giao</span>
           </div>
         </div>
         
         <div class="timeline-line" [class.active]="getTimelineStatus(order.status) >= 3"></div>
         
-        <div class="timeline-item" [class.active]="getTimelineStatus(order.status) >= 3">
-          <div class="timeline-icon">
-            <i class="bi bi-box-seam-fill"></i>
-          </div>
-          <div class="timeline-content">
-            <span class="timeline-title">Đã giao hàng</span>
-            <span class="timeline-status">Đơn hàng đã được giao</span>
-          </div>
-        </div>
-
-        <div class="timeline-line" [class.active]="getTimelineStatus(order.status) >= 4"></div>
-        
+        <!-- Final Status (Success or Failed) -->
         <div class="timeline-item" [class.active]="getTimelineStatus(order.status) >= 4">
-          <div class="timeline-icon">
-            <i class="bi bi-check2-circle"></i>
+          <div class="timeline-icon" [class.failed]="order.status === 'DELIVERY-FAILED'">
+            <i [class]="order.status === 'DELIVERY-FAILED' ? 'bi bi-x-circle' : 'bi bi-check2-circle'"></i>
           </div>
           <div class="timeline-content">
-            <span class="timeline-title">Thành công</span>
-            <span class="timeline-status">Giao hàng thành công</span>
-          </div>
-        </div>
-
-        <div class="timeline-line" [class.active]="getTimelineStatus(order.status) >= 5"></div>
-        
-        <div class="timeline-item" [class.active]="getTimelineStatus(order.status) >= 5">
-          <div class="timeline-icon failed">
-            <i class="bi bi-x-circle"></i>
-          </div>
-          <div class="timeline-content">
-            <span class="timeline-title">Giao hàng không thành công</span>
-            <span class="timeline-status">Đơn hàng giao không thành công</span>
-            <span class="timeline-reason" *ngIf="order.reason">
-              Lý do: {{order.reason}}
+            <span class="timeline-title">
+              {{order.status === 'DELIVERY-FAILED' ? 'Giao hàng không thành công' : 'Giao hàng thành công'}}
             </span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Timeline for cancelled order -->
-      <div class="timeline cancelled" *ngIf="order.status === 'CANCELLED'">
-        <div class="timeline-item active">
-          <div class="timeline-icon cancelled">
-            <i class="bi bi-x-circle"></i>
-          </div>
-          <div class="timeline-content">
-            <span class="timeline-title">Đơn hàng đã hủy</span>
-            <span class="timeline-date">{{order.createdDate | date:'dd/MM/yyyy HH:mm'}}</span>
-            <span class="timeline-reason" *ngIf="order.reason">
+            <span class="timeline-reason" *ngIf="order.status === 'DELIVERY-FAILED' && order.reason">
               Lý do: {{order.reason}}
             </span>
           </div>

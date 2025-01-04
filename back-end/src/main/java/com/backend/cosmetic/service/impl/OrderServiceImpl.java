@@ -159,14 +159,6 @@ public class OrderServiceImpl implements OrderService {
         if (orderDTO.getOrderDetails() == null || orderDTO.getOrderDetails().isEmpty()) {
             throw new DataInvalidException("Order must have at least one product");
         }
-
-//        if (StringUtils.isBlank(orderDTO.getFullName())) {
-//            throw new DataInvalidException("Full name is required");
-//        }
-//
-//        if (StringUtils.isBlank(orderDTO.getPhoneNumber())) {
-//            throw new DataInvalidException("Phone number is required");
-//        }
     }
 
     private Order buildInitialOrder(OrderDTO orderDTO) {
@@ -213,15 +205,11 @@ public class OrderServiceImpl implements OrderService {
         ProductDetail productDetail = productDetailRepo.findById(detail.getProductDetailId())
                 .orElseThrow(() -> new DataNotFoundException("Product detail not found"));
 
-        // Validate stock
-        if (productDetail.getQuantity() < detail.getQuantity()) {
-            throw new DataInvalidException("Insufficient stock for product: " + productDetail.getId());
-        }
         OrderDetail orderDetail = OrderDetail.builder()
                 .order(order)
                 .quantity(detail.getQuantity())
                 .productDetail(productDetail)
-                .price(productDetail.getSalePrice())
+                .price(productDetail.getSalePrice() - productDetail.getSalePrice()*productDetail.getDiscount()/100)
                 .build();
         return orderDetail;
     }
@@ -471,6 +459,9 @@ public class OrderServiceImpl implements OrderService {
         //minus quantity
         for (OrderDetail detail : order.getOrderDetails()) {
             ProductDetail productDetail = detail.getProductDetail();
+            if(detail.getQuantity() > productDetail.getQuantity()){
+                throw new DataInvalidException("Một số sản phẩm đã hết hàng hoặc không đủ số lượng");
+            }
             productDetail.setQuantity(productDetail.getQuantity() - detail.getQuantity());
             productDetailRepo.save(productDetail);
         }

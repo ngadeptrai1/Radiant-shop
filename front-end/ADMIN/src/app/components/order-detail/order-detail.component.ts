@@ -42,9 +42,9 @@ export class OrderDetailComponent implements OnInit {
   @ViewChild('updateModal') updateModal!: ElementRef;
   @ViewChild('cancelModal') cancelModal!: ElementRef;
   @ViewChild('confirmPaymentModal') confirmPaymentModal!: ElementRef;
-  @ViewChild('deliveryFailedModal') deliveryFailedModal: ElementRef;
-  @ViewChild('refundModal') refundModal: ElementRef;
-  
+  @ViewChild('deliveryFailedModal') deliveryFailedModal!: ElementRef;
+  @ViewChild('refundModal') refundModal!: ElementRef;
+
   cancelReason: string = '';
   private modalInstances: { [key: string]: any } = {};
   newVoucherCode: string = '';
@@ -72,7 +72,7 @@ export class OrderDetailComponent implements OnInit {
   ngOnInit() {
     this.loadOrderData();
   }
-  
+
   private loadOrderData() {
     const orderId = this.route.snapshot.params['id'];
     if (!orderId) {
@@ -81,7 +81,7 @@ export class OrderDetailComponent implements OnInit {
     }
 
     this.isLoading = true;
-    
+
     this.orderService.getOrderById(orderId).subscribe({
       next: (order) => {
         this.order = order;
@@ -118,7 +118,7 @@ export class OrderDetailComponent implements OnInit {
 
   private loadOrderDetails(orderId: number) {
     if (!orderId) return;
-    
+
     this.isLoading = true;
     this.orderService.getOrderDetails(orderId)
       .pipe(
@@ -141,7 +141,7 @@ export class OrderDetailComponent implements OnInit {
 
   private refreshOrderInfo() {
     if (!this.order?.id) return;
-    
+
     this.orderService.getOrderById(this.order.id).subscribe({
       next: (data) => {
         this.order = data;
@@ -171,23 +171,23 @@ export class OrderDetailComponent implements OnInit {
 
   isStatusCompleted(status: string): boolean {
     if (!this.order) return false;
-    
+
     // Nếu là đơn POS hoặc đã hủy, không có trạng thái completed
     if (this.order.type == 'POS' || this.order.status == 'CANCELLED') {
       return false;
     }
-    
+
     const statusOrder = ['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'SUCCESS'];
     const currentIndex = statusOrder.indexOf(this.order.status);
     const statusIndex = statusOrder.indexOf(status);
-    
+
     return currentIndex > -1 && statusIndex < currentIndex;
   }
 
 
   canCancel(): boolean {
     if (!this.order) return false;
-    return this.order.type == 'WEB' && 
+    return this.order.type == 'WEB' &&
            ['PENDING', 'PROCESSING'].includes(this.order.status) &&
            this.order.status !== 'CANCELLED' &&
            this.order.status !== 'SUCCESS';
@@ -195,28 +195,45 @@ export class OrderDetailComponent implements OnInit {
 
   canConfirm(): boolean {
     if (!this.order) return false;
-    
+
+    // Đối với đơn hàng online (CARD)
     if (this.order.paymentMethod == 'CARD') {
-      return this.order.status == 'PENDING' && this.order.paymentStatus == 'PAID';
+      // Chỉ cho phép xác nhận khi đã xác nhận thanh toán
+      return this.order.status == 'PENDING' && 
+             this.order.paymentStatus == 'PAID';
     }
-    
+
+    // Đối với đơn hàng tiền mặt (CASH)
     return this.order.status == 'PENDING';
   }
 
   canUpdateStatus(): boolean {
     if (!this.order) return false;
     
-    // If order is DELIVERED and payment is CASH, require payment confirmation
-    if (this.order.status === 'DELIVERED' && this.order.paymentMethod === 'CASH') {
-      return this.order.paymentStatus === 'PAID';
+    // Không cho phép cập nhật nếu đơn hàng đã giao không thành công
+    if (this.order.status == 'DELIVERY_FAILED') return false;
+
+    switch (this.order.status) {
+      case 'PENDING':
+        return true;
+      case 'PROCESSING':
+        return true;
+      case 'SHIPPED':
+        return true;
+      case 'DELIVERED':
+        // Chỉ cho phép cập nhật khi đã thanh toán
+        if (this.order.paymentMethod == 'CASH') {
+          return this.order.paymentStatus == 'PAID';
+        }
+        return true;
+      default:
+        return false;
     }
-    
-    return this.order.type === 'WEB' && 
-           !['CANCELLED', 'SUCCESS'].includes(this.order.status);
   }
 
   confirmOrder() {
     if (!this.order) return;
+
     this.isLoading = true;
     this.orderService.confirmOrder(this.order.id).subscribe({
       next: (response) => {
@@ -224,7 +241,7 @@ export class OrderDetailComponent implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error confirming order:', error);
+        this.snackBar.open(`Một số sản phẩm đã hết hàng hoặc không đủ số lượng`, 'Đóng', { duration: 3000 });
         this.isLoading = false;
       }
     });
@@ -267,8 +284,8 @@ export class OrderDetailComponent implements OnInit {
     }
   }
 
-  
-  
+
+
   formatCurrency(value: number): string {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
@@ -283,13 +300,13 @@ export class OrderDetailComponent implements OnInit {
         { value: 'CANCELLED', label: 'Đã hủy' }
       ];
     }
-    
+
     if (this.order?.type == 'POS') {
       return [
         { value: 'SUCCESS', label: 'Thành công' }
       ];
     }
-    
+
     return [
       { value: 'PENDING', label: 'Chờ xác nhận' },
       { value: 'PROCESSING', label: 'Đang xử lý' },
@@ -371,7 +388,7 @@ export class OrderDetailComponent implements OnInit {
   }
 
   canEditOrder(): boolean {
-    return this.order?.status == 'PENDING' && 
+    return this.order?.status == 'PENDING' &&
            this.order?.paymentStatus == 'UNPAID';
   }
 
@@ -380,10 +397,10 @@ export class OrderDetailComponent implements OnInit {
       alert('Không thể chỉnh sửa đơn hàng này!');
       return;
     }
-    
+
     this.isEditing = !this.isEditing;
     this.resetForm();
-    
+
     if (this.isEditing) {
       this.loadAvailableProducts();
     }
@@ -445,8 +462,8 @@ export class OrderDetailComponent implements OnInit {
       const totalQuantity = existingOrderDetail.quantity + this.newAddQuantity;
       if (totalQuantity > productInStock.quantity) {
         this.snackBar.open(
-          `Tổng số lượng (${totalQuantity}) vượt quá số trong kho (${productInStock.quantity}). Sản phẩm này đã có ${existingOrderDetail.quantity} trong đơn hàng.`, 
-          'Đóng', 
+          `Tổng số lượng (${totalQuantity}) vượt quá số trong kho (${productInStock.quantity}). Sản phẩm này đã có ${existingOrderDetail.quantity} trong đơn hàng.`,
+          'Đóng',
           { duration: 3000 }
         );
         return;
@@ -505,7 +522,7 @@ export class OrderDetailComponent implements OnInit {
       return;
     }
 
-    
+
     this.orderService.updateOrderDetail(detailId, this.newQuantity)
       .subscribe({
         next: () => {
@@ -540,14 +557,14 @@ export class OrderDetailComponent implements OnInit {
     if (!orderDetail) return;
 
     const newTotal = this.order.totalOrderAmount - (orderDetail.price * orderDetail.quantity);
-    
+
     // Validate voucher with new total
     const isVoucherValid = await this.validateVoucherAfterEdit(newTotal);
     if (!isVoucherValid) {
       return;
     }
 
-    
+
     this.orderService.deleteOrderDetail(this.order.id, detailId)
       .subscribe({
         next: () => {
@@ -563,7 +580,7 @@ export class OrderDetailComponent implements OnInit {
   }
 
   exportToPDF() {
-    if (this.order && this.orderDetails && 
+    if (this.order && this.orderDetails &&
         (this.order.status == 'SUCCESS' )) {
       this.pdfExportService.generateOrderPDF(this.order, this.orderDetails);
     } else {
@@ -585,7 +602,7 @@ export class OrderDetailComponent implements OnInit {
     if (!this.canEditOrder()) return;
 
     this.isLoadingProducts = true;
-    
+
     // Set timeout 3s
     this.loadingProductsTimeout = setTimeout(() => {
       this.isLoadingProducts = false;
@@ -607,23 +624,26 @@ export class OrderDetailComponent implements OnInit {
 
   canConfirmPayment(): boolean {
     if (!this.order) return false;
+    console.log(this.order);
     
-    // For CARD payment method
-    if (this.order.paymentMethod === 'CARD') {
-      return this.order.status === 'PENDING' && this.order.paymentStatus === 'UNPAID';
+    // Đơn hàng thanh toán bằng thẻ: chỉ xác nhận khi đã thanh toán nhưng chưa xác nhận
+    if (this.order.paymentMethod == 'CARD') {
+      return this.order.paymentStatus == 'UNPAID' && 
+             this.order.status == 'PENDING';
     }
-    
-    // For CASH payment method
-    if (this.order.paymentMethod === 'CASH') {
-      return this.order.status === 'DELIVERED' && this.order.paymentStatus === 'UNPAID';
+
+    // Đơn hàng tiền mặt: chỉ xác nhận khi đã giao hàng thành công
+    if (this.order.paymentMethod == 'CASH') {
+      return this.order.paymentStatus == 'UNPAID' && 
+             this.order.status == 'DELIVERED';
     }
-    
+
     return false;
   }
 
   confirmPayment() {
     if (!this.order) return;
-    
+
     this.isLoading = true;
     this.orderService.confirmPayment(this.order.id).subscribe({
       next: (response) => {
@@ -648,29 +668,35 @@ export class OrderDetailComponent implements OnInit {
 
   getNextStatusLabel(): string {
     if (!this.order) return '';
-    
+
     switch (this.order.status) {
-      case 'DELIVERED':
-        return 'Giao thành công';
+      case 'PENDING':
+        return 'Xác nhận đơn hàng';
       case 'PROCESSING':
         return 'Chuyển sang vận chuyển';
       case 'SHIPPED':
-        return 'Chuyển sang đã giao';
+        return 'Xác nhận đã giao hàng';
+      case 'DELIVERED':
+        return 'Hoàn thành đơn hàng';
       default:
-        return 'Chuyển trạng thái tiếp theo';
+        return 'Cập nhật trạng thái';
     }
   }
 
   getNextStatusIcon(): string {
     if (!this.order) return 'fa-arrow-right';
-    
+
     switch (this.order.status) {
+      case 'PENDING':
+        return 'fa-check-circle';
       case 'DELIVERED':
         return 'fa-check-circle';
       case 'PROCESSING':
         return 'fa-shipping-fast';
       case 'SHIPPED':
         return 'fa-box';
+      case 'DELIVERY_FAILED':
+        return this.order.paymentStatus == 'REFUNDED' ? 'fa-undo' : 'fa-times-circle';
       default:
         return 'fa-arrow-right';
     }
@@ -678,10 +704,12 @@ export class OrderDetailComponent implements OnInit {
 
   getNextStatusButtonClass(): string {
     if (!this.order) return 'btn-success';
-    
+
     switch (this.order.status) {
       case 'DELIVERED':
         return 'btn-success';
+      case 'DELIVERY_FAILED':
+        return this.order.paymentStatus == 'REFUNDED' ? 'btn-secondary' : 'btn-danger';
       default:
         return 'btn-primary';
     }
@@ -694,7 +722,7 @@ export class OrderDetailComponent implements OnInit {
 
   handleConfirmPayment() {
     if (!this.order) return;
-    
+
     this.isLoading = true;
     this.orderService.confirmPayment(this.order.id).subscribe({
       next: (response) => {
@@ -729,12 +757,12 @@ export class OrderDetailComponent implements OnInit {
 
   private async validateVoucherAfterEdit(newTotal: number): Promise<boolean> {
     if (!this.order?.voucherCode) return true;
-    
+
     try {
       // Get voucher details
       const vouchers = await this.voucherService.getValidVoucher(newTotal).toPromise();
       const isVoucherValid = vouchers?.some(v => v.code == this.order?.voucherCode);
-      
+
       if (!isVoucherValid) {
         const confirmRemove = await this.showVoucherWarningDialog();
         if (confirmRemove) {
@@ -762,7 +790,7 @@ export class OrderDetailComponent implements OnInit {
 
   private async removeVoucherFromOrder(): Promise<void> {
     if (!this.order) return;
-    
+
     try {
       const updatedOrder = await this.orderService.removeVoucher(this.order.id).toPromise();
       if (updatedOrder) {
@@ -816,14 +844,14 @@ export class OrderDetailComponent implements OnInit {
 
   // Kiểm tra có thể đánh dấu giao hàng không thành công
   canMarkDeliveryFailed(): boolean {
-    return this.order?.status === 'SHIPPED';
+    return this.order?.status == 'SHIPPED';
   }
 
   // Kiểm tra có thể hoàn tiền
   canRefundPayment(): boolean {
-    return this.order?.status === 'CANCELLED' && 
-           this.order?.paymentStatus === 'PAID' &&
-           this.order?.paymentMethod === 'CARD';
+    return this.order?.status == 'DELIVERY_FAILED' &&
+           this.order?.paymentStatus == 'PAID' &&
+           this.order?.paymentMethod == 'CARD';
   }
 
   // Xử lý giao hàng không thành công

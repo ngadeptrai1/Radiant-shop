@@ -32,17 +32,33 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     public VoucherResponse save(VoucherDTO voucherDTO) throws IOException {
+        LocalDateTime startDate = voucherDTO.getStartDate()
+                .plusDays(1)
+                .withHour(0)
+                .withMinute(0)
+                .withSecond(0)
+                .withNano(0);
+
+        // Set thời gian kết thúc là 23:59:59
+        LocalDateTime endDate = voucherDTO.getEndDate()
+                .plusDays(1)
+                .withHour(23)
+                .withMinute(59)
+                .withSecond(59)
+                .withNano(999999999);
+
         Voucher newVoucher = Voucher.builder()
                 .code(voucherDTO.getCode())
                 .type(voucherDTO.getType())
                 .value(voucherDTO.getValue())
                 .maxDiscountAmount(voucherDTO.getMaxDiscountAmount())
                 .minOrderAmount(voucherDTO.getMinOrderAmount())
-                .startDate(voucherDTO.getStartDate().plusDays(1))
-                .endDate(voucherDTO.getEndDate().plusDays(1))
+                .startDate(startDate)
+                .endDate(endDate)
                 .usageLimit(voucherDTO.getUsageLimit())
                 .description(voucherDTO.getDescription())
                 .build();
+
         newVoucher.setActive(voucherDTO.isActive());
         Voucher savedVoucher = voucherRepository.save(newVoucher);
         return voucherMapper.toVoucherResponse(savedVoucher);
@@ -50,6 +66,21 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     public VoucherResponse update(Long id, VoucherDTO voucherDTO) {
+        LocalDateTime startDate = voucherDTO.getStartDate()
+                .plusDays(1)
+                .withHour(0)
+                .withMinute(0)
+                .withSecond(0)
+                .withNano(0);
+
+        // Set thời gian kết thúc là 23:59:59
+        LocalDateTime endDate = voucherDTO.getEndDate()
+                .plusDays(1)
+                .withHour(23)
+                .withMinute(59)
+                .withSecond(59)
+                .withNano(999999999);
+
         Voucher voucher = voucherRepository.findById(id)
                 .orElseThrow(() -> new DataInvalidException("Voucher not found"));
 
@@ -58,8 +89,8 @@ public class VoucherServiceImpl implements VoucherService {
         voucher.setValue(voucherDTO.getValue());
         voucher.setMaxDiscountAmount(voucherDTO.getMaxDiscountAmount());
         voucher.setMinOrderAmount(voucherDTO.getMinOrderAmount());
-        voucher.setStartDate(voucherDTO.getStartDate().plusDays(1));
-        voucher.setEndDate(voucherDTO.getEndDate().plusDays(1));
+        voucher.setStartDate(startDate);
+        voucher.setEndDate(endDate);
         voucher.setUsageLimit(voucherDTO.getUsageLimit());
         voucher.setDescription(voucherDTO.getDescription());
         voucher.setActive(voucherDTO.isActive());
