@@ -15,7 +15,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     Optional<Category> findByName(String name);
 
     @EntityGraph(attributePaths = {"subCategories"})
-    List<Category> findAll();
+    List<Category> findAllByOrderByIdDesc();
 
     @EntityGraph(attributePaths = {"subCategories"})
     List<Category> findAllByParentCategoryIsNull();

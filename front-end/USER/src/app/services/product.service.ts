@@ -35,5 +35,9 @@ export class ProductService {
   getProductsByBrand(brandId: number): Observable<Products> {
       return this.apiService.get(this.url+"/brand/"+brandId);
   }
+  
+  checkActiveProduct(proudctDetailId:any):Observable<boolean>{
+    return this.apiService.get(this.url+"/check-active/"+proudctDetailId);
+  }
 
 }

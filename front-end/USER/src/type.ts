@@ -122,10 +122,8 @@ export interface OrderRequest {
   email: string;
 }
 export interface OrderDetail {
-
   productDetailId: number;
   quantity: number;
-
 }
 export interface OrderResponse {
   id: number
@@ -133,16 +131,17 @@ export interface OrderResponse {
   phoneNumber: string
   email: any
   address: any
-  status: 'PENDING'|'SHIPPED' | 'DELIVERED' | 'CANCELLED'|'PROCESSING'|'SUCCESS' |string;
-  paymentStatus: string
-  paymentMethod: string
-  totalOrderAmount: number
-  shippingCost: number
-  voucherAmount: number
-  finalAmount: number
-  totalItems: number
+  status: 'PENDING'|'SHIPPED' | 'DELIVERED' | 'CANCELLED'|'PROCESSING'|'SUCCESS'|'DELIVERY_FAILED' |string;
+  paymentStatus: string|'REFUNDED';
+  paymentMethod: string;
+  totalOrderAmount: number;
+  shippingCost: number;
+  voucherAmount: number;
+  finalAmount: number;
+  totalItems: number;
   type: string
-  createdDate: string
+  createdDate: string;
+  updatedDate:string;
   note: string
   userId: number
   voucherCode: any

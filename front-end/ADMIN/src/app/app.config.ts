@@ -6,6 +6,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { HTTP_INTERCEPTORS, provideHttpClient } from '@angular/common/http';
 import { provideLuxonDateAdapter } from '@angular/material-luxon-adapter';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { NgxMatDateAdapter, NgxMatNativeDateModule } from '@angular-material-components/datetime-picker';
 
 export const appConfig: ApplicationConfig = {
   providers: [provideZoneChangeDetection({ eventCoalescing: true }),
@@ -13,6 +14,9 @@ export const appConfig: ApplicationConfig = {
      provideAnimationsAsync(),
      provideHttpClient(),
      provideLuxonDateAdapter(),
+   
+      // { provide: NgxMatDateAdapter, useClass: NgxMatNativeDateModule },
+    
      { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
     ]
 };

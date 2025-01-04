@@ -13,6 +13,7 @@ import { Voucher } from '../../../type';
 import { AuthService } from '../../services/auth.service';
 import { UserAddressService } from '../../services/user-address.service';
 import { UserAddress } from '../../../type';
+import { forkJoin, firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-payment',
@@ -52,7 +53,8 @@ export class PaymentComponent implements OnInit, OnDestroy {
     private orderService: OrderService,
     private voucherService: VoucherService,
     private authService: AuthService,
-    private userAddressService: UserAddressService
+    private userAddressService: UserAddressService,
+    private productService: ProductService
   ) {
     this.paymentForm = this.fb.group({
       fullName: ['', [Validators.required, Validators.minLength(3)]],
@@ -72,8 +74,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
       status: ['PENDING'],
       paymentStatus: ['UNPAID']
     });
-
-  
+   
   }
 
   ngOnInit() {
@@ -89,6 +90,19 @@ export class PaymentComponent implements OnInit, OnDestroy {
     } else {
       // Nếu chưa đăng nhập, khôi phục form data từ session storage nếu có
       this.restoreAddressFromSession();
+    }
+
+    // Khôi phục thông tin shipping từ session storage
+    const savedShippingInfo = sessionStorage.getItem('shippingInfo');
+    if (savedShippingInfo) {
+      const shippingInfo = JSON.parse(savedShippingInfo);
+      this.selectedServiceId = shippingInfo.serviceId;
+      this.shippingFee = shippingInfo.fee;
+      
+      // Nếu có địa chỉ đã chọn, tính lại phí ship
+      if (shippingInfo.districtId && shippingInfo.wardCode) {
+        this.calculateShippingFee(shippingInfo.districtId);
+      }
     }
   }
 
@@ -127,29 +141,6 @@ export class PaymentComponent implements OnInit, OnDestroy {
     );
   }
 
-  // private loadAvailableServices() {
-  //   const defaultFromDistrictId = 1454; // ID quận/huyện shop
-  //   this.ghnService.getAvailableServices(defaultFromDistrictId).subscribe({
-  //     next: (response) => {
-  //       if (response.code === 200 && response.data) {
-  //         this.availableServices = response.data;
-  //         // Set default service_id
-  //         if (this.availableServices.length > 0) {
-  //           this.selectedServiceId = this.availableServices[0].service_id;
-  //           // Tính lại phí ship nếu đã có địa chỉ
-  //           const districtId = this.paymentForm.get('districtId')?.value;
-  //           if (districtId) {
-  //             this.calculateShippingFee(Number(districtId));
-  //           }
-  //         }
-  //       }
-  //     },
-  //     error: (error) => {
-  //       console.error('Error loading services:', error);
-  //       this.showError('Không thể tải danh sách dịch vụ vận chuyển');
-  //     }
-  //   });
-  // }
 
   selectUserAddress(address: UserAddress) {
     if (!this.isLoggedIn) return; // Chỉ cho phép chọn địa chỉ khi đã đăng nhập
@@ -226,20 +217,11 @@ export class PaymentComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Tính toán kích thước và cân nặng từ các sản phẩm trong giỏ hàng
-    const items = this.cartItems.map(item => ({
-      name: item.name,
-      quantity: item.quantity,
-      weight: 1000, // 1kg mỗi sản phẩm
-      length: 20,
-      width: 20,
-      height: 50
-    }));
-
-    // Tính tổng cân nặng từ tất cả items
-    const totalWeight = items.reduce((sum, item) => {
-      return sum + (item.weight * item.quantity);
-    }, 0);
+    // Tính tổng số lượng sản phẩm
+    const totalItems = this.cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    
+    // Tính trọng lượng dựa vào số lượng sản phẩm
+    const weight = totalItems > 10 ? 10000 : 200; // 10kg nếu > 10 sản phẩm, ngược lại 200g
 
     const shippingData = {
       from_district_id: 1454,
@@ -250,11 +232,10 @@ export class PaymentComponent implements OnInit, OnDestroy {
       service_type_id: null,
       height: 50,
       length: 20,
-      weight: Math.max(totalWeight, 200), // Tối thiểu 200g
+      weight: weight, // Trọng lượng thay đổi theo số lượng sản phẩm
       width: 20,
-      insurance_value: this.subTotal,
+      insurance_value: 0,
       coupon: null,
-      items: items,
       cod_failed_amount: 2000
     };
 
@@ -263,7 +244,15 @@ export class PaymentComponent implements OnInit, OnDestroy {
         if (response.code === 200 && response.data) {
           this.shippingFee = response.data.total || 0;
           this.calculateTotal();
-          sessionStorage.setItem('paymentFormData', JSON.stringify(this.paymentForm.value));
+          
+          // Lưu thông tin shipping vào session storage
+          const shippingInfo = {
+            serviceId: this.selectedServiceId,
+            fee: this.shippingFee,
+            districtId: districtId,
+            wardCode: this.paymentForm.get('wardCode')?.value
+          };
+          sessionStorage.setItem('shippingInfo', JSON.stringify(shippingInfo));
         }
       },
       error: (error) => {
@@ -342,6 +331,35 @@ export class PaymentComponent implements OnInit, OnDestroy {
     });
   }
 
+  // Thêm phương thức kiểm tra sản phẩm
+  private async validateProductsAvailability(): Promise<boolean> {
+    try {
+      // Tạo mảng các Observable để kiểm tra từng sản phẩm
+      const checks = this.cartItems.map(item => 
+        this.productService.checkActiveProduct(item.productDetail.id)
+      );
+
+      // Sử dụng firstValueFrom thay vì toPromise
+      const results = await firstValueFrom(forkJoin(checks));
+      
+      // Tìm các sản phẩm không có sẵn
+      const unavailableItems = this.cartItems.filter((item, index) => !results[index]);
+      
+      if (unavailableItems.length > 0) {
+        const itemNames = unavailableItems.map(item => item.name).join(', ');
+        this.showError(`Sản phẩm "${itemNames}" hiện không có sẵn`);
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Error checking product availability:', error);
+      this.showError('Không thể kiểm tra trạng thái sản phẩm');
+      return false;
+    }
+  }
+
+  // Sửa lại phương thức onSubmit
   async onSubmit() {
     if (this.isProcessing) {
       return;
@@ -356,6 +374,12 @@ export class PaymentComponent implements OnInit, OnDestroy {
     // Validate cart items
     if (!this.cartItems.length) {
       this.showError('Giỏ hàng của bạn đang trống');
+      return;
+    }
+
+    // Kiểm tra sản phẩm có sẵn không
+    const productsAvailable = await this.validateProductsAvailability();
+    if (!productsAvailable) {
       return;
     }
 
@@ -623,8 +647,19 @@ export class PaymentComponent implements OnInit, OnDestroy {
       next: (response) => {
         if (response.code === 200 && response.data && response.data.length > 0) {
           this.availableServices = response.data;
-          // Tự động chọn dịch vụ đầu tiên
-          this.selectedServiceId = this.availableServices[0].service_id;
+          
+          // Tính tổng số lượng sản phẩm
+          const totalItems = this.cartItems.reduce((sum, item) => sum + item.quantity, 0);
+          
+          // Chọn dịch vụ dựa vào số lượng sản phẩm
+          if (totalItems > 10 && this.availableServices.length > 1) {
+            // Nếu số lượng > 10 và có sẵn dịch vụ thứ 2, chọn dịch vụ thứ 2
+            this.selectedServiceId = this.availableServices[1].service_id;
+          } else {
+            // Ngược lại chọn dịch vụ đầu tiên
+            this.selectedServiceId = this.availableServices[0].service_id;
+          }
+          
           // Tính phí ship với dịch vụ đã chọn
           this.calculateShippingFee(toDistrictId);
         } else {

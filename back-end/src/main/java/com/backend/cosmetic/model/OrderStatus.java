@@ -24,4 +24,8 @@ public class OrderStatus {
     public static final String TYPE_ONLINE = "WEB";
 
     public static final String TYPE_COUNTER = "POS";
+
+    public static final String DELIVERY_FAILED = "DELIVERY_FAILED";
+
+    public static final String REFUNDED = "REFUNDED";
 }

@@ -249,4 +249,25 @@ public class OrderController {
     public ResponseEntity<?> addVoucher(@PathVariable("id") Long orderId, @RequestParam String code){
         return ResponseEntity.ok(orderService.addVoucher(orderId, code));
     }
+
+    @PutMapping("/{id}/delivery-failed")
+    public ResponseEntity<?> markDeliveryFailed(
+            @PathVariable("id") Long orderId,
+            @RequestParam String reason) {
+        try {
+            return ResponseEntity.ok(orderService.markDeliveryFailed(orderId, reason));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/{id}/refund")
+    public ResponseEntity<?> refundOrder(
+            @PathVariable("id") Long orderId) {
+        try {
+            return ResponseEntity.ok(orderService.refundOrder(orderId));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

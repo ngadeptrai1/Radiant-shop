@@ -83,7 +83,8 @@ export class OrderDetailComponent implements OnInit {
       'SHIPPED': 2,
       'DELIVERED': 3,
       'SUCCESS': 4,
-      'CANCELLED': 5
+      'DELIVERY-FAILED': 4,
+      'CANCELLED': -1
     };
     return statusOrder[status as keyof typeof statusOrder] ?? -1;
   }
@@ -95,6 +96,7 @@ export class OrderDetailComponent implements OnInit {
       'SHIPPED': 'Đang giao hàng',
       'DELIVERED': 'Đã giao hàng',
       'SUCCESS': 'Giao hàng thành công',
+      'DELIVERY-FAILED': 'Giao hàng không thành công',
       'CANCELLED': 'Đã hủy'
     };
     return statusText[status as keyof typeof statusText] ?? status;
@@ -171,5 +173,27 @@ export class OrderDetailComponent implements OnInit {
     });
 
     return `https://img.vietqr.io/image/TPB-84402072002-print.png?${params.toString()}`;
+  }
+
+  getPaymentStatusClass(): string {
+    switch (this.order?.paymentStatus) {
+      case 'PAID':
+        return 'paid';
+      case 'REFUNDED':
+        return 'refunded';
+      default:
+        return 'unpaid';
+    }
+  }
+
+  getPaymentStatusText(): string {
+    switch (this.order?.paymentStatus) {
+      case 'PAID':
+        return 'Đã thanh toán';
+      case 'REFUNDED':
+        return 'Đã hoàn tiền';
+      default:
+        return 'Chưa thanh toán';
+    }
   }
 }

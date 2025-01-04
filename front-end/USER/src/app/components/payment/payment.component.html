@@ -272,7 +272,7 @@
                     class="btn btn-voucher d-flex align-items-center gap-2"
                     (click)="applyVoucher(voucher)"
                     [class.active]="selectedVoucher?.code === voucher.code"
-                    [disabled]="isApplyingVoucher || selectedVoucher?.code === voucher.code"
+                    [disabled]="isApplyingVoucher || selectedVoucher?.code == voucher.code"
                   >
                     <img
                       src="assets/icons/ic-coupon-payment.svg"
@@ -286,7 +286,7 @@
                       <small class="text-muted" *ngIf="voucher.minOrderAmount">
                         Đơn tối thiểu {{ voucher.minOrderAmount | number }}đ
                       </small>
-                      <small class="text-muted" *ngIf="voucher.type === 'PERCENTAGE' && voucher.maxDiscountAmount">
+                      <small class="text-muted" *ngIf="voucher.type == 'PERCENTAGE' && voucher.maxDiscountAmount">
                         Giảm tối đa {{ voucher.maxDiscountAmount | number }}đ
                       </small>
                     </div>

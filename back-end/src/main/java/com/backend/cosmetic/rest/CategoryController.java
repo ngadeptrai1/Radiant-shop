@@ -40,7 +40,7 @@ public class CategoryController {
     @Cacheable
     public ResponseEntity<?> getAll(){
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(categoryRepository.findAll());
+            return ResponseEntity.status(HttpStatus.OK).body(categoryRepository.findAllByOrderByIdDesc());
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }

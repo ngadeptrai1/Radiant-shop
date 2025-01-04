@@ -48,15 +48,15 @@ export class BrandComponent implements OnInit, AfterViewInit   {
   @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
-    private brandService: BrandService,  
-    private dialog: MatDialog,  
+    private brandService: BrandService,
+    private dialog: MatDialog,
     private snackBar: MatSnackBar ) {
-    
+
   }
 
   ngOnInit() {
     this.loadBrands();
-    
+
   }
   ngAfterViewInit() {
     this.dataSource.sort = this.sort;
@@ -69,7 +69,7 @@ export class BrandComponent implements OnInit, AfterViewInit   {
         this.dataSource = new MatTableDataSource(brands);
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
-        
+
         // Custom sort for thumbnail column
         this.dataSource.filterPredicate = (data: Brand, filter: string): boolean => {
           return data.name.toLowerCase().includes(filter) ||
@@ -109,8 +109,8 @@ export class BrandComponent implements OnInit, AfterViewInit   {
         const str: string =result.get('id');
         const num: number = Number(str);
         if (num>0) {
-         
-          
+
+
             this.updateBrand(result,num);
           } else {
             console.log('create');
@@ -127,6 +127,7 @@ export class BrandComponent implements OnInit, AfterViewInit   {
       next: (newBrand) => {
         this.dataSource.data = [...this.dataSource.data, newBrand];
         this.showSnackBar('Thêm thương hiệu thành công');
+        location.reload();
         this.isLoading = false;
       },
       error: (error) => {

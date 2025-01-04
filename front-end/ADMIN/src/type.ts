@@ -128,8 +128,8 @@ export interface BrandReq {
     orderDetails: OrderDetail[];
     voucherCode: string;
     paymentMethod: 'CASH' | 'CARD';
-    status: 'PENDING' | 'DELIVERED' | 'CANCELLED'|'SHIPPED'  | 'PROCESSING' | 'SUCCESS' |string;
-    paymentStatus: 'PAID' | 'UNPAID';
+    status: 'PENDING' | 'DELIVERED' | 'CANCELLED' | 'SHIPPED' | 'PROCESSING' | 'SUCCESS' | 'DELIVERY_FAILED'| string;
+    paymentStatus: 'PAID' | 'UNPAID' | 'REFUNDED';
     shippingFee: number;
     type: 'POS' | 'WEB';
     note: string;

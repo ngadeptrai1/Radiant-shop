@@ -41,6 +41,8 @@ dependencies {
 	implementation 'org.mapstruct:mapstruct:1.6.3'
 
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+// https://mvnrepository.com/artifact/org.postgresql/postgresql
+	implementation 'org.postgresql:postgresql:42.7.3'
 
 	testImplementation 'org.springframework.security:spring-security-test'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -51,4 +53,3 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
-

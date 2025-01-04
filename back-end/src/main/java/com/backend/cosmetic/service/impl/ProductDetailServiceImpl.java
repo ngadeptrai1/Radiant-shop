@@ -174,4 +174,41 @@ public class ProductDetailServiceImpl implements ProductDetailService {
     public List<ProductDetailProjection> findByProductId(Long id) {
         return productDetailRepository.findAllProductDetailsByProductId(id);
     }
+
+    @Override
+    public boolean checkActive(Long id) {
+        ProductDetail productDetail = productDetailRepository.findById(id).orElseThrow(() -> {
+            return new DataNotFoundException("Product detail with id "+id + " Not found ");
+        });
+        boolean isActive = true;
+        if (!productDetail.isActive()) {
+            System.out.printf("1");
+            isActive = false;
+        }
+
+        // Kiểm tra trạng thái của Product
+        if (!productDetail.getProduct().isActive()) {
+            System.out.println(2);
+            isActive = false;
+        }
+
+        // Kiểm tra trạng thái của Brand
+        if (!productDetail.getProduct().getBrand().isActive()) {
+            System.out.println(3);
+            isActive = false;
+        }
+
+        // Kiểm tra trạng thái của Color
+        if (!productDetail.getColor().isActive()) {
+            System.out.println(4);
+            isActive = false;
+        }
+
+        // Validate stock
+        if (productDetail.getQuantity() < 1) {
+            isActive = false;
+        }
+        System.out.println(isActive);
+        return isActive;
+    }
 }

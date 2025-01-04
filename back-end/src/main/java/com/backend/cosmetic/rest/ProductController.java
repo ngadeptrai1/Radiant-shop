@@ -191,4 +191,9 @@ private final RateLimiter rateLimiter = RateLimiter.create(2.0);
     public ResponseEntity<?> findProductDetails(@PathVariable Long id) {
         return ResponseEntity.ok(productDetailService.findByProductId(id));
     }
+
+    @GetMapping("/check-active/{id}")
+    public ResponseEntity<?> checkActive(@PathVariable Long id){
+        return ResponseEntity.ok(productDetailService.checkActive(id));
+    }
 }

@@ -20,4 +20,5 @@ public interface ProductDetailService {
     void refillQuantity(Long id, int amount);
     Integer minusInPos(Long id, int amount);
     List<ProductDetailProjection> findByProductId(Long id);
+    boolean checkActive(Long id);
 }

@@ -35,4 +35,6 @@ public interface OrderService {
     OrderResponse addVoucher(Long orderId, String code);
     OrderResponse deleteVoucher(Long orderId);
     List<OrderResponse> findByEmail(String email);
+    OrderResponse markDeliveryFailed(Long orderId, String reason);
+    OrderResponse refundOrder(Long orderId);
 }
