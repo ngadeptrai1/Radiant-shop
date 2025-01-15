@@ -21,7 +21,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>,
 
     List<Order> findAllByCreatedDateBetween(LocalDateTime startDate, LocalDateTime endDate);
     
-    @Query("SELECT SUM(o.finalAmount) FROM Order o WHERE o.status = :status")
+    @Query("SELECT SUM(o.totalOrderAmount - o.voucherAmount) FROM Order o WHERE o.status = :status")
     Optional<Long> sumFinalAmountByStatus(@Param("status") String status);
 
     @Query("SELECT o.status as status, COUNT(o) as count FROM Order o " +
@@ -31,13 +31,13 @@ public interface OrderRepository extends JpaRepository<Order, Long>,
 
     @Query("SELECT DATE(o.createdDate) as date, " +
            "COUNT(o) as orderCount, " +
-           "SUM(o.finalAmount) as revenue " +
+           "SUM(o.totalOrderAmount - o.voucherAmount) as revenue " +
            "FROM Order o " +
            "WHERE o.status = 'SUCCESS' " +
            "GROUP BY DATE(o.updatedDate) " )
     List<Object[]> getRevenueStats();
 
-    @Query("SELECT SUM(o.finalAmount) FROM Order o " +
+    @Query("SELECT SUM(o.totalOrderAmount - o.voucherAmount) FROM Order o " +
            "WHERE o.status = 'SUCCESS' " +
            "AND DATE(o.updatedDate) = DATE(:date)")
     Long getTodayRevenue(@Param("date") LocalDateTime date);
@@ -45,7 +45,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>,
     @Query("SELECT COUNT(o) FROM Order o WHERE o.status = :status")
     Long countByStatus(@Param("status") String status);
 
-    @Query("SELECT SUM(o.finalAmount) FROM Order o " +
+    @Query("SELECT SUM(o.totalOrderAmount - o.voucherAmount) FROM Order o " +
            "WHERE o.status = 'SUCCESS' " +
            "AND o.updatedDate BETWEEN :startDate AND :endDate")
     Long getTotalRevenue(@Param("startDate") LocalDateTime startDate, 
@@ -53,7 +53,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>,
 
     List<Order> findAllByEmailOrderByCreatedDateDesc(String email);
 
-    @Query("SELECT MONTH(o.updatedDate) as month, COUNT(o) as orderCount, SUM(o.finalAmount) as revenue " +
+    @Query("SELECT MONTH(o.updatedDate) as month, COUNT(o) as orderCount, SUM(o.totalOrderAmount - o.voucherAmount) as revenue " +
            "FROM Order o " +
            "WHERE o.status = 'SUCCESS' " +
            "AND YEAR(o.updatedDate) = :year " +

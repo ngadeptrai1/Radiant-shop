@@ -37,28 +37,30 @@ export class UserService {
     }
 
     if (userData.role.includes('STAFF') || userData.role.includes('ADMIN')) {
-      return this.searchStaff('', userData.phoneNumber, userData.email).pipe(
+      return this.searchStaff(userData.username, userData.phoneNumber, userData.email).pipe(
         switchMap(staffs => {
           const isDuplicate = staffs.some(staff => 
             staff.phoneNumber === userData.phoneNumber || 
-            (userData.email && staff.email === userData.email)
+            (userData.email && staff.email === userData.email) ||
+            staff.username === userData.username
           );
           if (isDuplicate) {
-            throw new Error('Số điện thoại hoặc email đã tồn tại');
+            throw new Error('Số điện thoại, email hoặc tên người dùng đã tồn tại');
           }
           return this.createStaff(userData);
         })
       );
     }
 
-    return this.searchCustomer('', userData.phoneNumber, userData.email).pipe(
+    return this.searchCustomer(userData.username, userData.phoneNumber, userData.email).pipe(
       switchMap(customers => {
         const isDuplicate = customers.some(customer => 
           customer.phoneNumber === userData.phoneNumber || 
-          (userData.email && customer.email === userData.email)
+          (userData.email && customer.email === userData.email) ||
+          customer.username === userData.username
         );
         if (isDuplicate) {
-          throw new Error('Số điện thoại hoặc email đã tồn tại');
+          throw new Error('Số điện thoại, email hoặc tên người dùng đã tồn tại');
         }
         return this.createWalkInUser(userData);
       })
@@ -67,9 +69,9 @@ export class UserService {
   createWalkInUser(user: UserRequest): Observable<UserResponse> {
     return this.apiService.post<UserResponse>(`${this.endpoint}/walk-in`, user);
   }
-  searchCustomer(name: string = '', phone: string = '', email: string = ''): Observable<UserResponse[]> {
+  searchCustomer(username: string = '', phone: string = '', email: string = ''): Observable<UserResponse[]> {
     return this.apiService.get<UserResponse[]>(`${this.endpoint}/search`, { 
-      params: { name, phone, email } 
+      params: { username, phone, email } 
     });
   }
   updateUser(id: number, userData: UserRequest): Observable<UserResponse> {
@@ -85,42 +87,21 @@ export class UserService {
     }
 
     if (userData.role.includes('STAFF') || userData.role.includes('ADMIN')) {
-      return this.searchStaff('', userData.phoneNumber, userData.email).pipe(
-        switchMap(staffs => {
-          const duplicateStaff = staffs.find(staff => 
-            staff.id !== id && (
-              staff.phoneNumber == userData.phoneNumber || 
-              (userData.email && staff.email == userData.email)
-            )
-          );
-          
-          if (duplicateStaff) {
-            if (duplicateStaff.email == userData.email) {
-              throw new Error('Email đã được sử dụng');
-            }
-            throw new Error('Số điện thoại đã được sử dụng');
-          }
-          
+     
           return this.updateStaff(id, userData);
-        })
-      );
+    
     }
 
-    return this.searchCustomer('', userData.phoneNumber, userData.email).pipe(
+    return this.searchCustomer(userData.username, userData.phoneNumber, userData.email).pipe(
       switchMap(customers => {
         const duplicateCustomer = customers.find(customer => 
           customer.id != id && (
             customer.phoneNumber == userData.phoneNumber || 
-            (userData.email && customer.email == userData.email)
+            (userData.email && customer.email == userData.email) ||
+            customer.username === userData.username
           )
         );
-        
-        if (duplicateCustomer) {
-          if (duplicateCustomer.email === userData.email) {
-            throw new Error('Email đã được sử dụng');
-          }
-          throw new Error('Số điện thoại đã được sử dụng');
-        }
+    
         
         return this.apiService.put<UserResponse>(`${this.endpoint}/${id}`, userData);
       })
@@ -138,40 +119,27 @@ export class UserService {
 
   // crud staff
   createStaff(staff: UserRequest): Observable<UserResponse> {
-    return this.searchStaff('', staff.phoneNumber, staff.email).pipe(
+    return this.searchStaff(staff.username, staff.phoneNumber, staff.email).pipe(
       switchMap(users => {
         const isDuplicate = users.some(user => 
           user.phoneNumber === staff.phoneNumber || 
-          (staff.email && user.email === staff.email)
+          (staff.email && user.email === staff.email) ||
+          user.username === staff.username
         );
         if (isDuplicate) {
-          throw new Error('Số điện thoại hoặc email đã tồn tại');
+          throw new Error('Số điện thoại, email hoặc tên người dùng đã tồn tại');
         }
         return this.apiService.post<UserResponse>(`${this.endpoint}/staff`, staff);
       })
     );
   }
   updateStaff(id: number, staff: UserRequest): Observable<UserResponse> {
-    return this.searchCustomer('', staff.phoneNumber, staff.email).pipe(
-      switchMap(users => {
-        const duplicateUser = users.find(user => 
-          user.id !== id && (
-            user.phoneNumber == staff.phoneNumber || 
-            (staff.email && user.email == staff.email)
-          )
-        );
-        
-        if (duplicateUser) {
-          if (duplicateUser.email == staff.email) {
-            throw new Error('Email đã được sử dụng');
-          }
-          throw new Error('Số điện thoại đã được sử dụng');
-        }
+    
         
         return this.apiService.put<UserResponse>(`${this.endpoint}/staff/${id}`, staff);
-      })
-    );
-  }
+      }
+    
+  
   deleteStaff(id: number): Observable<void> {
     return this.apiService.delete<void>(`${this.endpoint}/staff/${id}`);
   }
@@ -185,5 +153,4 @@ export class UserService {
   getAllCustomer(): Observable<UserResponse[]> {
     return this.apiService.get<UserResponse[]>(`${this.endpoint}/customer`);
   }
-  
 }

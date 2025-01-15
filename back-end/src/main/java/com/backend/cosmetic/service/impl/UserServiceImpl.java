@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.backend.cosmetic.exception.DataInvalidException;
 import com.backend.cosmetic.repository.RoleRepository;
 import com.backend.cosmetic.service.RoleService;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -51,6 +52,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto updateUser(Long id, UserUpdateDto updateDto) {
+
+        if (userRepository.existsByEmailAndIdNot(updateDto.getEmail(), id)) {
+            throw new DataInvalidException("Email đã tồn tại!");
+        }
+        if (userRepository.existsByPhoneNumAndIdNot(updateDto.getPhoneNumber(), id)) {
+            throw new DataInvalidException("Số điện thoại đã tồn tại!");
+        }
         User user = userRepository.findById(id)
             .orElseThrow(() -> new DataNotFoundException("User not found"));
         
@@ -151,8 +159,16 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto createStaff(StaffCreateDto staffDto) {
         // Check if email already exists
         if (userRepository.existsByEmail(staffDto.getEmail())) {
-            throw new IllegalArgumentException("Email already exists");
+            throw new IllegalArgumentException("Email đã tồn tại!");
         }
+        if (userRepository.existsByPhoneNum(staffDto.getPhoneNumber())) {
+            throw new IllegalArgumentException("Số điện thoại đã tồn tại!");
+        }
+        if (userRepository.existsByUsername(staffDto.getUsername())) {
+            throw new IllegalArgumentException("Tên tài khoản đã tồn tại!");
+        }
+
+
         
         User newStaff = User.builder()
             .fullName(staffDto.getFullName())
@@ -195,21 +211,30 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto updateStaff(Long id, StaffCreateDto staffDto) {
+
+        if (userRepository.existsByEmailAndIdNot(staffDto.getEmail(), id)) {
+            throw new IllegalArgumentException("Email đã tồn tại!");
+        }
+        if (userRepository.existsByPhoneNumAndIdNot(staffDto.getPhoneNumber(), id)) {
+            throw new IllegalArgumentException("Số điện thoại đã tồn tại!");
+        }
+        if (userRepository.existsByUsernameAndIdNot(staffDto.getUsername(), id)) {
+            throw new IllegalArgumentException("Tên tài khoản đã tồn tại!");
+        }
         User staff = userRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("Staff not found"));
-        ;
 
         // Update fields
         staff.setFullName(staffDto.getFullName());
         staff.setPhoneNum(staffDto.getPhoneNumber());
-
+        staff.setUsername(staffDto.getUsername());
         // Only update email if it changed and isn't already taken
         if (!staff.getEmail().equals(staffDto.getEmail())) {
             if (userRepository.existsByEmail(staffDto.getEmail())) {
                 throw new IllegalArgumentException("Email already exists");
             }
             staff.setEmail(staffDto.getEmail());
-            staff.setUsername(staffDto.getEmail());
+
 
         }
         staff.setEnabled(staffDto.isEnabled());

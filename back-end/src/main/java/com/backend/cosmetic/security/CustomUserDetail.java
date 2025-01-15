@@ -15,7 +15,7 @@ public class CustomUserDetail implements UserDetails {
 private User user;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return EMPTY_LIST;
+        return user.getAuthorities();
     }
 
     @Override

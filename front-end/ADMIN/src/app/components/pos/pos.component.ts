@@ -506,7 +506,7 @@ export class POSComponent implements OnInit, OnDestroy {
   }
 
   toggleQRModal(): void {
-    this.qrImageUrl = `https://img.vietqr.io/image/TPB-84402072002-print.png?amount=${this.getSubTotal()}&addInfo=Thanh%20toan%20don%20hang%20${this.currentOrder.id}&accountName=DO%20XUAN%20NGA`;
+    this.qrImageUrl = `https://img.vietqr.io/image/TPB-84402072002-print.png?amount=${this.getTotal()}&addInfo=Thanh%20toan%20don%20hang%20${this.currentOrder.id}&accountName=DO%20XUAN%20NGA`;
     this.showQRModal = !this.showQRModal;
   }
 

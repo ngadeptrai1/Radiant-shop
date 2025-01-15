@@ -134,20 +134,26 @@
         
         <!-- Status update button -->
          @if (!(order.paymentStatus == 'UNPAID' && order.paymentMethod == 'CARD') ) {
-        <button *ngIf="canUpdateStatus()" 
+
+          @if(order.status == 'PENDING') {
+              <!-- Nút xác nhận đơn -->
+        <button *ngIf="order?.status == 'PENDING'" 
+                class="btn btn-primary me-2" 
+                (click)="openModal('confirm')">
+          <i class="fas fa-check me-2"></i>
+          Xác nhận đơn hàng
+        </button>
+          }@else {
+               <button *ngIf="canUpdateStatus()" 
                 class="btn btn-primary me-2" 
                 (click)="openModal('update')">
           <i class="fas fa-arrow-right me-2"></i>
           {{getNextStatusLabel()}}
         </button>
+          }
+     
       }
-        <!-- Nút xác nhận đơn -->
-        <!-- <button *ngIf="canConfirmOrder()" 
-                class="btn btn-primary me-2" 
-                (click)="openModal('confirm')">
-          <i class="fas fa-check me-2"></i>
-          Xác nhận đơn hàng
-        </button> -->
+      
 
         <!-- Nút hủy đơn -->
         <button *ngIf="canCancel()" 

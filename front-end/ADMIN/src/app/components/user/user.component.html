@@ -73,14 +73,20 @@
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef> Thao tác </th>
             <td mat-cell *matCellDef="let user">
-              <button mat-icon-button color="primary" (click)="openUserDialog(user)" 
+              @if(user.id != 11){
+                @if (currentUserId != user.id) {  
+                  <button mat-icon-button color="primary" (click)="openUserDialog(user)" 
                       matTooltip="Sửa">
                 <mat-icon>edit</mat-icon>
-              </button>
-              <button mat-icon-button color="warn" (click)="deleteUser(user.id)"
+              </button>}
+              @if (currentUserId != user.id) {  
+                <button mat-icon-button color="warn" (click)="deleteUser(user.id)"
                       matTooltip="Xóa">
                 <mat-icon>delete</mat-icon>
-              </button>
+              </button>}
+              }
+            
+            
             </td>
           </ng-container>
 

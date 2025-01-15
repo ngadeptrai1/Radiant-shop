@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { UserResponse, UserRequest } from '../../../../type';
 import { MatProgressSpinnerModule, MatSpinner } from '@angular/material/progress-spinner';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-user-dialog',
@@ -51,7 +52,7 @@ import { MatSlideToggle } from '@angular/material/slide-toggle';
         @if (data.type == 'Staff') {
                <mat-form-field appearance="outline">
             <mat-label>Tên đăng nhập</mat-label>
-            <input matInput formControlName="username" required>
+            <input matInput formControlName="username" required >
             <mat-error>{{getErrorMessage('username')}}</mat-error>
           </mat-form-field>
             
@@ -82,7 +83,7 @@ import { MatSlideToggle } from '@angular/material/slide-toggle';
       <div mat-dialog-actions align="end">
         <button mat-button type="button" [disabled]="isLoading" (click)="onCancel()">Hủy</button>
         <button mat-raised-button color="primary" type="submit" 
-                [disabled]="!userForm.valid || isLoading">
+                [disabled]="!userForm.valid || isLoading || userId == data.user?.id">
           {{data.user ? 'Cập nhật' : 'Thêm'}}
           @if (isLoading) {
             <mat-spinner diameter="20" style="margin-left: 8px;"></mat-spinner>
@@ -105,7 +106,7 @@ export class UserDialogComponent {
   userForm: FormGroup;
   isLoading = false;
   @Output() submitForm = new EventEmitter<UserRequest>();
-
+  userId : any ='';
   constructor(
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<UserDialogComponent>,
@@ -113,11 +114,12 @@ export class UserDialogComponent {
       user?: UserResponse,
       type: 'Customer' | 'Staff',
       roles: string[]
-    }
+    } ,
+    private cookieService: CookieService,
   ) {
     const isNewStaff = data.type == 'Staff' && !data.user;
     console.log(data);
-    
+    this.userId = this.cookieService.get('USER_ID');
     this.userForm = this.fb.group({
       username: [data.user?.username || '', data.type == 'Staff' ? [
         Validators.required,
@@ -129,7 +131,6 @@ export class UserDialogComponent {
         Validators.required, 
         Validators.minLength(2), 
         Validators.maxLength(50), 
-        Validators.pattern(/^[a-zA-ZÀ-ỹ\s]*$/) 
       ]],
       email: [data.user?.email || '', [ 
         Validators.email, 

@@ -20,6 +20,7 @@ export class HomeComponent implements OnInit {
   selectedYear: number = new Date().getFullYear();
   availableYears: number[] = [];
   topSellingProducts: any[] = [];
+  monthlyRevenueChart: Chart | undefined;
 
   constructor(private statisticService: StatisticService) {}
 
@@ -68,7 +69,13 @@ export class HomeComponent implements OnInit {
   private initMonthlyRevenueChart() {
     this.statisticService.getMonthlyRevenueChart(this.selectedYear).subscribe(data => {
       const ctx = document.getElementById('monthlyRevenueChart') as HTMLCanvasElement;
-      new Chart(ctx, {
+      
+      // Destroy existing chart instance if it exists
+      if (this.monthlyRevenueChart) {
+        this.monthlyRevenueChart.destroy();
+      }
+
+      this.monthlyRevenueChart = new Chart(ctx, {
         type: 'line',
         data: {
           labels: data.labels,

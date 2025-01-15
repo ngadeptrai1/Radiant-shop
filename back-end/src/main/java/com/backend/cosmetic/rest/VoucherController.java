@@ -10,6 +10,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -24,7 +27,7 @@ public class VoucherController {
     private final VoucherService voucherService;
 
     @PostMapping
-    public ResponseEntity<?> createVoucher(@RequestBody VoucherDTO voucherDTO) throws IOException {
+    public ResponseEntity<?> createVoucher(@RequestBody VoucherDTO voucherDTO ) throws IOException {
         return ResponseEntity.status(HttpStatus.CREATED).body(voucherService.save(voucherDTO));
     }
 
@@ -35,13 +38,19 @@ public class VoucherController {
 
     @GetMapping
     public ResponseEntity<?> getAllVouchers() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println(authentication.getPrincipal());
+        System.out.println(authentication);
+        System.out.println("Authorities: " + authentication.getAuthorities());
         return ResponseEntity.ok(voucherService.findAll());
     }
-
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateVoucher(@PathVariable Long id, @RequestBody VoucherDTO voucherDTO) {
+    public ResponseEntity<?> updateVoucher(@PathVariable Long id, @RequestBody VoucherDTO voucherDTO
+            ,@AuthenticationPrincipal String jwt) {
+        System.out.println(jwt);
         return ResponseEntity.ok(voucherService.update(id, voucherDTO));
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteVoucher(@PathVariable Long id) {

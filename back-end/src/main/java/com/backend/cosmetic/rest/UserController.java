@@ -97,6 +97,7 @@ public class UserController {
         return ResponseEntity.ok(userService.createStaff(staffDto));
     }
 
+
     @PutMapping("/staff/{id}")
     public ResponseEntity<?> updateStaff(@PathVariable Long id, @RequestBody @Valid StaffCreateDto staffDto) {
         return ResponseEntity.ok(userService.updateStaff(id, staffDto));

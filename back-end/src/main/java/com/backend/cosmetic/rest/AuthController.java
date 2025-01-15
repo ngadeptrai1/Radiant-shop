@@ -121,7 +121,7 @@ public class AuthController {
             if (!hasValidRole) {
                 throw new BadCredentialsException("Username or password incorrect");
             }
-
+            System.out.println("role "+auth.getAuthorities().toString());
             return ResponseEntity.ok(tokenGenerator.createToken(auth));
         } catch (UsernameNotFoundException usernameNotFoundException) {
             throw new UsernameNotFoundException("Username or password incorrect");

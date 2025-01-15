@@ -41,6 +41,7 @@ export class VoucherDialogComponent {
     this.selectedStartDate = data.voucher?.startDate;
     if(data.voucher){
       this.currentDate =  data.voucher?.startDate;
+      this.curentType = data.voucher?.type;
     }
     this.form = this.fb.group({
       id: [data.voucher?.id],
@@ -96,11 +97,12 @@ export class VoucherDialogComponent {
       ],
       active: [data.voucher?.active ?? true]
     });
-
+   
+    
     // Validate value based on type
     this.form.get('type')?.valueChanges.subscribe(type => {
       const valueControl = this.form.get('value');
-      if (type === 'PERCENTAGE') {
+      if (type == 'PERCENTAGE') {
         valueControl?.setValidators([
           Validators.required,
           Validators.min(1),
@@ -134,7 +136,7 @@ export class VoucherDialogComponent {
     }
 
     // Kiểm tra giá trị giảm giá
-    if (type === 'FIXED_AMOUNT') {
+    if (type == 'FIXED_AMOUNT') {
       if (value > minOrderAmount) {
         this.showError('Giá trị giảm không được lớn hơn giá trị đơn hàng tối thiểu');
         return false;
@@ -143,7 +145,7 @@ export class VoucherDialogComponent {
         this.showError('Giá trị giảm không được vượt quá 10.000.000đ');
         return false;
       }
-    } else if (type === 'PERCENTAGE') {
+    } else if (type == 'PERCENTAGE') {
       if (value > 100) {
         this.showError('Phần trăm giảm giá không được vượt quá 100%');
         return false;

@@ -21,6 +21,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-user',
@@ -49,7 +50,7 @@ export class UserComponent implements OnInit, AfterViewInit {
   @ViewChild(MatTable) table!: MatTable<UserResponse>;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-  
+  currentUserId:any;
   users: UserResponse[] = [];
   selectedRole: string = 'CUSTOMER';
   roles = ['CUSTOMER', 'STAFF', 'ADMIN'];
@@ -62,9 +63,11 @@ export class UserComponent implements OnInit, AfterViewInit {
   constructor(
     private userService: UserService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private cookieService: CookieService
   ) {
     this.dataSource = new MatTableDataSource<UserResponse>([]);
+    this.currentUserId = this.cookieService.get('USER_ID');
   }
 
   ngOnInit() {
@@ -190,7 +193,7 @@ export class UserComponent implements OnInit, AfterViewInit {
         },
         error: (error) => {
           console.error('Lỗi khi xóa người dùng:', error);
-          this.snackBar.open('Lỗi khi xóa người dùng', 'Đóng', {
+          this.snackBar.open('Bạn không có quyền xóa người dùng', 'Đóng', {
             duration: 3000,
             panelClass: ['error-snackbar']
           });
@@ -258,17 +261,20 @@ export class UserComponent implements OnInit, AfterViewInit {
         dialogRef.close();
       },
       error: (error) => {
-        console.error('Lỗi khi thêm người dùng:', error);
-        let message = `Lỗi khi thêm ${this.activeTab === 'customer' ? 'khách hàng' : 'nhân viên'}`;
-        if (error.message.includes('email')) {
-          message = 'Email đã được sử dụng';
-        } else if (error.message.includes('điện thoại')) {
-          message = 'Số điện thoại đã được sử dụng';
+        console.log(error);
+        if(error.status == 403){
+          this.snackBar.open('Bạn không có quyền thêm người dùng', 'Đóng', {
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          });
+          dialogRef.componentInstance.isLoading = false;
+          return
         }
-        this.snackBar.open(message, 'Đóng', {
+        this.snackBar.open("Số điện thoại, email hoặc tên người dùng đã tồn tại", 'Đóng', {
           duration: 3000,
           panelClass: ['error-snackbar']
         });
+
         dialogRef.componentInstance.isLoading = false;
       }
     });
@@ -287,13 +293,23 @@ export class UserComponent implements OnInit, AfterViewInit {
         dialogRef.close();
       },
       error: (error) => {
-        console.error('Lỗi khi cập nhật người dùng:', error);
-        let message = 'Lỗi khi cập nhật';
-        if (error.message.includes('email')) {
-          message = 'Email đã được sử dụng';
-        } else if (error.message.includes('điện thoại')) {
-          message = 'Số điện thoại đã được sử dụng';
+
+        if(error.status == 403){
+          this.snackBar.open('Bạn không có quyền cập nhật người dùng', 'Đóng', {
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          });
+          dialogRef.componentInstance.isLoading = false;
+          return
         }
+        console.error('Lỗi khi cập nhật người dùng:', error);
+
+        let message = error.error.message +'';
+
+        console.log(message);
+        
+        // message =  'Bạn không có quyền cập nhật người dùng';
+        
         this.snackBar.open(message, 'Đóng', {
           duration: 3000,
           panelClass: ['error-snackbar']

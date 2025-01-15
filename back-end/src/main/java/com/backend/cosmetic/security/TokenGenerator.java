@@ -4,11 +4,13 @@ import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -31,11 +33,11 @@ public class TokenGenerator {
     private String createAccessToken(Authentication authentication) {
         User user  = (User) authentication.getPrincipal();
         Instant now = Instant.now();
-
         JwtClaimsSet claimsSet = JwtClaimsSet.builder()
                 .issuer("myApp")
                 .issuedAt(now)
-                .expiresAt(now.plus(15, ChronoUnit.MINUTES))
+                .claim("roles", authentication.getAuthorities())
+                .expiresAt(now.plus(50, ChronoUnit.MINUTES))
                 .subject(user.getId()+"")
                 .build();
     return accessTokenEncoder.encode(JwtEncoderParameters.from(claimsSet)).getTokenValue();

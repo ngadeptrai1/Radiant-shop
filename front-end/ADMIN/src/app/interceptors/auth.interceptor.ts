@@ -42,7 +42,7 @@ export class AuthInterceptor implements HttpInterceptor {
             duration: 3000,
           });
           this.router.navigate(['/login']);
-        } else if (error.status === 403) {
+        } else if (error.status === 401) {
           // Xử lý lỗi "không đủ quyền"
           this.snackBar.open('Bạn không có quyền truy cập!', 'Đóng', {
             duration: 3000,

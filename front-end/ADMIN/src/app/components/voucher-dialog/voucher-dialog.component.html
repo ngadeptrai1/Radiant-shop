@@ -18,7 +18,15 @@
      
       </mat-form-field>
 
-      <mat-form-field appearance="fill">
+      @if(data.voucher) {
+        <mat-form-field appearance="fill">
+          <mat-label>Loại voucher</mat-label>
+         
+          <input matInput value="{{curentType === 'PERCENTAGE' ? 'Phần trăm' : 'Số tiền cố định'}}" readonly="true">
+
+        </mat-form-field>
+      }@else {
+         <mat-form-field appearance="fill">
         <mat-label>Loại giảm giá</mat-label>
         <mat-select formControlName="type" required (selectionChange)="onSelectionChange($event)">
           @for (type of voucherTypes; track $index) {
@@ -30,6 +38,8 @@
         </mat-select>
       </mat-form-field>
 
+      }
+     
       <mat-form-field appearance="fill">
         <mat-label>Giá trị giảm</mat-label>
         <input matInput type="number" formControlName="value" required>
@@ -54,7 +64,7 @@
        }
         
       </mat-form-field>
-      @if (curentType == 'PERCENTAGE') {
+      @if (curentType === 'PERCENTAGE') {
            <mat-form-field appearance="fill">
         <mat-label>Giảm tối đa</mat-label>
         <input matInput type="number" formControlName="maxDiscountAmount" required >

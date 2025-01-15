@@ -462,7 +462,9 @@ public class OrderServiceImpl implements OrderService {
             if(detail.getQuantity() > productDetail.getQuantity()){
                 throw new DataInvalidException("Một số sản phẩm đã hết hàng hoặc không đủ số lượng");
             }
+            else
             productDetail.setQuantity(productDetail.getQuantity() - detail.getQuantity());
+
             productDetailRepo.save(productDetail);
         }
         //send email

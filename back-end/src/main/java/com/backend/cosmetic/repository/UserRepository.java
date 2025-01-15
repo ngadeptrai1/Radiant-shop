@@ -21,6 +21,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     Optional<User> findByUsername(String username);
     boolean existsByEmail(String email);
+    boolean existsByPhoneNum(String phoneNum);
+    boolean existsByUsername(String userName);
     Optional<User> findByProviderId(String providerId) ;
 
     @Query("SELECT u FROM User u WHERE " +
@@ -60,15 +62,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
                 "WHERE r.role_name = 'CUSTOMER' AND u.active = true and u.enabled = true and u.blocked = false")
     List<UserProjection> findAllCustomers();
 
-    //  Long getId();
-    // String getUsername();
-    // String getEmail();
-    // String getFullName();
-    // String getPhoneNumber();
-    // String getProvider();
-    // boolean isBlocked();
-    // boolean isEnabled();
-    // Set<String> getRoles();
-    // LocalDateTime getCreatedAt();
-    // LocalDateTime getUpdatedAt();
+    boolean existsByEmailAndIdNot(String email, Long id);
+    boolean existsByPhoneNumAndIdNot(String phoneNumber, Long id);
+    boolean existsByUsernameAndIdNot(String userName, Long id);
 }

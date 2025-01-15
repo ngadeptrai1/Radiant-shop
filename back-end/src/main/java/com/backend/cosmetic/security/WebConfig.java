@@ -18,6 +18,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
@@ -37,6 +38,7 @@ import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthen
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -47,6 +49,7 @@ import java.util.List;
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @Slf4j
+@EnableMethodSecurity
 public class WebConfig {
 
     @Autowired
@@ -67,6 +70,15 @@ public class WebConfig {
                 .csrf(AbstractHttpConfigurer::disable)
 
                 .authorizeRequests(authorized -> authorized
+                        .requestMatchers(new AntPathRequestMatcher("/api/v1/vouchers/**", "PUT")).hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/api/v1/vouchers", "POST")).hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/api/v1/vouchers/**", "DELETE")).hasAuthority("ROLE_ADMIN")
+
+                        .requestMatchers(new AntPathRequestMatcher("/api/v1/users", "DELETE")).hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/api/v1/users/staff/**", "DELETE")).hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/api/v1/users/staff/**", "POST")).hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/api/v1/users/staff/**", "PUT")).hasAuthority("ROLE_ADMIN")
+
                         .anyRequest().permitAll())
 
                 .oauth2Login(oauth2 -> oauth2

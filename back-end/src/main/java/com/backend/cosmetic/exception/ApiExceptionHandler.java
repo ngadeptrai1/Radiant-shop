@@ -39,7 +39,8 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler(value = {
-            DataInvalidException.class
+            DataInvalidException.class,
+            IllegalArgumentException.class
     })
     public ResponseEntity<?> handleDataInvalidException(DataInvalidException ex){
         ApiException apiException =  new ApiException(

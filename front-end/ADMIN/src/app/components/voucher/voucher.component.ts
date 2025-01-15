@@ -113,7 +113,7 @@ export class VoucherComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error creating voucher:', error);
-        this.showSnackBar('Lỗi khi thêm voucher');
+        this.showSnackBar('Bạn không có quyền tạo voucher');
         this.isLoading = false;
       }
     });
@@ -133,7 +133,7 @@ export class VoucherComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error updating voucher:', error);
-        this.showSnackBar('Lỗi khi cập nhật voucher');
+        this.showSnackBar('Bạn không có quyền cập nhật voucher');
         this.isLoading = false;
       }
     });
@@ -163,7 +163,7 @@ export class VoucherComponent implements OnInit {
           },
           error: (error) => {
             console.error('Error deleting voucher:', error);
-            this.showSnackBar('Lỗi khi xóa voucher');
+            this.showSnackBar('Bạn không có quyền xóa voucher');
             this.isLoading = false;
           }
         });
