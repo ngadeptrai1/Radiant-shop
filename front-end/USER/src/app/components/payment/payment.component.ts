@@ -405,8 +405,13 @@ export class PaymentComponent implements OnInit, OnDestroy {
       this.showError('Giá trị đơn hàng tối thiểu là 10,000đ');
       return;
     }
-
+ let confirmPrompt = window.confirm('Xác nhận đặt hàng?');
+    if (!confirmPrompt) {
+      return;
+    }
     this.isProcessing = true;
+
+   
 
     try {
       const formValue = this.paymentForm.value;

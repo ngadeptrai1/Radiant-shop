@@ -3,9 +3,10 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
   <mat-dialog-content>
     <div class="form-grid">
-      <mat-form-field appearance="fill">
+      @if (data.voucher) {
+          <mat-form-field appearance="fill">
         <mat-label>Mã voucher</mat-label>
-        <input matInput formControlName="code" required >
+        <input matInput formControlName="code" required readonly="true" >
         <mat-hint>Chỉ chấp nhận chữ, số, gạch ngang và gạch dưới (4-20 ký tự)</mat-hint>
         @if (form.get('code')?.hasError('required') ) {
           <mat-error >
@@ -17,6 +18,23 @@
         </mat-error>}
      
       </mat-form-field>
+      }
+      @else {
+        <mat-form-field appearance="fill">
+      <mat-label>Mã voucher</mat-label>
+      <input matInput formControlName="code" required >
+      <mat-hint>Chỉ chấp nhận chữ, số, gạch ngang và gạch dưới (4-20 ký tự)</mat-hint>
+      @if (form.get('code')?.hasError('required') ) {
+        <mat-error >
+        Mã voucher là bắt buộc
+      </mat-error>
+      }
+      @if (form.get('code')?.hasError('pattern') ) {   <mat-error >
+        Mã voucher không hợp lệ
+      </mat-error>}
+   
+    </mat-form-field>
+    }
 
       @if(data.voucher) {
         <mat-form-field appearance="fill">
@@ -168,7 +186,7 @@
 
   <mat-dialog-actions align="end">
     <button mat-button type="button" (click)="onCancel()">Hủy</button>
-    <button mat-raised-button color="primary" type="submit" [disabled]="form.valid">
+    <button mat-raised-button color="primary" type="submit">
       {{data.voucher ? 'Cập nhật' : 'Thêm mới'}}
     </button>
   </mat-dialog-actions>

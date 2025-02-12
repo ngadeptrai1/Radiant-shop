@@ -91,7 +91,7 @@ export class VoucherDialogComponent {
         data.voucher?.description,
         [
           Validators.required,
-          Validators.minLength(10),
+          Validators.minLength(5),
           Validators.maxLength(500)
         ]
       ],
